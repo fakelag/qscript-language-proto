@@ -79,4 +79,18 @@ namespace Lexer
 
 		return symbols;
 	}
+
+	std::string Stringify( const std::vector< Grammar::SymbolInfo_t >& symbols )
+	{
+		std::string output;
+
+		char szFormat[ 256 ];
+		for ( auto symbol : symbols )
+		{
+			std::snprintf( szFormat, sizeof( szFormat ), "%s | lbp: %i\n", symbol.m_Token.c_str(), symbol.m_LBP );
+			output += szFormat;
+		}
+
+		return output;
+	}
 }
