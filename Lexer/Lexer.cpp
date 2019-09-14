@@ -15,7 +15,7 @@ namespace Lexer
 			commonSymbols.push_back( it->second );
 
 		// Sort the common symbols to have longest character words at the top
-		std::sort( commonSymbols.begin(), commonSymbols.end(), []( Grammar::SymbolInfo_t a, Grammar::SymbolInfo_t b )
+		std::sort( commonSymbols.begin(), commonSymbols.end(), []( Grammar::SymbolInfo_t a, Grammar::SymbolInfo_t b ) -> bool
 		{
 			return a.m_Token.length() > b.m_Token.length();
 		} );
@@ -26,7 +26,7 @@ namespace Lexer
 		// Iterate through source and look for common symbols
 		for ( auto srcIt = source.cbegin(); srcIt != source.cend(); ++srcIt )
 		{
-			auto findSymbol = [ &commonSymbols, &symbols, &stringBuffer ]( std::string pattern ) -> bool {
+			auto findSymbol = [ &commonSymbols, &symbols, &stringBuffer ]( std::string pattern ) -> int {
 				// Iterate all the commons
 				for ( auto symIt = commonSymbols.cbegin(); symIt != commonSymbols.cend(); ++symIt )
 				{
@@ -41,18 +41,26 @@ namespace Lexer
 
 						// Push the found common symbol
 						symbols.push_back( *symIt );
-						return true;
+						return symIt->m_Token.length();
 					}
 				}
 
-				return false;
+				return 0;
 			};
 
-			if ( findSymbol( source.substr( std::distance( source.cbegin(), srcIt ), longestToken ) ) )
+			int nCommonLength = findSymbol( source.substr( std::distance( source.cbegin(), srcIt ), longestToken ) );
+
+			if ( nCommonLength > 0 )
+			{
+				// Increment the iterator by the amount of characters in the symbol
+				srcIt += nCommonLength - 1;
 				continue;
+			}
 
 			switch ( *srcIt )
 			{
+			case '\n':
+			case '\t':
 			case ' ':
 				if ( stringBuffer.length() > 0 )
 				{
