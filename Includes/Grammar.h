@@ -9,7 +9,9 @@ namespace Grammar
 		LBP_NAME			= 0,
 		LBP_SCOLON			= 0,
 		LBP_ASSIGN			= 10,
-		LBP_ARITHMETIC		= 40,
+		LBP_ARITHMETIC_1	= 40,
+		LBP_ARITHMETIC_2	= 50,
+		LBP_ARITHMETIC_3	= 60,
 	};
 
 	enum SymbolGroup
@@ -39,10 +41,10 @@ namespace Grammar
 	};
 
 	static const std::map<Symbol, SymbolInfo_t> LanguageSymbols = {
-		{ S_ADD,		{ "+", LBP_ARITHMETIC, SG_ARITHMETIC } },
-		{ S_SUB,		{ "-", LBP_ARITHMETIC, SG_ARITHMETIC } },
-		{ S_MUL,		{ "*", LBP_ARITHMETIC, SG_ARITHMETIC } },
-		{ S_DIV,		{ "/", LBP_ARITHMETIC, SG_ARITHMETIC } },
+		{ S_ADD,		{ "+", LBP_ARITHMETIC_1, SG_ARITHMETIC } },
+		{ S_SUB,		{ "-", LBP_ARITHMETIC_1, SG_ARITHMETIC } },
+		{ S_MUL,		{ "*", LBP_ARITHMETIC_2, SG_ARITHMETIC } },
+		{ S_DIV,		{ "/", LBP_ARITHMETIC_2, SG_ARITHMETIC } },
 		{ S_SCOLON,		{ ";", LBP_SCOLON, SG_SCOLON } },
 	};
 }
