@@ -14,19 +14,31 @@
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
     <Filter Include="Shared">
-      <UniqueIdentifier>{8f6b16b7-9fed-4ed4-98ae-5bb784b7af2d}</UniqueIdentifier>
+      <UniqueIdentifier>{2c755679-0352-4f1a-91db-4ae5c71f5c4b}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Lexer.cpp">
+    <ClCompile Include="Parser.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Shared\AST.cpp">
+      <Filter>Shared</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Shared\Value.cpp">
+      <Filter>Shared</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Includes\Grammar.h">
       <Filter>Shared</Filter>
     </ClInclude>
-    <ClInclude Include="..\Includes\Lexer.h">
+    <ClInclude Include="..\Includes\Parser.h">
+      <Filter>Shared</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Includes\AST.h">
+      <Filter>Shared</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Includes\Value.h">
       <Filter>Shared</Filter>
     </ClInclude>
   </ItemGroup>
