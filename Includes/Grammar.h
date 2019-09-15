@@ -32,6 +32,11 @@ namespace Grammar
 		SG_BRACKET,
 		SG_FEATURE,
 		SG_NAME,
+		SG_INTCONST,
+		// Double constants are the responsibility of parser instead of the lexer
+		// since the dot operator may have a different meaning depending on the resolved expression type.
+		SG_DOUBLECONST,
+		SG_STRCONST,
 		SG_OTHER,
 	};
 
@@ -49,6 +54,7 @@ namespace Grammar
 		S_ASSIGN_SUB,
 		S_ASSIGN_MUL,
 		S_ASSIGN_DIV,
+		S_ASSIGN_MOD,
 		S_LOGIC_AND,
 		S_LOGIC_OR,
 		S_LOGIC_NOT,
@@ -71,6 +77,7 @@ namespace Grammar
 		S_MUL,
 		S_DIV,
 		S_POW,
+		S_MOD,
 		S_SEMICOLON,
 		S_COLON,
 		S_IF,
@@ -90,6 +97,7 @@ namespace Grammar
 		{ S_ASSIGN_SUB,		{ "-=",			LBP_ASSIGN,			SG_ASSIGNMENT } },
 		{ S_ASSIGN_MUL,		{ "*=",			LBP_ASSIGN,			SG_ASSIGNMENT } },
 		{ S_ASSIGN_DIV,		{ "/=",			LBP_ASSIGN,			SG_ASSIGNMENT } },
+		{ S_ASSIGN_MOD,		{ "%=",			LBP_ASSIGN,			SG_ASSIGNMENT } },
 
 		// Logical operators
 		{ S_LOGIC_AND,		{ "&&",			LBP_LOGIC,			SG_LOGICAL } },
@@ -121,6 +129,7 @@ namespace Grammar
 		{ S_SUB,			{ "-",			LBP_ARITHMETIC_1,	SG_ARITHMETIC } },
 		{ S_MUL,			{ "*",			LBP_ARITHMETIC_2,	SG_ARITHMETIC } },
 		{ S_DIV,			{ "/",			LBP_ARITHMETIC_2,	SG_ARITHMETIC } },
+		{ S_MOD,			{ "%",			LBP_ARITHMETIC_2,	SG_ARITHMETIC } },
 		{ S_POW,			{ "**",			LBP_ARITHMETIC_3,	SG_ARITHMETIC } },
 
 		// Separators
