@@ -13,6 +13,9 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Shared">
+      <UniqueIdentifier>{a54097cd-1ee0-43a5-acf9-d6c508f96dc1}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="LexerTests.cpp">
@@ -21,6 +24,15 @@
     <ClCompile Include="UnitTests.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="ValueTests.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Shared\AST.cpp">
+      <Filter>Shared</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Shared\Value.cpp">
+      <Filter>Shared</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="UnitTests.h">
@@ -28,6 +40,21 @@
     </ClInclude>
     <ClInclude Include="Tests.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Includes\AST.h">
+      <Filter>Shared</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Includes\Grammar.h">
+      <Filter>Shared</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Includes\Lexer.h">
+      <Filter>Shared</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Includes\Parser.h">
+      <Filter>Shared</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Includes\Value.h">
+      <Filter>Shared</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

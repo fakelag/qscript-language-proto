@@ -124,10 +124,18 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\Shared\AST.cpp" />
+    <ClCompile Include="..\Shared\Value.cpp" />
     <ClCompile Include="LexerTests.cpp" />
     <ClCompile Include="UnitTests.cpp" />
+    <ClCompile Include="ValueTests.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\Includes\AST.h" />
+    <ClInclude Include="..\Includes\Grammar.h" />
+    <ClInclude Include="..\Includes\Lexer.h" />
+    <ClInclude Include="..\Includes\Parser.h" />
+    <ClInclude Include="..\Includes\Value.h" />
     <ClInclude Include="Tests.h" />
     <ClInclude Include="UnitTests.h" />
   </ItemGroup>

@@ -19,5 +19,8 @@ int main()
 
 	// Call tests
 	RunLexerTests();
+	RunValueTests();
+
+	std::getchar();
 	return 0;
 }

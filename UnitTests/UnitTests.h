@@ -30,8 +30,7 @@ for ( TestResult_t result : testResults) { \
 		for ( std::string failedCondition : result.m_FailedConditions) \
 			std::cout << "\t\t Assert: " << failedCondition << std::endl; \
 	} \
-} \
-std::getchar();
+}
 
 #define UTEST_CASE( description ) \
 testResults.push_back( { description, false } ); \
