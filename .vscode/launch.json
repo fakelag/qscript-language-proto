@@ -1,0 +1,34 @@
+{
+	// Use IntelliSense to learn about possible attributes.
+	// Hover to view descriptions of existing attributes.
+	// For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+	"version": "0.2.0",
+	"configurations": [
+		{
+			"name": "Launch CLI Lexer",
+			"type": "cppdbg",
+			"request": "launch",
+			"program": "${workspaceFolder}/OSX/Lib/CLI.o",
+			"args": ["-target", "lexer"],
+			"stopAtEntry": false,
+			"cwd": "${workspaceFolder}",
+			"environment": [],
+			"externalConsole": true,
+			"preLaunchTask": "buildCli",
+			"MIMode": "lldb"
+		},
+		{
+			"name": "Launch CLI Parser",
+			"type": "cppdbg",
+			"request": "launch",
+			"program": "${workspaceFolder}/OSX/Lib/CLI.o",
+			"args": ["-target", "parser"],
+			"stopAtEntry": false,
+			"cwd": "${workspaceFolder}",
+			"environment": [],
+			"externalConsole": true,
+			"preLaunchTask": "buildCli",
+			"MIMode": "lldb"
+		}
+	]
+}
