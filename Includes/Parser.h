@@ -3,10 +3,11 @@
 #include <vector>
 
 #include "Grammar.h"
+#include "Lexer.h"
 #include "AST.h"
 
 namespace Parser
 {
-	std::vector< Grammar::SymbolInfo_t > Parse( const std::string source );
+	std::vector< AST::IExpression > Parse( const std::vector< Lexer::LexerSymbol_t >& symbols );
 	// std::string Stringify( const std::vector< Grammar::SymbolInfo_t >& symbols );
 }
