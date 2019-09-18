@@ -20,6 +20,8 @@ namespace Value
 	class CValue
 	{
 	public:
+		CValue();
+		CValue( const CValue& value );
 		CValue( const std::string& string );
 		CValue( const char* string );
 		CValue( int integer );
@@ -39,6 +41,23 @@ namespace Value
 		FORCEINLINE bool				GetBool()			const { return !!GetInt(); };
 		FORCEINLINE ValueType			GetType()			const { return m_ValueType; };
 
+		FORCEINLINE CValue operator=(const CValue& other)
+		{
+			switch (other.m_ValueType)
+			{
+				case VT_STRING:
+					SetString( other.m_StringValue );
+					return *this;
+				case VT_INTEGER:
+					SetInt( other.m_IntValue );
+					return *this;
+				case VT_DOUBLE:
+					SetDouble( other.m_DoubleValue );
+					return *this;
+				default:
+					throw "Invalid operation";
+			}
+		}
 
 	private:
 		std::string			m_StringValue;
