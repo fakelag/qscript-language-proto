@@ -1,16 +1,17 @@
 #pragma once
 
 #include <string>
+#include <vector>
+#include "Value.h"
 #include "Lexer.h"
 
 namespace AST
 {
-	class CValue;
-
 	enum ExpressionType
 	{
 		ET_SIMPLE = 0,
 		ET_VALUE,
+		ET_LIST,
 		ET_COMPLEX,
 	};
 
@@ -19,12 +20,14 @@ namespace AST
 	public:
 		virtual ~IExpression() {};
 		virtual ExpressionType Type() = 0;
+		virtual std::string ToString(int indent = 1) = 0;
 	};
 
-	class CComplexExpression : IExpression
+	class CComplexExpression : public IExpression
 	{
 	public:
 		CComplexExpression( IExpression* lhs, IExpression* rhs, const std::string& token, const Lexer::DebugInfo_t& dbg );
+		std::string ToString(int indent);
 		ExpressionType Type() { return ET_COMPLEX; };
 	private:
 		IExpression*			m_LHS;
@@ -33,10 +36,11 @@ namespace AST
 		std::string				m_Token;
 	};
 
-	class CSimpleExpression : IExpression
+	class CSimpleExpression : public IExpression
 	{
 	public:
 		CSimpleExpression( IExpression* expression, const std::string& token, const Lexer::DebugInfo_t& dbg );
+		std::string ToString(int indent);
 		ExpressionType Type() { return ET_SIMPLE; };
 	private:
 		IExpression*			m_Expression;
@@ -44,14 +48,27 @@ namespace AST
 		std::string				m_Token;
 	};
 
-	class CValueExpression : IExpression
+	class CValueExpression : public IExpression
 	{
 	public:
-		CValueExpression( CValue* value, const std::string& token, const Lexer::DebugInfo_t& dbg );
+		CValueExpression( const Value::CValue& value, const std::string& token, const Lexer::DebugInfo_t& dbg );
+		std::string ToString(int indent);
 		ExpressionType Type() { return ET_VALUE; };
 	private:
-		CValue*					m_Value;
+		Value::CValue			m_Value;
 		Lexer::DebugInfo_t		m_DebugInfo;
 		std::string				m_Token;
+	};
+
+	class CListExpression : public IExpression
+	{
+	public:
+		CListExpression( const std::vector< IExpression* >& list, const std::string& token, const Lexer::DebugInfo_t& dbg );
+		std::string ToString(int indent);
+		ExpressionType Type() { return ET_LIST; };
+	private:
+		std::vector< IExpression* >	m_List;
+		Lexer::DebugInfo_t			m_DebugInfo;
+		std::string					m_Token;
 	};
 }
