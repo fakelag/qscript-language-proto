@@ -19,11 +19,6 @@ namespace AST
 		std::string output = std::string(indent - 1 < 0 ? indent : indent - 1, '\t') + "{\n";
 		output += std::string(indent, '\t') + "type: COMPLEX\n";
 		output += std::string(indent, '\t') + "token: " + m_Token + "\n";
-		// output += std::string(indent, '\t')
-		// 	+ "dbg: line "+ std::to_string(m_DebugInfo.m_LineNr)
-		// 	+ " col " + std::to_string(m_DebugInfo.m_ColNr)
-		// 	+ "\n";
-
 		output += std::string(indent, '\t') + "lhs: \n" + m_LHS->ToString(indent + 1);
 		output += std::string(indent, '\t') + "rhs: \n" + m_RHS->ToString(indent + 1);
 		output += std::string(indent - 1 < 0 ? indent : indent - 1, '\t') + "}\n";
@@ -42,11 +37,6 @@ namespace AST
 		std::string output = std::string(indent - 1 < 0 ? indent : indent - 1, '\t') + "{\n";
 		output += std::string(indent, '\t') + "type: SIMPLE\n";
 		output += std::string(indent, '\t') + "token: " + m_Token + "\n";
-		// output += std::string(indent, '\t')
-		// 	+ "dbg: line "+ std::to_string(m_DebugInfo.m_LineNr)
-		// 	+ " col " + std::to_string(m_DebugInfo.m_ColNr)
-		// 	+ "\n";
-
 		output += std::string(indent, '\t') + "expression: \n" + m_Expression->ToString(indent + 1);
 		output += std::string(indent - 1 < 0 ? indent : indent - 1, '\t') + "}\n";
 		return output;
@@ -69,12 +59,6 @@ namespace AST
 
 		std::string output = std::string(indent - 1 < 0 ? indent : indent - 1, '\t') + "{\n";
 		output += std::string(indent, '\t') + "type: VALUE\n";
-		// output += std::string(indent, '\t') + "token: " + m_Token + "\n";
-		// output += std::string(indent, '\t')
-		// 	+ "dbg: line "+ std::to_string(m_DebugInfo.m_LineNr)
-		// 	+ " col " + std::to_string(m_DebugInfo.m_ColNr)
-		// 	+ "\n";
-
 		output += std::string(indent, '\t') + "value: " + m_Value.GetString() + "\n";
 		output += std::string(indent, '\t') + "valueType: " + std::string(s_ValueTypes[m_Value.GetType()]) + "\n";
 		output += std::string(indent - 1 < 0 ? indent : indent - 1, '\t') + "}\n";
@@ -92,12 +76,6 @@ namespace AST
 	{
 		std::string output = std::string(indent - 1 < 0 ? indent : indent - 1, '\t') + "{\n";
 		output += std::string(indent, '\t') + "type: LIST\n";
-		// output += std::string(indent, '\t') + "token: " + m_Token + "\n";
-		// output += std::string(indent, '\t')
-		// 	+ "dbg: line "+ std::to_string(m_DebugInfo.m_LineNr)
-		// 	+ " col " + std::to_string(m_DebugInfo.m_ColNr)
-		// 	+ "\n";
-
 		output += std::string(indent, '\t') + "length: " + std::to_string(m_List.size()) + "\n";
 		output += std::string(indent, '\t') + "items: [\n";
 
