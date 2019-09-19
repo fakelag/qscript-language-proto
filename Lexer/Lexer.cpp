@@ -4,17 +4,23 @@
 
 namespace Lexer
 {
+	struct CommonSymbol_t
+	{
+		Grammar::SymbolInfo_t 	m_Info;
+		Grammar::Symbol 		m_Symbol;
+	};
+
 	std::vector< LexerSymbol_t > Parse( const std::string source )
 	{
 		std::vector< LexerSymbol_t > symbols;
-		std::vector< Grammar::SymbolInfo_t > commonSymbols;
+		std::vector< CommonSymbol_t > commonSymbols;
 		std::string stringBuffer = "";
 		int currentLineNr = 0;
 		int currentColNr = 0;
 
 		// Map common symbols to a vector
 		for ( auto it = Grammar::LanguageSymbols.cbegin(); it != Grammar::LanguageSymbols.cend(); ++it )
-			commonSymbols.push_back( it->second );
+			commonSymbols.push_back( { it->second, it->first } );
 
 		// Sort the common symbols to have longest character words at the top
 		std::sort( commonSymbols.begin(), commonSymbols.end(), []( Grammar::SymbolInfo_t a, Grammar::SymbolInfo_t b ) -> bool
@@ -23,7 +29,7 @@ namespace Lexer
 		} );
 
 		// Get the longest searchable token length
-		int longestToken = commonSymbols.size() > 0 ? commonSymbols[ 0 ].m_Token.length() : 0;
+		int longestToken = commonSymbols.size() > 0 ? commonSymbols[ 0 ].m_Info.m_Token.length() : 0;
 
 		auto pushSymbol = [ &currentLineNr, &currentColNr, &stringBuffer, &symbols ]() -> void {
 			if ( stringBuffer.length() == 0 )
@@ -42,6 +48,7 @@ namespace Lexer
 
 			// Push the last accumulated string as SG_NAME and flush stringBuffer
 			symbols.push_back( {
+				Grammar::S_INVALID,
 				{ stringBuffer, Grammar::LBP_NAME, symbolGroup },
 				{ currentLineNr, currentColNr },
 			} );
@@ -57,15 +64,15 @@ namespace Lexer
 				// Iterate all the commons
 				for ( auto symIt = commonSymbols.cbegin(); symIt != commonSymbols.cend(); ++symIt )
 				{
-					if ( symIt->m_Token == pattern.substr( 0, symIt->m_Token.length() ) )
+					if ( symIt->m_Info.m_Token == pattern.substr( 0, symIt->m_Info.m_Token.length() ) )
 					{
 						pushSymbol();
 
 						// Push the found common symbol
-						symbols.push_back( { *symIt, { currentLineNr, currentColNr } } );
-						currentColNr += symIt->m_Token.length();
+						symbols.push_back( { symIt->m_Symbol, symIt->m_Info, { currentLineNr, currentColNr } } );
+						currentColNr += symIt->m_Info.m_Token.length();
 
-						return symIt->m_Token.length();
+						return symIt->m_Info.m_Token.length();
 					}
 				}
 

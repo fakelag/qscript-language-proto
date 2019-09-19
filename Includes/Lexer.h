@@ -14,6 +14,7 @@ namespace Lexer
 
 	struct LexerSymbol_t
 	{
+		Grammar::Symbol			m_Symbol;
 		Grammar::SymbolInfo_t	m_SymbolInfo;
 		DebugInfo_t				m_DebugInfo;
 	};
