@@ -47,12 +47,12 @@ int main( int argc, const char** argv )
 			Value::CValue varName("x");
 			Value::CValue value("hello world...");
 
-			AST::CValueExpression* valueExpr = new AST::CValueExpression( value, "\"hello world...\"", { 0, 42 } );
-			AST::CValueExpression* varNameExpr = new AST::CValueExpression( varName, "x", { 0, 13 } );
-			AST::CComplexExpression* assignExpr = new AST::CComplexExpression( varNameExpr, valueExpr, "=", { 0, 32 } );
-			AST::CComplexExpression* assignExpr2 = new AST::CComplexExpression( varNameExpr, valueExpr, "=", { 0, 46 } );
-			AST::CListExpression* listExpression = new AST::CListExpression({ assignExpr, assignExpr2 }, "LIST", { 0, 1337 });
-			AST::CSimpleExpression* scopeExpr = new AST::CSimpleExpression( listExpression, "SCOPE", { 0, 0 } );
+			AST::CValueExpression* valueExpr = new AST::CValueExpression( value, Grammar::Symbol::S_INVALID, { 0, 42 } );
+			AST::CValueExpression* varNameExpr = new AST::CValueExpression( varName, Grammar::Symbol::S_INVALID, { 0, 13 } );
+			AST::CComplexExpression* assignExpr = new AST::CComplexExpression( varNameExpr, valueExpr, Grammar::Symbol::S_ASSIGN, { 0, 32 } );
+			AST::CComplexExpression* assignExpr2 = new AST::CComplexExpression( varNameExpr, valueExpr, Grammar::Symbol::S_ASSIGN, { 0, 46 } );
+			AST::CListExpression* listExpression = new AST::CListExpression({ assignExpr, assignExpr2 }, Grammar::Symbol::S_INVALID, { 0, 1337 });
+			AST::CSimpleExpression* scopeExpr = new AST::CSimpleExpression( listExpression, Grammar::Symbol::S_INVALID, { 0, 0 } );
 
 			std::cout << Parser::Stringify({ scopeExpr }) << std::endl;
 		}
