@@ -49,6 +49,7 @@ namespace Grammar
 
 	enum Symbol
 	{
+		S_INVALID = -1, // reserved for names
 		S_ASSIGN = 0,
 		S_ASSIGN_ADD,
 		S_ASSIGN_SUB,
