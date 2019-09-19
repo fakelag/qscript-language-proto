@@ -26,49 +26,49 @@ namespace AST
 	class CComplexExpression : public IExpression
 	{
 	public:
-		CComplexExpression( IExpression* lhs, IExpression* rhs, const std::string& token, const Lexer::DebugInfo_t& dbg );
+		CComplexExpression( IExpression* lhs, IExpression* rhs, Grammar::Symbol symbol, const Lexer::DebugInfo_t& dbg );
 		std::string ToString(int indent);
 		ExpressionType Type() { return ET_COMPLEX; };
 	private:
 		IExpression*			m_LHS;
 		IExpression*			m_RHS;
 		Lexer::DebugInfo_t		m_DebugInfo;
-		std::string				m_Token;
+		Grammar::Symbol			m_Symbol;
 	};
 
 	class CSimpleExpression : public IExpression
 	{
 	public:
-		CSimpleExpression( IExpression* expression, const std::string& token, const Lexer::DebugInfo_t& dbg );
+		CSimpleExpression( IExpression* expression, Grammar::Symbol symbol, const Lexer::DebugInfo_t& dbg );
 		std::string ToString(int indent);
 		ExpressionType Type() { return ET_SIMPLE; };
 	private:
 		IExpression*			m_Expression;
 		Lexer::DebugInfo_t		m_DebugInfo;
-		std::string				m_Token;
+		Grammar::Symbol			m_Symbol;
 	};
 
 	class CValueExpression : public IExpression
 	{
 	public:
-		CValueExpression( const Value::CValue& value, const std::string& token, const Lexer::DebugInfo_t& dbg );
+		CValueExpression( const Value::CValue& value, Grammar::Symbol symbol, const Lexer::DebugInfo_t& dbg );
 		std::string ToString(int indent);
 		ExpressionType Type() { return ET_VALUE; };
 	private:
 		Value::CValue			m_Value;
 		Lexer::DebugInfo_t		m_DebugInfo;
-		std::string				m_Token;
+		Grammar::Symbol			m_Symbol;
 	};
 
 	class CListExpression : public IExpression
 	{
 	public:
-		CListExpression( const std::vector< IExpression* >& list, const std::string& token, const Lexer::DebugInfo_t& dbg );
+		CListExpression( const std::vector< IExpression* >& list, Grammar::Symbol symbol, const Lexer::DebugInfo_t& dbg );
 		std::string ToString(int indent);
 		ExpressionType Type() { return ET_LIST; };
 	private:
 		std::vector< IExpression* >	m_List;
 		Lexer::DebugInfo_t			m_DebugInfo;
-		std::string					m_Token;
+		Grammar::Symbol				m_Symbol;
 	};
 }
