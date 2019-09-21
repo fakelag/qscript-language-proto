@@ -4,21 +4,21 @@ namespace Value
 {
 	CValue::CValue()
 	{
-		m_DoubleValue = 0.0;
-		m_IntValue = 0;
-		m_ValueType = VT_INTEGER;
-		m_StringDouble = 0.0;
-		m_StringInt = 0;
+		m_DoubleValue		= 0.0;
+		m_IntValue			= 0;
+		m_ValueType			= VT_INTEGER;
+		m_StringDouble		= 0.0;
+		m_StringInt			= 0;
 	}
 
 	CValue::CValue( const CValue& value )
 	{
-		m_ValueType = value.m_ValueType;
-		m_DoubleValue = value.m_DoubleValue;
-		m_IntValue = value.m_IntValue;
-		m_StringValue = value.m_StringValue;
-		m_StringDouble = value.m_StringDouble;
-		m_StringInt = value.m_StringInt;
+		m_ValueType			= value.m_ValueType;
+		m_DoubleValue		= value.m_DoubleValue;
+		m_IntValue			= value.m_IntValue;
+		m_StringValue		= value.m_StringValue;
+		m_StringDouble		= value.m_StringDouble;
+		m_StringInt			= value.m_StringInt;
 	}
 
 	CValue::CValue( const std::string& string )
@@ -56,10 +56,13 @@ namespace Value
 		{
 			if ( m_StringDouble == m_DoubleValue )
 			{
+				// A cached value remains from a previous call. Use it.
 				return m_StringValue;
 			}
 			else
 			{
+				// There is no cached value yet, we'll stringify the value and
+				// cache it off for next time
 				m_StringValue = std::to_string( m_DoubleValue );
 				m_StringDouble = m_DoubleValue;
 				return m_StringValue;
