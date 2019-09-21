@@ -44,25 +44,22 @@ namespace Parser
 
 		bool IsFinished()
 		{
-			return m_CurrentSymbol >= m_Symbols.size() - 1;
+			return ( size_t ) m_CurrentSymbol >= m_Symbols.size();
 		}
 
 		const ParserSymbol_t& CurrentSymbol()
 		{
-			if (IsFinished())
+			if ( IsFinished() )
 				throw "Reading tokens past end of stream";
 
-			return m_Symbols[m_CurrentSymbol];
+			return m_Symbols[ m_CurrentSymbol ];
 		}
 
 		// Increments the current symbol index
 		// & returns the previous symbol
 		const ParserSymbol_t& NextSymbol()
 		{
-			if (IsFinished())
-				throw "Reading tokens past end of stream";
-
-			return m_Symbols[++m_CurrentSymbol - 1];
+			return m_Symbols[ ++m_CurrentSymbol - 1];
 		}
 
 		void AddExpression( AST::IExpression* expression )
@@ -85,53 +82,104 @@ namespace Parser
 	{
 		CParserState parserState;
 
-		auto nextExpression = [&parserState](int rbp = 0) -> AST::IExpression*
+		auto nextExpression = [ &parserState ]( int rbp = 0 ) -> AST::IExpression*
 		{
 			auto curSymbol = parserState.NextSymbol();
-			auto leftSide = curSymbol.m_RightBind(curSymbol);
+			auto leftSide = curSymbol.m_RightBind( curSymbol );
 
-			if (rbp == -1)
+			if ( rbp == -1 )
 				return leftSide;
 
-			while (rbp < curSymbol.m_LexerSymbol.m_SymbolInfo.m_LBP)
+			if ( parserState.IsFinished() )
+				throw "Expected end of expression";
+
+			while ( rbp < parserState.CurrentSymbol().m_LBP )
 			{
-				auto nextSymbol = parserState.NextSymbol();
-				leftSide = nextSymbol.m_RightBind(nextSymbol);
+				curSymbol = parserState.NextSymbol();
+				leftSide = curSymbol.m_LeftBind( curSymbol, leftSide );
 			}
 
 			return leftSide;
 		};
 
 		std::vector< ParserSymbol_t > parserSymbols;
-		std::transform(symbols.begin(), symbols.end(), parserSymbols.begin(),
-			[&nextExpression]( const Lexer::LexerSymbol_t& lexerSymbol ) -> ParserSymbol_t {
-				ParserSymbol_t symbol;
-				symbol.m_LexerSymbol = lexerSymbol;
-				symbol.m_LeftBind = NULL;
-				symbol.m_RightBind = NULL;
+		std::transform( symbols.begin(), symbols.end(), std::back_inserter( parserSymbols ),
+			[ &nextExpression ]( const Lexer::LexerSymbol_t& lexerSymbol ) -> ParserSymbol_t {
+			ParserSymbol_t symbol( lexerSymbol );
 
-				switch (lexerSymbol.m_Symbol)
+			switch ( lexerSymbol.m_Symbol )
+			{
+			case Grammar::Symbol::S_INTCNST:
+			{
+				symbol.m_RightBind = [ &nextExpression ]( const ParserSymbol_t& symbol ) -> AST::IExpression*
 				{
-					case Grammar::Symbol::S_ADD:
-					{
-						symbol.m_LeftBind = [&nextExpression](const ParserSymbol_t& symbol, AST::IExpression* left) -> AST::IExpression*
-						{
-							auto right = nextExpression(symbol.m_LexerSymbol.m_SymbolInfo.m_LBP);
-							auto assignExpr = new AST::CComplexExpression( left, right, symbol.m_LexerSymbol.m_Symbol, symbol.m_LexerSymbol.m_DebugInfo );
-							return assignExpr;
-						};
-						break;
-					}
-					default:
-						throw "Unhandled symbol";
-				}
+					Value::CValue intValue( std::stoi( symbol.m_Token ) );
+					return new AST::CValueExpression( intValue, symbol.m_Symbol, symbol.m_Locations );
+				};
+				break;
+			}
+			case Grammar::Symbol::S_NAME:
+			{
+				symbol.m_RightBind = [ &nextExpression ]( const ParserSymbol_t& symbol ) -> AST::IExpression*
+				{
+					Value::CValue intValue( symbol.m_Token );
+					return new AST::CValueExpression( intValue, symbol.m_Symbol, symbol.m_Locations );
+				};
+				break;
+			}
+			case Grammar::Symbol::S_ADD:
+			case Grammar::Symbol::S_SUB:
+			{
+				symbol.m_LeftBind = [ &nextExpression ]( const ParserSymbol_t& symbol, AST::IExpression* left ) -> AST::IExpression*
+				{
+					auto right = nextExpression( symbol.m_LBP );
+					return new AST::CComplexExpression( left, right, symbol.m_Symbol, symbol.m_Locations );
+				};
 
-				return symbol;
-			});
+				symbol.m_RightBind = [ &nextExpression ]( const ParserSymbol_t& symbol ) -> AST::IExpression*
+				{
+					auto right = nextExpression( -1 );
+					return new AST::CSimpleExpression( right, symbol.m_Symbol, symbol.m_Locations );
+				};
+				break;
+			}
+			case Grammar::Symbol::S_MUL:
+			case Grammar::Symbol::S_DIV:
+			case Grammar::Symbol::S_POW:
+			case Grammar::Symbol::S_MOD:
+			case Grammar::Symbol::S_ASSIGN:
+			{
+				symbol.m_LeftBind = [ &nextExpression ]( const ParserSymbol_t& symbol, AST::IExpression* left ) -> AST::IExpression*
+				{
+					auto right = nextExpression( symbol.m_LBP );
+					return new AST::CComplexExpression( left, right, symbol.m_Symbol, symbol.m_Locations );
+				};
+				break;
+			}
+			case Grammar::Symbol::S_VAR:
+			{
+				symbol.m_RightBind = [ &nextExpression ]( const ParserSymbol_t& symbol ) -> AST::IExpression*
+				{
+					auto nameExpr = nextExpression( symbol.m_LBP );
+					return new AST::CSimpleExpression( nameExpr, symbol.m_Symbol, symbol.m_Locations );
+				};
+				break;
+			}
+			case Grammar::Symbol::S_SEMICOLON:
+				break;
+			default:
+				throw "Unhandled symbol";
+			}
 
-		while (!parserState.IsFinished())
+			return symbol;
+		} );
+
+		parserState.AddSymbols( parserSymbols );
+
+		while ( !parserState.IsFinished() )
 		{
-			auto currentSymbol = parserState.NextSymbol();
+			parserState.AddExpression( nextExpression() );
+			parserState.NextSymbol();
 		}
 
 		return parserState.Expressions();
@@ -141,7 +189,7 @@ namespace Parser
 	{
 		std::string output;
 
-		for (auto expression : expressions)
+		for ( auto expression : expressions )
 			output += expression->ToString();
 
 		return output;
