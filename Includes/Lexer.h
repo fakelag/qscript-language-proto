@@ -6,16 +6,12 @@
 
 namespace Lexer
 {
-	struct DebugInfo_t
-	{
-		int						m_LineNr;
-		int						m_ColNr;
-	};
-
 	struct LexerSymbol_t
 	{
-		Grammar::SymbolInfo_t	m_SymbolInfo;
-		DebugInfo_t				m_DebugInfo;
+		Grammar::Symbol				m_Symbol;
+		Grammar::SymbolLoc_t		m_Locations;
+		int							m_LBP;
+		std::string					m_Token;
 	};
 
 	std::vector< LexerSymbol_t > Parse( const std::string source );

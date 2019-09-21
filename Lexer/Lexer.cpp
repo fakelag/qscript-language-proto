@@ -4,36 +4,42 @@
 
 namespace Lexer
 {
+	struct CommonSymbol_t
+	{
+		Grammar::SymbolInfo_t 	m_Info;
+		Grammar::Symbol 		m_Symbol;
+	};
+
 	std::vector< LexerSymbol_t > Parse( const std::string source )
 	{
 		std::vector< LexerSymbol_t > symbols;
-		std::vector< Grammar::SymbolInfo_t > commonSymbols;
+		std::vector< CommonSymbol_t > commonSymbols;
 		std::string stringBuffer = "";
 		int currentLineNr = 0;
 		int currentColNr = 0;
 
 		// Map common symbols to a vector
 		for ( auto it = Grammar::LanguageSymbols.cbegin(); it != Grammar::LanguageSymbols.cend(); ++it )
-			commonSymbols.push_back( it->second );
+			commonSymbols.push_back( { it->second, it->first } );
 
 		// Sort the common symbols to have longest character words at the top
-		std::sort( commonSymbols.begin(), commonSymbols.end(), []( Grammar::SymbolInfo_t a, Grammar::SymbolInfo_t b ) -> bool
+		std::sort( commonSymbols.begin(), commonSymbols.end(), []( CommonSymbol_t a, CommonSymbol_t b ) -> bool
 		{
-			return a.m_Token.length() > b.m_Token.length();
+			return a.m_Info.m_Token.length() > b.m_Info.m_Token.length();
 		} );
 
 		// Get the longest searchable token length
-		int longestToken = commonSymbols.size() > 0 ? commonSymbols[ 0 ].m_Token.length() : 0;
+		int longestToken = commonSymbols.size() > 0 ? commonSymbols[ 0 ].m_Info.m_Token.length() : 0;
 
 		auto pushSymbol = [ &currentLineNr, &currentColNr, &stringBuffer, &symbols ]() -> void {
 			if ( stringBuffer.length() == 0 )
 				return;
 
-			Grammar::SymbolGroup symbolGroup = Grammar::SG_NAME;
+			Grammar::Symbol symbolType = Grammar::S_NAME;
 			try
 			{
 				std::stoi( stringBuffer );
-				symbolGroup = Grammar::SG_INTCONST;
+				symbolType = Grammar::S_INTCNST;
 			}
 			catch ( std::exception e )
 			{
@@ -41,10 +47,12 @@ namespace Lexer
 			}
 
 			// Push the last accumulated string as SG_NAME and flush stringBuffer
-			symbols.push_back( {
-				{ stringBuffer, Grammar::LBP_NAME, symbolGroup },
-				{ currentLineNr, currentColNr },
-			} );
+			symbols.push_back( LexerSymbol_t {
+				symbolType,
+				Grammar::SymbolLoc_t { currentLineNr, currentColNr },
+				Grammar::LBP_NAME,
+				stringBuffer,
+				} );
 
 			currentColNr += stringBuffer.length();
 			stringBuffer = "";
@@ -57,15 +65,21 @@ namespace Lexer
 				// Iterate all the commons
 				for ( auto symIt = commonSymbols.cbegin(); symIt != commonSymbols.cend(); ++symIt )
 				{
-					if ( symIt->m_Token == pattern.substr( 0, symIt->m_Token.length() ) )
+					if ( symIt->m_Info.m_Token == pattern.substr( 0, symIt->m_Info.m_Token.length() ) )
 					{
 						pushSymbol();
 
 						// Push the found common symbol
-						symbols.push_back( { *symIt, { currentLineNr, currentColNr } } );
-						currentColNr += symIt->m_Token.length();
+						symbols.push_back( LexerSymbol_t {
+							symIt->m_Symbol,
+							Grammar::SymbolLoc_t { currentLineNr, currentColNr },
+							symIt->m_Info.m_LBP,
+							symIt->m_Info.m_Token,
+						} );
 
-						return symIt->m_Token.length();
+						currentColNr += symIt->m_Info.m_Token.length();
+
+						return symIt->m_Info.m_Token.length();
 					}
 				}
 
@@ -109,6 +123,8 @@ namespace Lexer
 			}
 		}
 
+		pushSymbol();
+
 		return symbols;
 	}
 
@@ -119,7 +135,7 @@ namespace Lexer
 		char szFormat[ 256 ];
 		for ( auto symbol : symbols )
 		{
-			std::snprintf( szFormat, sizeof( szFormat ), "%s | lbp: %i\n", symbol.m_SymbolInfo.m_Token.c_str(), symbol.m_SymbolInfo.m_LBP );
+			std::snprintf( szFormat, sizeof( szFormat ), "%s | lbp: %i\n", symbol.m_Token.c_str(), symbol.m_LBP );
 			output += szFormat;
 		}
 

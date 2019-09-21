@@ -7,7 +7,7 @@ namespace Grammar
 	enum LeftBindingPower
 	{
 		LBP_NAME			= 0,
-		LBP_FEATURE			= 0,
+		LBP_FEATURE			= 0, // TODO: Split this into multiple (e.g LBP_FORLOOP)
 		LBP_SEMICOLON		= 0,
 		LBP_LOGIC_NOT		= 0,
 		LBP_LOGIC			= 10,
@@ -21,35 +21,26 @@ namespace Grammar
 		LBP_OPENBRACKET		= 80,
 	};
 
-	enum SymbolGroup
+	struct SymbolLoc_t
 	{
-		SG_ARITHMETIC		= 0,
-		SG_ASSIGNMENT,
-		SG_LOGICAL,
-		SG_SEPARATOR,
-		SG_EQUALITY,
-		SG_INCDEC,
-		SG_BRACKET,
-		SG_FEATURE,
-		SG_NAME,
-		SG_INTCONST,
-		// Double constants are the responsibility of parser instead of the lexer
-		// since the dot operator may have a different meaning depending on the resolved expression type.
-		SG_DOUBLECONST,
-		SG_STRCONST,
-		SG_OTHER,
+		int					m_LineNr;
+		int					m_ColNr;
 	};
 
 	struct SymbolInfo_t
 	{
 		std::string			m_Token;
 		int					m_LBP;
-		SymbolGroup			m_Group;
 	};
 
 	enum Symbol
 	{
-		S_ASSIGN = 0,
+		S_NAME,
+		S_STRCNST,
+		S_INTCNST,
+		S_DBLCNST,
+
+		S_ASSIGN,
 		S_ASSIGN_ADD,
 		S_ASSIGN_SUB,
 		S_ASSIGN_MUL,
@@ -88,62 +79,63 @@ namespace Grammar
 		S_BREAK,
 		S_TRUE,
 		S_FALSE,
+		S_SCOPE,
 	};
 
 	static const std::map<Symbol, SymbolInfo_t> LanguageSymbols = {
 		// Assignments
-		{ S_ASSIGN,			{ "=",			LBP_ASSIGN,			SG_ASSIGNMENT } },
-		{ S_ASSIGN_ADD,		{ "+=",			LBP_ASSIGN,			SG_ASSIGNMENT } },
-		{ S_ASSIGN_SUB,		{ "-=",			LBP_ASSIGN,			SG_ASSIGNMENT } },
-		{ S_ASSIGN_MUL,		{ "*=",			LBP_ASSIGN,			SG_ASSIGNMENT } },
-		{ S_ASSIGN_DIV,		{ "/=",			LBP_ASSIGN,			SG_ASSIGNMENT } },
-		{ S_ASSIGN_MOD,		{ "%=",			LBP_ASSIGN,			SG_ASSIGNMENT } },
+		{ S_ASSIGN,			{ "=",			LBP_ASSIGN,			} },
+		{ S_ASSIGN_ADD,		{ "+=",			LBP_ASSIGN,			} },
+		{ S_ASSIGN_SUB,		{ "-=",			LBP_ASSIGN,			} },
+		{ S_ASSIGN_MUL,		{ "*=",			LBP_ASSIGN,			} },
+		{ S_ASSIGN_DIV,		{ "/=",			LBP_ASSIGN,			} },
+		{ S_ASSIGN_MOD,		{ "%=",			LBP_ASSIGN,			} },
 
 		// Logical operators
-		{ S_LOGIC_AND,		{ "&&",			LBP_LOGIC,			SG_LOGICAL } },
-		{ S_LOGIC_OR,		{ "||",			LBP_LOGIC,			SG_LOGICAL } },
-		{ S_LOGIC_NOT,		{ "!",			LBP_LOGIC_NOT,		SG_LOGICAL } },
+		{ S_LOGIC_AND,		{ "&&",			LBP_LOGIC,			} },
+		{ S_LOGIC_OR,		{ "||",			LBP_LOGIC,			} },
+		{ S_LOGIC_NOT,		{ "!",			LBP_LOGIC_NOT,		} },
 
 		// Equality
-		{ S_EQUALS,			{ "==",			LBP_EQUALITY,		SG_EQUALITY } },
-		{ S_EQUALS_NOT,		{ "!=",			LBP_EQUALITY,		SG_EQUALITY } },
-		{ S_MORE_OR_EQUALS,	{ ">=",			LBP_EQUALITY,		SG_EQUALITY } },
-		{ S_LESS_OR_EQUALS,	{ "<=",			LBP_EQUALITY,		SG_EQUALITY } },
-		{ S_MORETHAN,		{ ">",			LBP_EQUALITY,		SG_EQUALITY } },
-		{ S_LESSTHAN,		{ "<",			LBP_EQUALITY,		SG_EQUALITY } },
+		{ S_EQUALS,			{ "==",			LBP_EQUALITY,		} },
+		{ S_EQUALS_NOT,		{ "!=",			LBP_EQUALITY,		} },
+		{ S_MORE_OR_EQUALS,	{ ">=",			LBP_EQUALITY,		} },
+		{ S_LESS_OR_EQUALS,	{ "<=",			LBP_EQUALITY,		} },
+		{ S_MORETHAN,		{ ">",			LBP_EQUALITY,		} },
+		{ S_LESSTHAN,		{ "<",			LBP_EQUALITY,		} },
 
 		// Increment/Decrement
-		{ S_INCREMENT,		{ "++",			LBP_INCDEC,			SG_INCDEC } },
-		{ S_LESSTHAN,		{ "--",			LBP_INCDEC,			SG_INCDEC } },
+		{ S_INCREMENT,		{ "++",			LBP_INCDEC,			} },
+		{ S_LESSTHAN,		{ "--",			LBP_INCDEC,			} },
 
 		// Brackets
-		{ S_BRACKET_OPEN,	{ "{",			0,					SG_BRACKET } },
-		{ S_BRACKET_CLOSE,	{ "}",			0,					SG_BRACKET } },
-		{ S_SBRACKET_OPEN,	{ "[",			LBP_OPENBRACKET,	SG_BRACKET } },
-		{ S_SBRACKET_CLOSE,	{ "]",			0,					SG_BRACKET } },
-		{ S_PARENT_OPEN,	{ "(",			LBP_OPENBRACKET,	SG_BRACKET } },
-		{ S_PARENT_CLOSE,	{ ")",			0,					SG_BRACKET } },
+		{ S_BRACKET_OPEN,	{ "{",			0,					} },
+		{ S_BRACKET_CLOSE,	{ "}",			0,					} },
+		{ S_SBRACKET_OPEN,	{ "[",			LBP_OPENBRACKET,	} },
+		{ S_SBRACKET_CLOSE,	{ "]",			0,					} },
+		{ S_PARENT_OPEN,	{ "(",			LBP_OPENBRACKET,	} },
+		{ S_PARENT_CLOSE,	{ ")",			0,					} },
 
 		// Arithmetics
-		{ S_ADD,			{ "+",			LBP_ARITHMETIC_1,	SG_ARITHMETIC } },
-		{ S_SUB,			{ "-",			LBP_ARITHMETIC_1,	SG_ARITHMETIC } },
-		{ S_MUL,			{ "*",			LBP_ARITHMETIC_2,	SG_ARITHMETIC } },
-		{ S_DIV,			{ "/",			LBP_ARITHMETIC_2,	SG_ARITHMETIC } },
-		{ S_MOD,			{ "%",			LBP_ARITHMETIC_2,	SG_ARITHMETIC } },
-		{ S_POW,			{ "**",			LBP_ARITHMETIC_3,	SG_ARITHMETIC } },
+		{ S_ADD,			{ "+",			LBP_ARITHMETIC_1,	} },
+		{ S_SUB,			{ "-",			LBP_ARITHMETIC_1,	} },
+		{ S_MUL,			{ "*",			LBP_ARITHMETIC_2,	} },
+		{ S_DIV,			{ "/",			LBP_ARITHMETIC_2,	} },
+		{ S_MOD,			{ "%",			LBP_ARITHMETIC_2,	} },
+		{ S_POW,			{ "**",			LBP_ARITHMETIC_3,	} },
 
 		// Separators
-		{ S_SEMICOLON,		{ ";",			LBP_SEMICOLON,		SG_SEPARATOR } },
-		{ S_COLON,			{ ",",			LBP_COLON,			SG_SEPARATOR } },
+		{ S_SEMICOLON,		{ ";",			LBP_SEMICOLON,		} },
+		{ S_COLON,			{ ",",			LBP_COLON,			} },
 
 		// Language Features
-		{ S_IF,				{ "if",			LBP_FEATURE,		SG_FEATURE } },
-		{ S_WHILE,			{ "while",		LBP_FEATURE,		SG_FEATURE } },
-		{ S_VAR,			{ "var",		LBP_FEATURE,		SG_FEATURE } },
-		{ S_FUNC,			{ "function",	LBP_FEATURE,		SG_FEATURE } },
-		{ S_RETURN,			{ "return",		LBP_FEATURE,		SG_FEATURE } },
-		{ S_BREAK,			{ "break",		LBP_FEATURE,		SG_FEATURE } },
-		{ S_TRUE,			{ "true",		LBP_FEATURE,		SG_FEATURE } },
-		{ S_FALSE,			{ "false",		LBP_FEATURE,		SG_FEATURE } },
+		{ S_IF,				{ "if",			LBP_FEATURE,		} },
+		{ S_WHILE,			{ "while",		LBP_FEATURE,		} },
+		{ S_VAR,			{ "var",		-1,					} },
+		{ S_FUNC,			{ "function",	LBP_FEATURE,		} },
+		{ S_RETURN,			{ "return",		LBP_FEATURE,		} },
+		{ S_BREAK,			{ "break",		LBP_FEATURE,		} },
+		{ S_TRUE,			{ "true",		LBP_FEATURE,		} },
+		{ S_FALSE,			{ "false",		LBP_FEATURE,		} },
 	};
 }
