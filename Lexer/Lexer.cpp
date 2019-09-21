@@ -23,9 +23,9 @@ namespace Lexer
 			commonSymbols.push_back( { it->second, it->first } );
 
 		// Sort the common symbols to have longest character words at the top
-		std::sort( commonSymbols.begin(), commonSymbols.end(), []( Grammar::SymbolInfo_t a, Grammar::SymbolInfo_t b ) -> bool
+		std::sort( commonSymbols.begin(), commonSymbols.end(), []( CommonSymbol_t a, CommonSymbol_t b ) -> bool
 		{
-			return a.m_Token.length() > b.m_Token.length();
+			return a.m_Info.m_Token.length() > b.m_Info.m_Token.length();
 		} );
 
 		// Get the longest searchable token length
@@ -35,11 +35,11 @@ namespace Lexer
 			if ( stringBuffer.length() == 0 )
 				return;
 
-			Grammar::SymbolGroup symbolGroup = Grammar::SG_NAME;
+			Grammar::Symbol symbolType = Grammar::S_NAME;
 			try
 			{
 				std::stoi( stringBuffer );
-				symbolGroup = Grammar::SG_INTCONST;
+				symbolType = Grammar::S_INTCNST;
 			}
 			catch ( std::exception e )
 			{
@@ -47,11 +47,12 @@ namespace Lexer
 			}
 
 			// Push the last accumulated string as SG_NAME and flush stringBuffer
-			symbols.push_back( {
-				Grammar::S_INVALID,
-				{ stringBuffer, Grammar::LBP_NAME, symbolGroup },
-				{ currentLineNr, currentColNr },
-			} );
+			symbols.push_back( LexerSymbol_t {
+				symbolType,
+				Grammar::SymbolLoc_t { currentLineNr, currentColNr },
+				Grammar::LBP_NAME,
+				stringBuffer,
+				} );
 
 			currentColNr += stringBuffer.length();
 			stringBuffer = "";
@@ -69,7 +70,13 @@ namespace Lexer
 						pushSymbol();
 
 						// Push the found common symbol
-						symbols.push_back( { symIt->m_Symbol, symIt->m_Info, { currentLineNr, currentColNr } } );
+						symbols.push_back( LexerSymbol_t {
+							symIt->m_Symbol,
+							Grammar::SymbolLoc_t { currentLineNr, currentColNr },
+							symIt->m_Info.m_LBP,
+							symIt->m_Info.m_Token,
+						} );
+
 						currentColNr += symIt->m_Info.m_Token.length();
 
 						return symIt->m_Info.m_Token.length();
@@ -116,6 +123,8 @@ namespace Lexer
 			}
 		}
 
+		pushSymbol();
+
 		return symbols;
 	}
 
@@ -126,7 +135,7 @@ namespace Lexer
 		char szFormat[ 256 ];
 		for ( auto symbol : symbols )
 		{
-			std::snprintf( szFormat, sizeof( szFormat ), "%s | lbp: %i\n", symbol.m_SymbolInfo.m_Token.c_str(), symbol.m_SymbolInfo.m_LBP );
+			std::snprintf( szFormat, sizeof( szFormat ), "%s | lbp: %i\n", symbol.m_Token.c_str(), symbol.m_LBP );
 			output += szFormat;
 		}
 

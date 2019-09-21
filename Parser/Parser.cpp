@@ -1,18 +1,32 @@
 #include <functional>
+#include <algorithm>
 #include "Parser.h"
 
 namespace Parser
 {
 	struct ParserSymbol_t;
 
-	using LeftBindFn = std::function<AST::IExpression*(const ParserSymbol_t& symbol, AST::IExpression* left)>;
-	using RightBindFn = std::function<AST::IExpression*(const ParserSymbol_t& symbol)>;
+	using LeftBindFn = std::function<AST::IExpression*( const ParserSymbol_t& symbol, AST::IExpression* left )>;
+	using RightBindFn = std::function<AST::IExpression*( const ParserSymbol_t& symbol )>;
 
 	struct ParserSymbol_t
 	{
-		Lexer::LexerSymbol_t 	m_LexerSymbol;
-		LeftBindFn				m_LeftBind;
-		RightBindFn				m_RightBind;
+		ParserSymbol_t( Lexer::LexerSymbol_t lexerSymbol )
+		{
+			m_Locations				= lexerSymbol.m_Locations;
+			m_LBP					= lexerSymbol.m_LBP;
+			m_Symbol				= lexerSymbol.m_Symbol;
+			m_Token					= lexerSymbol.m_Token;
+			m_LeftBind				= NULL;
+			m_RightBind				= NULL;
+		}
+
+		Grammar::Symbol				m_Symbol;
+		Grammar::SymbolLoc_t		m_Locations;
+		int							m_LBP;
+		std::string					m_Token;
+		LeftBindFn					m_LeftBind;
+		RightBindFn					m_RightBind;
 	};
 
 	class CParserState
