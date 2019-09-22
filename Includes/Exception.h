@@ -11,7 +11,7 @@ public:
 		m_What = what;
 	}
 
-	const char* what() const { return m_What.c_str(); }
+	const char* what() const _NOEXCEPT { return m_What.c_str(); }
 private:
 	std::string m_What;
 };
