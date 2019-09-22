@@ -45,6 +45,8 @@ namespace Parser
 		CParserState()
 		{
 			m_CurrentSymbol = 0;
+			m_NextErrorSymbol = 0;
+			m_HasErrors = false;
 		}
 
 		void AddSymbols( const std::vector< ParserSymbol_t >& symbols )
@@ -52,12 +54,12 @@ namespace Parser
 			m_Symbols = symbols;
 		}
 
-		bool IsFinished()
+		bool IsFinished() const
 		{
 			return ( size_t ) m_CurrentSymbol >= m_Symbols.size();
 		}
 
-		const ParserSymbol_t& CurrentSymbol()
+		const ParserSymbol_t& CurrentSymbol() const
 		{
 			if ( IsFinished() )
 				throw "Reading tokens past end of stream";
@@ -71,10 +73,41 @@ namespace Parser
 			return m_Symbols[ ++m_CurrentSymbol - 1];
 		}
 
-		void OnException( const Grammar::SymbolLoc_t& location, const std::string& exception )
+		void AddError( const Grammar::SymbolLoc_t& location, const std::string& exception )
 		{
 			m_HasErrors = true;
-			m_Exceptions.AddError( location, exception );
+
+			if ( m_CurrentSymbol >= m_NextErrorSymbol )
+			{
+				m_Exception.AddError( location, exception );
+
+				int nextSymbol = m_CurrentSymbol;
+				while ( nextSymbol < m_Symbols.size() )
+				{
+					switch ( m_Symbols[ nextSymbol ].m_Symbol )
+					{
+					case Grammar::Symbol::S_SEMICOLON:
+					case Grammar::Symbol::S_BRACKET_CLOSE:
+						m_NextErrorSymbol = nextSymbol + 1;
+						break;
+					default:
+						++nextSymbol;
+						continue;
+					}
+
+					break;
+				}
+			}
+		}
+
+		const ParseException& Exception() const
+		{
+			return m_Exception;
+		}
+
+		bool HasErrors() const
+		{
+			return m_HasErrors;
 		}
 
 		void AddExpression( AST::IExpression* expression )
@@ -82,7 +115,7 @@ namespace Parser
 			m_Expressions.push_back( expression );
 		}
 
-		const std::vector< AST::IExpression* >& Expressions()
+		const std::vector< AST::IExpression* >& Expressions() const
 		{
 			return m_Expressions;
 		}
@@ -93,7 +126,8 @@ namespace Parser
 		int 										m_CurrentSymbol;
 
 		bool										m_HasErrors;
-		ParseException								m_Exceptions;
+		int 										m_NextErrorSymbol;
+		ParseException								m_Exception;
 	};
 
 	std::vector< AST::IExpression* > Parse( const std::vector< Lexer::LexerSymbol_t >& symbols )
@@ -110,6 +144,9 @@ namespace Parser
 				// Get the current symbol (and advance to the next one)
 				auto curSymbol = parserState.NextSymbol();
 
+				if (curSymbol.m_RightBind == NULL)
+					throw ParseException( curSymbol.m_Locations, "Expected an expression" );
+
 				// Construct the left hand tree
 				leftHand = curSymbol.m_RightBind( curSymbol );
 
@@ -121,13 +158,13 @@ namespace Parser
 				// this will happen with inputs like "var x = 4 +"
 				// where the last operator is expecting a right hand argument
 				if ( parserState.IsFinished() )
-					throw "Expected end of expression";
+					throw ParseException( curSymbol.m_Locations, "Expected an end of expression" );
 
 				// Call left bind while the current right binding power is less than the
 				// next symbols left binding power. E.g:
 				// 4	+	2	*	2	+	1;
 				//		│		│		└ binding power is 10
-				//		│		│ 
+				//		│		│
 				//		│		└─ binding power is 20
 				//		└─ binding power is 10
 				//
@@ -137,12 +174,17 @@ namespace Parser
 				while ( rbp < parserState.CurrentSymbol().m_LBP )
 				{
 					curSymbol = parserState.NextSymbol();
+
+					if (curSymbol.m_LeftBind == NULL)
+						throw ParseException( curSymbol.m_Locations, "Expected an expression" );
+
 					leftHand = curSymbol.m_LeftBind( curSymbol, leftHand );
 				}
 			}
 			catch ( const ParseException& exception )
 			{
-				parserState.OnException( exception.locations()[ 0 ], exception.errors()[ 0 ] );
+				// Propagate the error, but keep parsing.
+				parserState.AddError( exception.locations()[ 0 ], exception.errors()[ 0 ] );
 			}
 
 			return leftHand;
@@ -230,7 +272,8 @@ namespace Parser
 		}
 		catch ( const ParseException& exception )
 		{
-			parserState.OnException( exception.locations()[ 0 ], exception.errors()[ 0 ] );
+			// Add to the error list
+			parserState.AddError( exception.locations()[ 0 ], exception.errors()[ 0 ] );
 		}
 
 		// Load the symbols
@@ -243,7 +286,9 @@ namespace Parser
 			parserState.NextSymbol();
 		}
 
-		if ( parserState.Exceptions() ) // todo: this
+		// Propagate all the accumulated errors to the caller, if any
+		if ( parserState.HasErrors() )
+			throw parserState.Exception();
 
 		return parserState.Expressions();
 	}
