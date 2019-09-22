@@ -3,6 +3,7 @@
 #include "Lexer.h"
 #include "Parser.h"
 #include "Value.h"
+#include "Exception.h"
 
 bool GetArg( const std::string& argument, std::string& value, int argc, const char** argv )
 {
@@ -44,10 +45,24 @@ int main( int argc, const char** argv )
 		}
 		else if ( target == "parser" )
 		{
-			auto symbols = Lexer::Parse( command );
-			auto syntaxTree = Parser::Parse( symbols );
+			try {
+				auto symbols = Lexer::Parse( command );
+				auto syntaxTree = Parser::Parse( symbols );
 
-			std::cout << Parser::Stringify( syntaxTree ) << std::endl;
+				std::cout << Parser::Stringify( syntaxTree ) << std::endl;
+			}
+			catch ( const ParseException& exception )
+			{
+				std::cout << exception.what() << std::endl;
+
+				auto errors = exception.errors();
+				auto locations = exception.locations();
+				for (int i = 0; i < errors.size(); ++i)
+				{
+					std::cout << errors[i] << " at line " << locations[i].m_LineNr
+						<< " col " << locations[i].m_ColNr << std::endl;
+				}
+			}
 		}
 		else
 		{
