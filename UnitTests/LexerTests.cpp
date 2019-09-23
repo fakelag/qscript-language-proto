@@ -54,24 +54,24 @@ void RunLexerTests()
 		auto symbols = Lexer::Parse( "5 \n+ 2 ** 3\n * 2+2\n*1;" );
 
 		UTEST_ASSERT( symbols.size() == 12 );
-		UTEST_ASSERT( symbols[ 0 ].m_Locations.m_ColNr		== 0 );
-		UTEST_ASSERT( symbols[ 0 ].m_Locations.m_LineNr		== 0 );
-		UTEST_ASSERT( symbols[ 1 ].m_Locations.m_ColNr		== 0 );
-		UTEST_ASSERT( symbols[ 1 ].m_Locations.m_LineNr		== 1 );
-		UTEST_ASSERT( symbols[ 2 ].m_Locations.m_ColNr		== 2 );
-		UTEST_ASSERT( symbols[ 2 ].m_Locations.m_LineNr		== 1 );
-		UTEST_ASSERT( symbols[ 3 ].m_Locations.m_ColNr		== 4 );
-		UTEST_ASSERT( symbols[ 3 ].m_Locations.m_LineNr		== 1 );
-		UTEST_ASSERT( symbols[ 6 ].m_Locations.m_ColNr		== 3 );
-		UTEST_ASSERT( symbols[ 6 ].m_Locations.m_LineNr		== 2 );
-		UTEST_ASSERT( symbols[ 7 ].m_Locations.m_ColNr		== 4 ); // +
-		UTEST_ASSERT( symbols[ 7 ].m_Locations.m_LineNr		== 2 );
-		UTEST_ASSERT( symbols[ 8 ].m_Locations.m_ColNr		== 5 ); // 2
-		UTEST_ASSERT( symbols[ 8 ].m_Locations.m_LineNr		== 2 );
-		UTEST_ASSERT( symbols[ 9 ].m_Locations.m_ColNr		== 0 ); // *
-		UTEST_ASSERT( symbols[ 9 ].m_Locations.m_LineNr		== 3 );
-		UTEST_ASSERT( symbols[ 10 ].m_Locations.m_ColNr		== 1 ); // 1
-		UTEST_ASSERT( symbols[ 10 ].m_Locations.m_LineNr	== 3 );
+		UTEST_ASSERT( symbols[ 0 ].m_Location.m_ColNr		== 0 );
+		UTEST_ASSERT( symbols[ 0 ].m_Location.m_LineNr		== 0 );
+		UTEST_ASSERT( symbols[ 1 ].m_Location.m_ColNr		== 0 );
+		UTEST_ASSERT( symbols[ 1 ].m_Location.m_LineNr		== 1 );
+		UTEST_ASSERT( symbols[ 2 ].m_Location.m_ColNr		== 2 );
+		UTEST_ASSERT( symbols[ 2 ].m_Location.m_LineNr		== 1 );
+		UTEST_ASSERT( symbols[ 3 ].m_Location.m_ColNr		== 4 );
+		UTEST_ASSERT( symbols[ 3 ].m_Location.m_LineNr		== 1 );
+		UTEST_ASSERT( symbols[ 6 ].m_Location.m_ColNr		== 3 );
+		UTEST_ASSERT( symbols[ 6 ].m_Location.m_LineNr		== 2 );
+		UTEST_ASSERT( symbols[ 7 ].m_Location.m_ColNr		== 4 ); // +
+		UTEST_ASSERT( symbols[ 7 ].m_Location.m_LineNr		== 2 );
+		UTEST_ASSERT( symbols[ 8 ].m_Location.m_ColNr		== 5 ); // 2
+		UTEST_ASSERT( symbols[ 8 ].m_Location.m_LineNr		== 2 );
+		UTEST_ASSERT( symbols[ 9 ].m_Location.m_ColNr		== 0 ); // *
+		UTEST_ASSERT( symbols[ 9 ].m_Location.m_LineNr		== 3 );
+		UTEST_ASSERT( symbols[ 10 ].m_Location.m_ColNr		== 1 ); // 1
+		UTEST_ASSERT( symbols[ 10 ].m_Location.m_LineNr	== 3 );
 
 		UTEST_CASE_CLOSED();
 	}( );
