@@ -4,7 +4,7 @@
 
 void RunValueTests()
 {
-	UTEST_BEGIN( "Lexer Tests" );
+	UTEST_BEGIN( "CValue Tests" );
 
 	UTEST_CASE( "Creating a string value" )
 	{
