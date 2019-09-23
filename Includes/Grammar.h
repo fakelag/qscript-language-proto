@@ -25,6 +25,7 @@ namespace Grammar
 	{
 		int					m_LineNr;
 		int					m_ColNr;
+		int 				m_Length;
 	};
 
 	struct SymbolInfo_t
