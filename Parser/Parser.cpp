@@ -1,4 +1,4 @@
-﻿#include <functional>
+#include <functional>
 #include <algorithm>
 #include "Parser.h"
 #include "Exception.h"
@@ -19,7 +19,7 @@ namespace Parser
 	{
 		ParserSymbol_t( Lexer::LexerSymbol_t lexerSymbol )
 		{
-			m_Locations				= lexerSymbol.m_Locations;
+			m_Location				= lexerSymbol.m_Location;
 			m_LBP					= lexerSymbol.m_LBP;
 			m_Symbol				= lexerSymbol.m_Symbol;
 			m_Token					= lexerSymbol.m_Token;
@@ -28,7 +28,7 @@ namespace Parser
 		}
 
 		Grammar::Symbol				m_Symbol;		// Current symbol
-		Grammar::SymbolLoc_t		m_Locations;	// Debugging locations
+		Grammar::SymbolLoc_t		m_Location;		// Debugging locations
 		int							m_LBP;			// Left binding power
 		std::string					m_Token;		// Token (Only used to propagate to CValueExpression for names and constants)
 
@@ -206,7 +206,7 @@ namespace Parser
 					symbol.m_RightBind = [ &nextExpression ]( const ParserSymbol_t& symbol ) -> AST::IExpression*
 					{
 						Value::CValue intValue( std::stoi( symbol.m_Token ) );
-						return new AST::CValueExpression( intValue, symbol.m_Symbol, symbol.m_Locations );
+						return new AST::CValueExpression( intValue, symbol.m_Symbol, symbol.m_Location );
 					};
 					break;
 				}
@@ -215,7 +215,7 @@ namespace Parser
 					symbol.m_RightBind = [ &nextExpression ]( const ParserSymbol_t& symbol ) -> AST::IExpression*
 					{
 						Value::CValue intValue( symbol.m_Token );
-						return new AST::CValueExpression( intValue, symbol.m_Symbol, symbol.m_Locations );
+						return new AST::CValueExpression( intValue, symbol.m_Symbol, symbol.m_Location );
 					};
 					break;
 				}
@@ -227,7 +227,7 @@ namespace Parser
 					symbol.m_LeftBind = [ &nextExpression ]( const ParserSymbol_t& symbol, AST::IExpression* left ) -> AST::IExpression*
 					{
 						auto right = nextExpression( symbol.m_LBP );
-						return new AST::CComplexExpression( left, right, symbol.m_Symbol, symbol.m_Locations );
+						return new AST::CComplexExpression( left, right, symbol.m_Symbol, symbol.m_Location );
 					};
 
 					// Right binding function only parses ahead of the current token. Usually to embed the next expression to
@@ -235,7 +235,7 @@ namespace Parser
 					symbol.m_RightBind = [ &nextExpression ]( const ParserSymbol_t& symbol ) -> AST::IExpression*
 					{
 						auto right = nextExpression( -1 );
-						return new AST::CSimpleExpression( right, symbol.m_Symbol, symbol.m_Locations );
+						return new AST::CSimpleExpression( right, symbol.m_Symbol, symbol.m_Location );
 					};
 					break;
 				}
@@ -248,7 +248,7 @@ namespace Parser
 					symbol.m_LeftBind = [ &nextExpression ]( const ParserSymbol_t& symbol, AST::IExpression* left ) -> AST::IExpression*
 					{
 						auto right = nextExpression( symbol.m_LBP );
-						return new AST::CComplexExpression( left, right, symbol.m_Symbol, symbol.m_Locations );
+						return new AST::CComplexExpression( left, right, symbol.m_Symbol, symbol.m_Location );
 					};
 					break;
 				}
@@ -257,14 +257,14 @@ namespace Parser
 					symbol.m_RightBind = [ &nextExpression ]( const ParserSymbol_t& symbol ) -> AST::IExpression*
 					{
 						auto nameExpr = nextExpression( symbol.m_LBP );
-						return new AST::CSimpleExpression( nameExpr, symbol.m_Symbol, symbol.m_Locations );
+						return new AST::CSimpleExpression( nameExpr, symbol.m_Symbol, symbol.m_Location );
 					};
 					break;
 				}
 				case Grammar::Symbol::S_SEMICOLON:
 					break;
 				default:
-					throw ParseException( lexerSymbol.m_Locations, "Unknown symbol: " + std::to_string( lexerSymbol.m_Symbol ) );
+					throw ParseException( lexerSymbol.m_Location, "Unknown symbol: " + std::to_string( lexerSymbol.m_Symbol ) );
 				}
 
 				return symbol;

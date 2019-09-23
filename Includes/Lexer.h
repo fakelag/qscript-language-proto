@@ -9,7 +9,7 @@ namespace Lexer
 	struct LexerSymbol_t
 	{
 		Grammar::Symbol				m_Symbol;
-		Grammar::SymbolLoc_t		m_Locations;
+		Grammar::SymbolLoc_t		m_Location;
 		int							m_LBP;
 		std::string					m_Token;
 	};
