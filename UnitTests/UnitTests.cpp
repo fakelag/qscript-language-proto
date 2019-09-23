@@ -20,6 +20,7 @@ int main()
 	// Call tests
 	RunLexerTests();
 	RunValueTests();
+	RunParserTests();
 
 	std::getchar();
 	return 0;

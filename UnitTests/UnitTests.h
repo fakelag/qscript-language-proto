@@ -61,6 +61,23 @@ if ( !(condition) ) { \
 	} \
 }
 
+#define UTEST_THROW_EXCEPTION( condition, exceptionType, exceptionTest ) \
+{\
+	bool passed = false; \
+	try { \
+		condition; \
+	} catch ( exceptionType ) { \
+		if (exceptionTest) {\
+			passed = true; \
+		} \
+	} \
+	if (!passed) { \
+		testResults[ testResults.size() - 1 ].m_Passed = false; \
+		testResults[ testResults.size() - 1 ].m_FailedConditions.push_back( "\033[33m" #condition "\033[39m at line " S__LINE__ ); \
+		return; \
+	} \
+}
+
 #define UTEST_NOT_THROW( condition ) \
 {\
 	try { \
