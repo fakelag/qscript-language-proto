@@ -1,4 +1,4 @@
-#include <functional>
+﻿#include <functional>
 #include <algorithm>
 #include "Parser.h"
 #include "Exception.h"
@@ -45,7 +45,6 @@ namespace Parser
 		CParserState()
 		{
 			m_CurrentSymbol = 0;
-			m_NextErrorSymbol = 0;
 			m_HasErrors = false;
 		}
 
@@ -76,27 +75,28 @@ namespace Parser
 		void AddError( const Grammar::SymbolLoc_t& location, const std::string& exception )
 		{
 			m_HasErrors = true;
+			m_Exception.AddError( location, exception );
+		}
 
-			if ( m_CurrentSymbol >= m_NextErrorSymbol )
+		void AddErrorAndResync( const Grammar::SymbolLoc_t& location, const std::string& exception )
+		{
+			m_HasErrors = true;
+			m_Exception.AddError( location, exception );
+
+			while ( !IsFinished() )
 			{
-				m_Exception.AddError( location, exception );
-
-				int nextSymbol = m_CurrentSymbol;
-				while ( nextSymbol < m_Symbols.size() )
+				switch ( m_Symbols[ m_CurrentSymbol ].m_Symbol )
 				{
-					switch ( m_Symbols[ nextSymbol ].m_Symbol )
-					{
-					case Grammar::Symbol::S_SEMICOLON:
-					case Grammar::Symbol::S_BRACKET_CLOSE:
-						m_NextErrorSymbol = nextSymbol + 1;
-						break;
-					default:
-						++nextSymbol;
-						continue;
-					}
-
+				case Grammar::Symbol::S_SEMICOLON:
+				case Grammar::Symbol::S_BRACKET_CLOSE:
+					++m_CurrentSymbol;
 					break;
+				default:
+					++m_CurrentSymbol;
+					continue;
 				}
+
+				break;
 			}
 		}
 
@@ -126,7 +126,6 @@ namespace Parser
 		int 										m_CurrentSymbol;
 
 		bool										m_HasErrors;
-		int 										m_NextErrorSymbol;
 		ParseException								m_Exception;
 	};
 
@@ -138,53 +137,44 @@ namespace Parser
 		// m_LeftBind and m_RightBind to form a tree like structure
 		auto nextExpression = [ &parserState ]( int rbp = 0 /* Right binding power */ ) -> AST::IExpression*
 		{
-			AST::IExpression* leftHand = NULL;
-			try
+			// Get the current symbol (and advance to the next one)
+			auto curSymbol = parserState.NextSymbol();
+
+			if (curSymbol.m_RightBind == NULL)
+				throw ParseException( curSymbol.m_Location, "Expected an expression" );
+
+			// Construct the left hand tree
+			auto leftHand = curSymbol.m_RightBind( curSymbol );
+
+			// Override -- if we only need the first right hand symbol, return it now
+			if ( rbp == -1 )
+				return leftHand;
+
+			// Finished parsing while expecting more tokens,
+			// this will happen with inputs like "var x = 4 +"
+			// where the last operator is expecting a right hand argument
+			if ( parserState.IsFinished() )
+				throw ParseException( curSymbol.m_Location, "Expected an end of expression" );
+
+			// Call left bind while the current right binding power is less than the
+			// next symbols left binding power. E.g:
+			// 4	+	2	*	2	+	1;
+			//		│		│		└ binding power is 10
+			//		│		│
+			//		│		└─ binding power is 20
+			//		└─ binding power is 10
+			//
+			// this will group (2*2) at the bottom of the tree
+			// while (4+(2*2)) is the second outer node,
+			// and (4+(2*2))+1) the most outer node
+			while ( rbp < parserState.CurrentSymbol().m_LBP )
 			{
-				// Get the current symbol (and advance to the next one)
-				auto curSymbol = parserState.NextSymbol();
+				curSymbol = parserState.NextSymbol();
 
-				if (curSymbol.m_RightBind == NULL)
-					throw ParseException( curSymbol.m_Locations, "Expected an expression" );
+				if (curSymbol.m_LeftBind == NULL)
+					throw ParseException( curSymbol.m_Location, "Expected an expression" );
 
-				// Construct the left hand tree
-				leftHand = curSymbol.m_RightBind( curSymbol );
-
-				// Override -- if we only need the first right hand symbol, return it now
-				if ( rbp == -1 )
-					return leftHand;
-
-				// Finished parsing while expecting more tokens,
-				// this will happen with inputs like "var x = 4 +"
-				// where the last operator is expecting a right hand argument
-				if ( parserState.IsFinished() )
-					throw ParseException( curSymbol.m_Locations, "Expected an end of expression" );
-
-				// Call left bind while the current right binding power is less than the
-				// next symbols left binding power. E.g:
-				// 4	+	2	*	2	+	1;
-				//		│		│		└ binding power is 10
-				//		│		│
-				//		│		└─ binding power is 20
-				//		└─ binding power is 10
-				//
-				// this will group (2*2) at the bottom of the tree
-				// while (4+(2*2)) is the second outer node,
-				// and (4+(2*2))+1) the most outer node
-				while ( rbp < parserState.CurrentSymbol().m_LBP )
-				{
-					curSymbol = parserState.NextSymbol();
-
-					if (curSymbol.m_LeftBind == NULL)
-						throw ParseException( curSymbol.m_Locations, "Expected an expression" );
-
-					leftHand = curSymbol.m_LeftBind( curSymbol, leftHand );
-				}
-			}
-			catch ( const ParseException& exception )
-			{
-				// Propagate the error, but keep parsing.
-				parserState.AddError( exception.locations()[ 0 ], exception.errors()[ 0 ] );
+				leftHand = curSymbol.m_LeftBind( curSymbol, leftHand );
 			}
 
 			return leftHand;
@@ -281,9 +271,17 @@ namespace Parser
 
 		while ( !parserState.IsFinished() )
 		{
-			// Add all top level expressions to the Expressions list
-			parserState.AddExpression( nextExpression() );
-			parserState.NextSymbol();
+			try
+			{
+				// Add all top level expressions to the Expressions list
+				parserState.AddExpression( nextExpression() );
+				parserState.NextSymbol();
+			}
+			catch ( const ParseException& exception )
+			{
+				// Propagate the error and relocate
+				parserState.AddErrorAndResync( exception.locations()[ 0 ], exception.errors()[ 0 ] );
+			}
 		}
 
 		// Propagate all the accumulated errors to the caller, if any
