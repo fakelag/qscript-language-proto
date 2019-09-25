@@ -51,6 +51,7 @@ namespace AST
 		ExpressionType 					Type() 			const { return ET_SIMPLE; };
 		Grammar::Symbol 				Symbol()		const { return m_Symbol; }
 		const Grammar::SymbolLoc_t& 	Location() 		const { return m_Loc; }
+		IExpression*					Expression() 	const { return m_Expression; }
 
 	private:
 		IExpression*			m_Expression;
