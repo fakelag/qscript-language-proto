@@ -191,6 +191,15 @@ namespace Parser
 
 				switch ( lexerSymbol.m_Symbol )
 				{
+				case Grammar::Symbol::S_DBLCNST:
+				{
+					symbol.m_RightBind = [ &nextExpression ]( const ParserSymbol_t& symbol ) -> AST::IExpression*
+					{
+						Value::CValue dblValue( std::stod( symbol.m_Token ) );
+						return new AST::CValueExpression( dblValue, symbol.m_Symbol, symbol.m_Location );
+					};
+					break;
+				}
 				case Grammar::Symbol::S_INTCNST:
 				{
 					symbol.m_RightBind = [ &nextExpression ]( const ParserSymbol_t& symbol ) -> AST::IExpression*
@@ -200,12 +209,22 @@ namespace Parser
 					};
 					break;
 				}
+				case Grammar::Symbol::S_STRCNST:
 				case Grammar::Symbol::S_NAME:
 				{
 					symbol.m_RightBind = [ &nextExpression ]( const ParserSymbol_t& symbol ) -> AST::IExpression*
 					{
-						Value::CValue intValue( symbol.m_Token );
-						return new AST::CValueExpression( intValue, symbol.m_Symbol, symbol.m_Location );
+						Value::CValue strValue( symbol.m_Token );
+						return new AST::CValueExpression( strValue, symbol.m_Symbol, symbol.m_Location );
+					};
+					break;
+				}
+				case Grammar::Symbol::S_LOGIC_NOT:
+				{
+					symbol.m_RightBind = [ &nextExpression ]( const ParserSymbol_t& symbol ) -> AST::IExpression*
+					{
+						auto right = nextExpression( symbol.m_LBP );
+						return new AST::CSimpleExpression( right, symbol.m_Symbol, symbol.m_Location );
 					};
 					break;
 				}
@@ -234,6 +253,19 @@ namespace Parser
 				case Grammar::Symbol::S_POW:
 				case Grammar::Symbol::S_MOD:
 				case Grammar::Symbol::S_ASSIGN:
+				case Grammar::Symbol::S_ASSIGN_ADD:
+				case Grammar::Symbol::S_ASSIGN_DIV:
+				case Grammar::Symbol::S_ASSIGN_SUB:
+				case Grammar::Symbol::S_ASSIGN_MUL:
+				case Grammar::Symbol::S_ASSIGN_MOD:
+				case Grammar::Symbol::S_LOGIC_AND:
+				case Grammar::Symbol::S_LOGIC_OR:
+				case Grammar::Symbol::S_EQUALS:
+				case Grammar::Symbol::S_EQUALS_NOT:
+				case Grammar::Symbol::S_MORE_OR_EQUALS:
+				case Grammar::Symbol::S_LESS_OR_EQUALS:
+				case Grammar::Symbol::S_LESSTHAN:
+				case Grammar::Symbol::S_MORETHAN:
 				{
 					symbol.m_LeftBind = [ &nextExpression ]( const ParserSymbol_t& symbol, AST::IExpression* left ) -> AST::IExpression*
 					{
