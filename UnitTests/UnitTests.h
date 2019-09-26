@@ -28,7 +28,7 @@ for ( TestResult_t result : testResults) { \
 	} else { \
 		std::cout << "\t\033[31m[Failed]\033[39m " << result.m_TestDescription << std::endl; \
 		for ( std::string failedCondition : result.m_FailedConditions) \
-			std::cout << "\t\t Assert: " << failedCondition << std::endl; \
+			std::cout << "\t\t " << failedCondition << std::endl; \
 	} \
 }
 
@@ -42,7 +42,7 @@ testResults[ testResults.size() - 1 ].m_Passed = true;
 #define UTEST_ASSERT( condition ) \
 if ( !(condition) ) { \
 	testResults[ testResults.size() - 1 ].m_Passed = false; \
-	testResults[ testResults.size() - 1 ].m_FailedConditions.push_back( "\033[33m" #condition "\033[39m at line " S__LINE__ ); \
+	testResults[ testResults.size() - 1 ].m_FailedConditions.push_back( "Assert: \033[33m" #condition "\033[39m at line " S__LINE__ ); \
 	return; \
 }
 
@@ -56,7 +56,7 @@ if ( !(condition) ) { \
 	} \
 	if (!passed) { \
 		testResults[ testResults.size() - 1 ].m_Passed = false; \
-		testResults[ testResults.size() - 1 ].m_FailedConditions.push_back( "\033[33m" #condition "\033[39m at line " S__LINE__ ); \
+		testResults[ testResults.size() - 1 ].m_FailedConditions.push_back( "Code: \033[33m" #condition "\033[39m at line " S__LINE__ ); \
 		return; \
 	} \
 }
@@ -73,7 +73,7 @@ if ( !(condition) ) { \
 	} \
 	if (!passed) { \
 		testResults[ testResults.size() - 1 ].m_Passed = false; \
-		testResults[ testResults.size() - 1 ].m_FailedConditions.push_back( "\033[33m" #condition "\033[39m at line " S__LINE__ ); \
+		testResults[ testResults.size() - 1 ].m_FailedConditions.push_back( "Exception condition: \033[33m" #exceptionTest "\033[39m at line " S__LINE__ ); \
 		return; \
 	} \
 }
@@ -84,7 +84,7 @@ if ( !(condition) ) { \
 		condition; \
 	} catch ( ... ) { \
 		testResults[ testResults.size() - 1 ].m_Passed = false; \
-		testResults[ testResults.size() - 1 ].m_FailedConditions.push_back( "\033[33m" #condition "\033[39m at line " S__LINE__ ); \
+		testResults[ testResults.size() - 1 ].m_FailedConditions.push_back( "Code: \033[33m" #condition "\033[39m at line " S__LINE__ ); \
 		return; \
 	} \
 }
