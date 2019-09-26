@@ -49,7 +49,7 @@ namespace Lexer
 			// Push the last accumulated string as SG_NAME and flush stringBuffer
 			symbols.push_back( LexerSymbol_t {
 				symbolType,
-				Grammar::SymbolLoc_t { currentLineNr, currentColNr, ( int ) stringBuffer.length() },
+				Grammar::SymbolLoc_t { currentLineNr, currentColNr, stringBuffer },
 				Grammar::LBP_NAME,
 				stringBuffer,
 				} );
@@ -72,7 +72,7 @@ namespace Lexer
 						// Push the found common symbol
 						symbols.push_back( LexerSymbol_t {
 							symIt->m_Symbol,
-							Grammar::SymbolLoc_t { currentLineNr, currentColNr, ( int ) symIt->m_Info.m_Token.length() },
+							Grammar::SymbolLoc_t { currentLineNr, currentColNr, symIt->m_Info.m_Token },
 							symIt->m_Info.m_LBP,
 							symIt->m_Info.m_Token,
 						} );
