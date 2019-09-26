@@ -25,7 +25,7 @@ namespace Grammar
 	{
 		int					m_LineNr;
 		int					m_ColNr;
-		int 				m_Length;
+		std::string 		m_SrcToken;
 	};
 
 	struct SymbolInfo_t

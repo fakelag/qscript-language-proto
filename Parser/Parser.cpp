@@ -182,13 +182,14 @@ namespace Parser
 
 		std::vector< ParserSymbol_t > parserSymbols;
 
-		try
+		// Map lexer symbols to parser symbols
+		std::transform( symbols.begin(), symbols.end(), std::back_inserter( parserSymbols ),
+			[ &nextExpression, &parserState ]( const Lexer::LexerSymbol_t& lexerSymbol ) -> ParserSymbol_t
 		{
-			// Map lexer symbols to parser symbols
-			std::transform( symbols.begin(), symbols.end(), std::back_inserter( parserSymbols ),
-				[ &nextExpression ]( const Lexer::LexerSymbol_t& lexerSymbol ) -> ParserSymbol_t {
-				ParserSymbol_t symbol( lexerSymbol );
+			ParserSymbol_t symbol( lexerSymbol );
 
+			try
+			{
 				switch ( lexerSymbol.m_Symbol )
 				{
 				case Grammar::Symbol::S_DBLCNST:
@@ -243,7 +244,29 @@ namespace Parser
 					// it's tree
 					symbol.m_RightBind = [ &nextExpression ]( const ParserSymbol_t& symbol ) -> AST::IExpression*
 					{
-						auto right = nextExpression( -1 );
+						auto right = nextExpression( symbol.m_LBP );
+						return new AST::CSimpleExpression( right, symbol.m_Symbol, symbol.m_Location );
+					};
+					break;
+				}
+				case Grammar::Symbol::S_INCREMENT:
+				case Grammar::Symbol::S_DECREMENT:
+				{
+					symbol.m_LeftBind = [ &nextExpression ]( const ParserSymbol_t& symbol, AST::IExpression* left ) -> AST::IExpression*
+					{
+						if ( AST::IsNameConstant( left ) )
+							throw ParseException( left->Location(), "Expcected a variable, got: \"" + left->Location().m_SrcToken + "\"" );
+
+						return new AST::CSimpleExpression( left, symbol.m_Symbol, symbol.m_Location );
+					};
+
+					symbol.m_RightBind = [ &nextExpression ]( const ParserSymbol_t& symbol ) -> AST::IExpression*
+					{
+						auto right = nextExpression( symbol.m_LBP );
+
+						if ( AST::IsNameConstant( right ) )
+							throw ParseException( right->Location(), "Expcected a variable, got: \"" + right->Location().m_SrcToken + "\"" );
+
 						return new AST::CSimpleExpression( right, symbol.m_Symbol, symbol.m_Location );
 					};
 					break;
@@ -278,8 +301,12 @@ namespace Parser
 				{
 					symbol.m_RightBind = [ &nextExpression ]( const ParserSymbol_t& symbol ) -> AST::IExpression*
 					{
-						auto nameExpr = nextExpression( symbol.m_LBP );
-						return new AST::CSimpleExpression( nameExpr, symbol.m_Symbol, symbol.m_Location );
+						auto right = nextExpression( symbol.m_LBP );
+
+						if ( !AST::IsNameConstant( right ) )
+							throw ParseException( right->Location(), "Expcected a variable name, got: \"" + right->Location().m_SrcToken + "\"" );
+
+						return new AST::CSimpleExpression( right, symbol.m_Symbol, symbol.m_Location );
 					};
 					break;
 				}
@@ -288,15 +315,15 @@ namespace Parser
 				default:
 					throw ParseException( lexerSymbol.m_Location, "Unknown symbol: " + std::to_string( lexerSymbol.m_Symbol ) );
 				}
+			}
+			catch ( const ParseException& exception )
+			{
+				// Add to the error list
+				parserState.AddError( exception.locations()[ 0 ], exception.errors()[ 0 ] );
+			}
 
-				return symbol;
-			} );
-		}
-		catch ( const ParseException& exception )
-		{
-			// Add to the error list
-			parserState.AddError( exception.locations()[ 0 ], exception.errors()[ 0 ] );
-		}
+			return symbol;
+		} );
 
 		// Load the symbols
 		parserState.AddSymbols( parserSymbols );

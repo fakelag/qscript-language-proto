@@ -3,9 +3,13 @@
 #include <string>
 
 #if defined(_WIN32)
+#ifndef FORCEINLINE
 #define FORCEINLINE __forceinline
+#endif
 #elif defined(_OSX)
+#ifndef FORCEINLINE
 #define FORCEINLINE inline
+#endif
 #endif
 
 namespace Value
