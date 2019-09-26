@@ -5,6 +5,16 @@
 #include "Value.h"
 #include "Lexer.h"
 
+#if defined(_WIN32)
+#ifndef FORCEINLINE
+#define FORCEINLINE __forceinline
+#endif
+#elif defined(_OSX)
+#ifndef FORCEINLINE
+#define FORCEINLINE inline
+#endif
+#endif
+
 namespace AST
 {
 	enum ExpressionType
@@ -19,8 +29,10 @@ namespace AST
 	{
 	public:
 		virtual ~IExpression() {};
-		virtual ExpressionType Type() const = 0;
-		virtual std::string ToString( int indent = 1 ) = 0;
+		virtual ExpressionType 					Type() const = 0;
+		virtual Grammar::Symbol 				Symbol() const = 0;
+		virtual const Grammar::SymbolLoc_t& 	Location() const = 0;
+		virtual std::string 					ToString( int indent = 1 ) = 0;
 	};
 
 	class CComplexExpression : public IExpression
@@ -68,6 +80,7 @@ namespace AST
 		ExpressionType 					Type() 			const { return ET_VALUE; };
 		Grammar::Symbol 				Symbol()		const { return m_Symbol; }
 		const Grammar::SymbolLoc_t& 	Location() 		const { return m_Loc; }
+		Value::CValue&					Value()			{ return m_Value; }
 
 	private:
 		Value::CValue			m_Value;
@@ -90,4 +103,20 @@ namespace AST
 		Grammar::SymbolLoc_t			m_Loc;
 		Grammar::Symbol					m_Symbol;
 	};
+
+	FORCEINLINE bool IsNumberConstant( AST::IExpression* expression )
+	{
+		if ( expression->Symbol() != Grammar::Symbol::S_INTCNST && expression->Symbol() != Grammar::Symbol::S_DBLCNST )
+			return false;
+
+		return true;
+	}
+
+	FORCEINLINE bool IsNameConstant( AST::IExpression* expression )
+	{
+		if ( expression->Symbol() != Grammar::Symbol::S_NAME )
+			return false;
+
+		return true;
+	}
 }
