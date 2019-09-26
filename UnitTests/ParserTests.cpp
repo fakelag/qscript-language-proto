@@ -58,10 +58,10 @@ void RunParserTests()
 			e.errors().size() == 2
 			&& e.locations()[0].m_LineNr == 0
 			&& e.locations()[0].m_ColNr == 8
-			&& e.locations()[0].m_Length == 1
+			&& e.locations()[0].m_SrcToken == "="
 			&& e.locations()[1].m_LineNr == 0
 			&& e.locations()[1].m_ColNr == 17
-			&& e.locations()[1].m_Length == 1
+			&& e.locations()[1].m_SrcToken == "="
 		);
 
 		UTEST_CASE_CLOSED();
@@ -79,13 +79,13 @@ void RunParserTests()
 		UTEST_ASSERT( syntaxTree[ 4 ]->Type() == AST::ExpressionType::ET_COMPLEX );
 		UTEST_ASSERT( syntaxTree[ 5 ]->Type() == AST::ExpressionType::ET_COMPLEX );
 		UTEST_ASSERT( syntaxTree[ 6 ]->Type() == AST::ExpressionType::ET_COMPLEX );
-		UTEST_ASSERT( static_cast<AST::CComplexExpression*>( syntaxTree[ 0 ] )->Symbol() == Grammar::Symbol::S_ASSIGN_ADD );
-		UTEST_ASSERT( static_cast<AST::CComplexExpression*>( syntaxTree[ 1 ] )->Symbol() == Grammar::Symbol::S_ASSIGN_SUB );
-		UTEST_ASSERT( static_cast<AST::CComplexExpression*>( syntaxTree[ 2 ] )->Symbol() == Grammar::Symbol::S_ASSIGN_MUL );
-		UTEST_ASSERT( static_cast<AST::CComplexExpression*>( syntaxTree[ 3 ] )->Symbol() == Grammar::Symbol::S_ASSIGN_DIV );
-		UTEST_ASSERT( static_cast<AST::CComplexExpression*>( syntaxTree[ 4 ] )->Symbol() == Grammar::Symbol::S_ASSIGN_MOD );
-		UTEST_ASSERT( static_cast<AST::CComplexExpression*>( syntaxTree[ 5 ] )->Symbol() == Grammar::Symbol::S_ASSIGN );
-		UTEST_ASSERT( static_cast<AST::CComplexExpression*>( syntaxTree[ 6 ] )->Symbol() == Grammar::Symbol::S_ASSIGN_ADD );
+		UTEST_ASSERT( syntaxTree[ 0 ]->Symbol() == Grammar::Symbol::S_ASSIGN_ADD );
+		UTEST_ASSERT( syntaxTree[ 2 ]->Symbol() == Grammar::Symbol::S_ASSIGN_MUL );
+		UTEST_ASSERT( syntaxTree[ 1 ]->Symbol() == Grammar::Symbol::S_ASSIGN_SUB );
+		UTEST_ASSERT( syntaxTree[ 3 ]->Symbol() == Grammar::Symbol::S_ASSIGN_DIV );
+		UTEST_ASSERT( syntaxTree[ 4 ]->Symbol() == Grammar::Symbol::S_ASSIGN_MOD );
+		UTEST_ASSERT( syntaxTree[ 5 ]->Symbol() == Grammar::Symbol::S_ASSIGN );
+		UTEST_ASSERT( syntaxTree[ 6 ]->Symbol() == Grammar::Symbol::S_ASSIGN_ADD );
 
 		UTEST_ASSERT(
 			static_cast<AST::IExpression*>(
@@ -125,13 +125,13 @@ void RunParserTests()
 		UTEST_ASSERT( syntaxTree[ 4 ]->Type() == AST::ExpressionType::ET_COMPLEX );
 		UTEST_ASSERT( syntaxTree[ 5 ]->Type() == AST::ExpressionType::ET_COMPLEX );
 		UTEST_ASSERT( syntaxTree[ 6 ]->Type() == AST::ExpressionType::ET_COMPLEX );
-		UTEST_ASSERT( static_cast<AST::CComplexExpression*>( syntaxTree[ 0 ] )->Symbol() == Grammar::Symbol::S_EQUALS );
-		UTEST_ASSERT( static_cast<AST::CComplexExpression*>( syntaxTree[ 1 ] )->Symbol() == Grammar::Symbol::S_EQUALS_NOT );
-		UTEST_ASSERT( static_cast<AST::CComplexExpression*>( syntaxTree[ 2 ] )->Symbol() == Grammar::Symbol::S_MORE_OR_EQUALS );
-		UTEST_ASSERT( static_cast<AST::CComplexExpression*>( syntaxTree[ 3 ] )->Symbol() == Grammar::Symbol::S_LESS_OR_EQUALS );
-		UTEST_ASSERT( static_cast<AST::CComplexExpression*>( syntaxTree[ 4 ] )->Symbol() == Grammar::Symbol::S_LESSTHAN );
-		UTEST_ASSERT( static_cast<AST::CComplexExpression*>( syntaxTree[ 5 ] )->Symbol() == Grammar::Symbol::S_MORETHAN );
-		UTEST_ASSERT( static_cast<AST::CComplexExpression*>( syntaxTree[ 6 ] )->Symbol() == Grammar::Symbol::S_ASSIGN );
+		UTEST_ASSERT( syntaxTree[ 0 ]->Symbol() == Grammar::Symbol::S_EQUALS );
+		UTEST_ASSERT( syntaxTree[ 1 ]->Symbol() == Grammar::Symbol::S_EQUALS_NOT );
+		UTEST_ASSERT( syntaxTree[ 2 ]->Symbol() == Grammar::Symbol::S_MORE_OR_EQUALS );
+		UTEST_ASSERT( syntaxTree[ 3 ]->Symbol() == Grammar::Symbol::S_LESS_OR_EQUALS );
+		UTEST_ASSERT( syntaxTree[ 4 ]->Symbol() == Grammar::Symbol::S_LESSTHAN );
+		UTEST_ASSERT( syntaxTree[ 5 ]->Symbol() == Grammar::Symbol::S_MORETHAN );
+		UTEST_ASSERT( syntaxTree[ 6 ]->Symbol() == Grammar::Symbol::S_ASSIGN );
 
 		UTEST_ASSERT(
 			static_cast<AST::IExpression*>(
@@ -160,9 +160,9 @@ void RunParserTests()
 		UTEST_ASSERT( static_cast<AST::CComplexExpression*>( syntaxTree[ 0 ] )->Symbol() == Grammar::Symbol::S_LOGIC_OR );
 		UTEST_ASSERT( syntaxTree[ 1 ]->Type() == AST::ExpressionType::ET_COMPLEX );
 		UTEST_ASSERT( syntaxTree[ 2 ]->Type() == AST::ExpressionType::ET_SIMPLE );
-		UTEST_ASSERT( static_cast<AST::CComplexExpression*>( syntaxTree[ 0 ] )->Symbol() == Grammar::Symbol::S_LOGIC_OR );
-		UTEST_ASSERT( static_cast<AST::CComplexExpression*>( syntaxTree[ 1 ] )->Symbol() == Grammar::Symbol::S_LOGIC_AND );
-		UTEST_ASSERT( static_cast<AST::CSimpleExpression*>( syntaxTree[ 2 ] )->Symbol() == Grammar::Symbol::S_LOGIC_NOT );
+		UTEST_ASSERT( syntaxTree[ 0 ]->Symbol() == Grammar::Symbol::S_LOGIC_OR );
+		UTEST_ASSERT( syntaxTree[ 1 ]->Symbol() == Grammar::Symbol::S_LOGIC_AND );
+		UTEST_ASSERT( syntaxTree[ 2 ]->Symbol() == Grammar::Symbol::S_LOGIC_NOT );
 
 		UTEST_ASSERT(
 			static_cast<AST::IExpression*>(
