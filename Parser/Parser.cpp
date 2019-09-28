@@ -1,4 +1,4 @@
-#include <functional>
+﻿#include <functional>
 #include <algorithm>
 #include "Parser.h"
 #include "Exception.h"
@@ -271,10 +271,6 @@ namespace Parser
 					};
 					break;
 				}
-				case Grammar::Symbol::S_MUL:
-				case Grammar::Symbol::S_DIV:
-				case Grammar::Symbol::S_POW:
-				case Grammar::Symbol::S_MOD:
 				case Grammar::Symbol::S_ASSIGN:
 				case Grammar::Symbol::S_ASSIGN_ADD:
 				case Grammar::Symbol::S_ASSIGN_DIV:
@@ -326,6 +322,23 @@ namespace Parser
 					};
 					break;
 				}
+				case Grammar::Symbol::S_BRACKET_OPEN:
+				{
+					symbol.m_RightBind = [ &nextExpression, &parserState ]( const ParserSymbol_t& symbol ) -> AST::IExpression*
+					{
+						std::vector< AST::IExpression* > expressionList;
+
+						while ( parserState.CurrentSymbol().m_Symbol != Grammar::Symbol::S_BRACKET_CLOSE )
+						{
+							expressionList.push_back( nextExpression() );
+							parserState.NextSymbol();
+						}
+
+						return new AST::CListExpression( expressionList, symbol.m_Symbol, symbol.m_Location );
+					};
+					break;
+				}
+				case Grammar::Symbol::S_BRACKET_CLOSE:
 				case Grammar::Symbol::S_SEMICOLON:
 					break;
 				default:
