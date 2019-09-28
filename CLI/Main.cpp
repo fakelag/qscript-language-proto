@@ -57,10 +57,10 @@ int main( int argc, const char** argv )
 
 				auto errors = exception.errors();
 				auto locations = exception.locations();
-				for (int i = 0; i < errors.size(); ++i)
+				for ( size_t i = 0; i < errors.size(); ++i )
 				{
-					std::cout << errors[i] << " at line " << locations[i].m_LineNr
-						<< " col " << locations[i].m_ColNr << std::endl;
+					std::cout << errors[ i ] << " at line " << locations[ i ].m_LineNr
+						<< " col " << locations[ i ].m_ColNr << std::endl;
 				}
 			}
 		}

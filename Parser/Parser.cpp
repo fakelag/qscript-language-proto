@@ -1,4 +1,4 @@
-﻿#include <functional>
+#include <functional>
 #include <algorithm>
 #include "Parser.h"
 #include "Exception.h"
@@ -69,7 +69,7 @@ namespace Parser
 		// Increments the current symbol index & returns the previous symbol
 		const ParserSymbol_t& NextSymbol()
 		{
-			return m_Symbols[ ++m_CurrentSymbol - 1];
+			return m_Symbols[ ++m_CurrentSymbol - 1 ];
 		}
 
 		void AddError( const Grammar::SymbolLoc_t& location, const std::string& exception )
@@ -140,7 +140,7 @@ namespace Parser
 			// Get the current symbol (and advance to the next one)
 			auto curSymbol = parserState.NextSymbol();
 
-			if (curSymbol.m_RightBind == NULL)
+			if ( curSymbol.m_RightBind == NULL )
 				throw ParseException( curSymbol.m_Location, "Expected an expression" );
 
 			// Construct the left hand tree
@@ -171,7 +171,7 @@ namespace Parser
 			{
 				curSymbol = parserState.NextSymbol();
 
-				if (curSymbol.m_LeftBind == NULL)
+				if ( curSymbol.m_LeftBind == NULL )
 					throw ParseException( curSymbol.m_Location, "Expected an expression" );
 
 				leftHand = curSymbol.m_LeftBind( curSymbol, leftHand );
