@@ -3,6 +3,10 @@
 #include <vector>
 #include "Grammar.h"
 
+#ifndef _NOEXCEPT
+#define _NOEXCEPT noexcept
+#endif
+
 class Exception : public std::exception
 {
 public:
