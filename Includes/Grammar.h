@@ -107,7 +107,7 @@ namespace Grammar
 
 		// Increment/Decrement
 		{ S_INCREMENT,		{ "++",			LBP_INCDEC,			} },
-		{ S_LESSTHAN,		{ "--",			LBP_INCDEC,			} },
+		{ S_DECREMENT,		{ "--",			LBP_INCDEC,			} },
 
 		// Brackets
 		{ S_BRACKET_OPEN,	{ "{",			0,					} },
