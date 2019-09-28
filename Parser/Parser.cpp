@@ -254,20 +254,20 @@ namespace Parser
 				{
 					symbol.m_LeftBind = [ &nextExpression ]( const ParserSymbol_t& symbol, AST::IExpression* left ) -> AST::IExpression*
 					{
-						if ( AST::IsNameConstant( left ) )
+						if ( !AST::IsNameConstant( left ) )
 							throw ParseException( left->Location(), "Expcected a variable, got: \"" + left->Location().m_SrcToken + "\"" );
 
-						return new AST::CSimpleExpression( left, symbol.m_Symbol, symbol.m_Location );
+						return new AST::CComplexExpression( left, NULL, symbol.m_Symbol, symbol.m_Location );
 					};
 
 					symbol.m_RightBind = [ &nextExpression ]( const ParserSymbol_t& symbol ) -> AST::IExpression*
 					{
 						auto right = nextExpression( symbol.m_LBP );
 
-						if ( AST::IsNameConstant( right ) )
+						if ( !AST::IsNameConstant( right ) )
 							throw ParseException( right->Location(), "Expcected a variable, got: \"" + right->Location().m_SrcToken + "\"" );
 
-						return new AST::CSimpleExpression( right, symbol.m_Symbol, symbol.m_Location );
+						return new AST::CComplexExpression( NULL, right, symbol.m_Symbol, symbol.m_Location );
 					};
 					break;
 				}
@@ -281,6 +281,22 @@ namespace Parser
 				case Grammar::Symbol::S_ASSIGN_SUB:
 				case Grammar::Symbol::S_ASSIGN_MUL:
 				case Grammar::Symbol::S_ASSIGN_MOD:
+				{
+					symbol.m_LeftBind = [ &nextExpression ]( const ParserSymbol_t& symbol, AST::IExpression* left ) -> AST::IExpression*
+					{
+						auto right = nextExpression( symbol.m_LBP );
+
+						if ( !AST::IsNameConstant( left ) )
+							throw ParseException( left->Location(), "Expcected a variable, got: \"" + left->Location().m_SrcToken + "\"" );
+
+						return new AST::CComplexExpression( left, right, symbol.m_Symbol, symbol.m_Location );
+					};
+					break;
+				}
+				case Grammar::Symbol::S_MUL:
+				case Grammar::Symbol::S_DIV:
+				case Grammar::Symbol::S_POW:
+				case Grammar::Symbol::S_MOD:
 				case Grammar::Symbol::S_LOGIC_AND:
 				case Grammar::Symbol::S_LOGIC_OR:
 				case Grammar::Symbol::S_EQUALS:
@@ -304,7 +320,7 @@ namespace Parser
 						auto right = nextExpression( symbol.m_LBP );
 
 						if ( !AST::IsNameConstant( right ) )
-							throw ParseException( right->Location(), "Expcected a variable name, got: \"" + right->Location().m_SrcToken + "\"" );
+							throw ParseException( right->Location(), "Expcected a variable, got: \"" + right->Location().m_SrcToken + "\"" );
 
 						return new AST::CSimpleExpression( right, symbol.m_Symbol, symbol.m_Location );
 					};
