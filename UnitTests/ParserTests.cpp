@@ -182,5 +182,79 @@ void RunParserTests()
 		UTEST_CASE_CLOSED();
 	}( );
 
+	UTEST_CASE( "Incremment/Decrement operators (++, --)" )
+	{
+		auto syntaxTree = Parser::Parse( Lexer::Parse( "a++ || --b; ++a; a--;" ) );
+
+		UTEST_ASSERT( syntaxTree.size() == 3 );
+		UTEST_ASSERT( syntaxTree[ 0 ]->Type() == AST::ExpressionType::ET_COMPLEX );
+		UTEST_ASSERT( syntaxTree[ 0 ]->Symbol() == Grammar::Symbol::S_LOGIC_OR );
+
+		UTEST_ASSERT( syntaxTree[ 1 ]->Type() == AST::ExpressionType::ET_COMPLEX );
+		UTEST_ASSERT( syntaxTree[ 2 ]->Type() == AST::ExpressionType::ET_COMPLEX );
+
+		UTEST_ASSERT( syntaxTree[ 1 ]->Symbol() == Grammar::Symbol::S_INCREMENT );
+		UTEST_ASSERT( syntaxTree[ 2 ]->Symbol() == Grammar::Symbol::S_DECREMENT );
+
+		UTEST_ASSERT(
+			static_cast< AST::IExpression* >(
+				static_cast< AST::CComplexExpression* >( syntaxTree[ 0 ] )->Lhs()
+				)->Type() == AST::ExpressionType::ET_COMPLEX );
+
+		UTEST_ASSERT(
+			static_cast< AST::CComplexExpression* >(
+				static_cast< AST::CComplexExpression* >( syntaxTree[ 0 ] )->Lhs()
+				)->Symbol() == Grammar::Symbol::S_INCREMENT );
+
+		UTEST_ASSERT(
+			static_cast< AST::CComplexExpression* >(
+				static_cast< AST::CComplexExpression* >( syntaxTree[ 0 ] )->Rhs()
+				)->Symbol() == Grammar::Symbol::S_DECREMENT );
+
+		UTEST_ASSERT(
+			static_cast< AST::CComplexExpression* >(
+				static_cast< AST::CComplexExpression* >( syntaxTree[ 0 ] )->Lhs()
+				)->Lhs()->Symbol() == Grammar::Symbol::S_NAME );
+
+		UTEST_ASSERT(
+			static_cast< AST::CComplexExpression* >(
+				static_cast< AST::CComplexExpression* >( syntaxTree[ 0 ] )->Lhs()
+				)->Rhs() == NULL );
+
+		UTEST_ASSERT(
+			static_cast< AST::CComplexExpression* >(
+				static_cast< AST::CComplexExpression* >( syntaxTree[ 0 ] )->Rhs()
+				)->Rhs()->Symbol() == Grammar::Symbol::S_NAME );
+
+		UTEST_ASSERT(
+			static_cast< AST::CComplexExpression* >(
+				static_cast< AST::CComplexExpression* >( syntaxTree[ 0 ] )->Rhs()
+				)->Lhs() == NULL );
+
+		UTEST_CASE_CLOSED();
+	}( );
+
+	UTEST_CASE( "Scopes (brackets) ({})" )
+	{
+		auto syntaxTree = Parser::Parse( Lexer::Parse( "{ a = 0; a++; } {} { a; }" ) );
+
+		UTEST_ASSERT( syntaxTree.size() == 3 );
+		UTEST_ASSERT( syntaxTree[ 0 ]->Type() == AST::ExpressionType::ET_LIST );
+		UTEST_ASSERT( syntaxTree[ 0 ]->Symbol() == Grammar::Symbol::S_BRACKET_OPEN );
+		UTEST_ASSERT( syntaxTree[ 1 ]->Type() == AST::ExpressionType::ET_LIST );
+		UTEST_ASSERT( syntaxTree[ 2 ]->Type() == AST::ExpressionType::ET_LIST );
+
+		UTEST_ASSERT( static_cast< AST::CListExpression* >( syntaxTree[ 0 ] )->List().size() == 2 );
+		UTEST_ASSERT( static_cast< AST::CListExpression* >( syntaxTree[ 0 ] )->List()[ 0 ]->Symbol() == Grammar::Symbol::S_ASSIGN );
+		UTEST_ASSERT( static_cast< AST::CListExpression* >( syntaxTree[ 0 ] )->List()[ 1 ]->Symbol() == Grammar::Symbol::S_INCREMENT );
+
+		UTEST_ASSERT( static_cast< AST::CListExpression* >( syntaxTree[ 1 ] )->List().size() == 0 );
+
+		UTEST_ASSERT( static_cast< AST::CListExpression* >( syntaxTree[ 2 ] )->List().size() == 1 );
+		UTEST_ASSERT( static_cast< AST::CListExpression* >( syntaxTree[ 2 ] )->List()[ 0 ]->Symbol() == Grammar::Symbol::S_NAME );
+
+		UTEST_CASE_CLOSED();
+	}( );
+
 	UTEST_END();
 }
