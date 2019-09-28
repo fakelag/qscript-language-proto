@@ -97,6 +97,7 @@ namespace AST
 		ExpressionType 					Type() 			const { return ET_LIST; };
 		Grammar::Symbol 				Symbol()		const { return m_Symbol; }
 		const Grammar::SymbolLoc_t& 	Location() 		const { return m_Loc; }
+		std::vector< IExpression* >&	List()			{ return m_List; }
 
 	private:
 		std::vector< IExpression* >		m_List;
