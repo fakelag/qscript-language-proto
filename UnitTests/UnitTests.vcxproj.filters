@@ -33,6 +33,9 @@
     <ClCompile Include="..\Shared\Value.cpp">
       <Filter>Shared</Filter>
     </ClCompile>
+    <ClCompile Include="ParserTests.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="UnitTests.h">
