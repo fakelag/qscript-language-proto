@@ -69,7 +69,7 @@ namespace Parser
 		// Increments the current symbol index & returns the previous symbol
 		const ParserSymbol_t& NextSymbol()
 		{
-			return m_Symbols[ ++m_CurrentSymbol - 1];
+			return m_Symbols[ ++m_CurrentSymbol - 1 ];
 		}
 
 		void AddError( const Grammar::SymbolLoc_t& location, const std::string& exception )
@@ -140,7 +140,7 @@ namespace Parser
 			// Get the current symbol (and advance to the next one)
 			auto curSymbol = parserState.NextSymbol();
 
-			if (curSymbol.m_RightBind == NULL)
+			if ( curSymbol.m_RightBind == NULL )
 				throw ParseException( curSymbol.m_Location, "Expected an expression" );
 
 			// Construct the left hand tree
@@ -171,7 +171,7 @@ namespace Parser
 			{
 				curSymbol = parserState.NextSymbol();
 
-				if (curSymbol.m_LeftBind == NULL)
+				if ( curSymbol.m_LeftBind == NULL )
 					throw ParseException( curSymbol.m_Location, "Expected an expression" );
 
 				leftHand = curSymbol.m_LeftBind( curSymbol, leftHand );
@@ -254,20 +254,38 @@ namespace Parser
 				{
 					symbol.m_LeftBind = [ &nextExpression ]( const ParserSymbol_t& symbol, AST::IExpression* left ) -> AST::IExpression*
 					{
-						if ( AST::IsNameConstant( left ) )
+						if ( !AST::IsNameConstant( left ) )
 							throw ParseException( left->Location(), "Expcected a variable, got: \"" + left->Location().m_SrcToken + "\"" );
 
-						return new AST::CSimpleExpression( left, symbol.m_Symbol, symbol.m_Location );
+						return new AST::CComplexExpression( left, NULL, symbol.m_Symbol, symbol.m_Location );
 					};
 
 					symbol.m_RightBind = [ &nextExpression ]( const ParserSymbol_t& symbol ) -> AST::IExpression*
 					{
 						auto right = nextExpression( symbol.m_LBP );
 
-						if ( AST::IsNameConstant( right ) )
+						if ( !AST::IsNameConstant( right ) )
 							throw ParseException( right->Location(), "Expcected a variable, got: \"" + right->Location().m_SrcToken + "\"" );
 
-						return new AST::CSimpleExpression( right, symbol.m_Symbol, symbol.m_Location );
+						return new AST::CComplexExpression( NULL, right, symbol.m_Symbol, symbol.m_Location );
+					};
+					break;
+				}
+				case Grammar::Symbol::S_ASSIGN:
+				case Grammar::Symbol::S_ASSIGN_ADD:
+				case Grammar::Symbol::S_ASSIGN_DIV:
+				case Grammar::Symbol::S_ASSIGN_SUB:
+				case Grammar::Symbol::S_ASSIGN_MUL:
+				case Grammar::Symbol::S_ASSIGN_MOD:
+				{
+					symbol.m_LeftBind = [ &nextExpression ]( const ParserSymbol_t& symbol, AST::IExpression* left ) -> AST::IExpression*
+					{
+						auto right = nextExpression( symbol.m_LBP );
+
+						if ( !AST::IsNameConstant( left ) )
+							throw ParseException( left->Location(), "Expcected a variable, got: \"" + left->Location().m_SrcToken + "\"" );
+
+						return new AST::CComplexExpression( left, right, symbol.m_Symbol, symbol.m_Location );
 					};
 					break;
 				}
@@ -275,12 +293,6 @@ namespace Parser
 				case Grammar::Symbol::S_DIV:
 				case Grammar::Symbol::S_POW:
 				case Grammar::Symbol::S_MOD:
-				case Grammar::Symbol::S_ASSIGN:
-				case Grammar::Symbol::S_ASSIGN_ADD:
-				case Grammar::Symbol::S_ASSIGN_DIV:
-				case Grammar::Symbol::S_ASSIGN_SUB:
-				case Grammar::Symbol::S_ASSIGN_MUL:
-				case Grammar::Symbol::S_ASSIGN_MOD:
 				case Grammar::Symbol::S_LOGIC_AND:
 				case Grammar::Symbol::S_LOGIC_OR:
 				case Grammar::Symbol::S_EQUALS:
@@ -304,12 +316,29 @@ namespace Parser
 						auto right = nextExpression( symbol.m_LBP );
 
 						if ( !AST::IsNameConstant( right ) )
-							throw ParseException( right->Location(), "Expcected a variable name, got: \"" + right->Location().m_SrcToken + "\"" );
+							throw ParseException( right->Location(), "Expcected a variable, got: \"" + right->Location().m_SrcToken + "\"" );
 
 						return new AST::CSimpleExpression( right, symbol.m_Symbol, symbol.m_Location );
 					};
 					break;
 				}
+				case Grammar::Symbol::S_BRACKET_OPEN:
+				{
+					symbol.m_RightBind = [ &nextExpression, &parserState ]( const ParserSymbol_t& symbol ) -> AST::IExpression*
+					{
+						std::vector< AST::IExpression* > expressionList;
+
+						while ( parserState.CurrentSymbol().m_Symbol != Grammar::Symbol::S_BRACKET_CLOSE )
+						{
+							expressionList.push_back( nextExpression() );
+							parserState.NextSymbol();
+						}
+
+						return new AST::CListExpression( expressionList, symbol.m_Symbol, symbol.m_Location );
+					};
+					break;
+				}
+				case Grammar::Symbol::S_BRACKET_CLOSE:
 				case Grammar::Symbol::S_SEMICOLON:
 					break;
 				default:
