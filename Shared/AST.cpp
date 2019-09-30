@@ -3,6 +3,7 @@
 #include "Grammar.h"
 #include "Parser.h"
 #include "Value.h"
+#include "Exception.h"
 
 namespace AST
 {
@@ -96,5 +97,47 @@ namespace AST
 
 		output += std::string( indent - 1 < 0 ? indent : indent - 1, '\t' ) + "]\n" + "}\n";
 		return output;
+	}
+
+	void FreeNode( IExpression* expression )
+	{
+		switch ( expression->Type() )
+		{
+			case ET_LIST:
+			{
+				auto list = static_cast< CListExpression* >( expression )->List();
+				for ( auto expr : list )
+					FreeNode( expr );
+				break;
+			}
+			case ET_COMPLEX:
+			{
+				if ( static_cast< CComplexExpression* >( expression )->Lhs() )
+					FreeNode( static_cast< CComplexExpression* >( expression )->Lhs() );
+				if ( static_cast< CComplexExpression* >( expression )->Rhs() )
+					FreeNode( static_cast< CComplexExpression* >( expression )->Rhs() );
+				break;
+			}
+			case ET_SIMPLE:
+			{
+				if ( static_cast< CSimpleExpression* >( expression )->Expression() )
+					FreeNode( static_cast< CSimpleExpression* >( expression )->Expression() );
+				break;
+			}
+			case ET_VALUE:
+				break;
+			default:
+				throw new Exception( "Unknown expression type: " + std::to_string( expression->Type() ) );
+		}
+
+		delete expression;
+	}
+
+	void FreeTree( const std::vector< IExpression* > tree )
+	{
+		for ( auto expr : tree )
+		{
+			FreeNode( expr );
+		}
 	}
 }

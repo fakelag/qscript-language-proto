@@ -105,6 +105,9 @@ namespace AST
 		Grammar::Symbol					m_Symbol;
 	};
 
+	void FreeNode( IExpression* expression );
+	void FreeTree( const std::vector< IExpression* > tree );
+
 	FORCEINLINE bool IsNumberConstant( AST::IExpression* expression )
 	{
 		if ( expression->Symbol() != Grammar::Symbol::S_INTCNST && expression->Symbol() != Grammar::Symbol::S_DBLCNST )
