@@ -1,15 +1,17 @@
+#include "Lexer.h"
+#include "Parser.h"
+#include "AST.h"
+#include "Memory.h"
+
+#include "UnitTests.h"
+#include "Tests.h"
+
+#include <string>
+
 #if defined(_WIN32) || defined(_WIN64)
 #define WIN32_LEAN_AND_MEAN
 #include "windows.h"
 #endif
-
-#include "Memory.h"
-#include "UnitTests.h"
-#include "Tests.h"
-
-#include "Lexer.h"
-#include "Parser.h"
-#include "AST.h"
 
 bool HasArg( const std::string& argument, int argc, const char** argv )
 {
@@ -36,25 +38,17 @@ int main( int argc, const char** argv )
 
 	if ( HasArg( "-memtest", argc, argv ) )
 	{
+		std::cout << "Running memory tests.." << std::endl;
 		size_t beginUsage = Memory::GetVirtualMemoryUsage();
 		size_t finishUsage = 0;
 
-		std::cout << "Running memory tests.." << std::endl;
 		std::cout << "Current memory usage: " << Memory::FormatBytes( beginUsage ) << std::endl;
 
-		std::vector< AST::IExpression* > allExpressions;
-
-		for ( int i = 0; i < 10000 * 8; ++i )
+		for ( int i = 0; i < 10000 * 12; ++i )
 		{
 			auto lexed = Lexer::Parse( "{ a = 1 + 2 * 2 + -5; a = a || 8; } { a; b; a++ || b; }" );
-			// AST::FreeTree( Parser::Parse( lexed ) );
-
-			auto expressions = Parser::Parse( lexed );
-			allExpressions.insert( allExpressions.end(), expressions.begin(), expressions.end() );
+			AST::FreeTree( Parser::Parse( lexed ) );
 		}
-
-		AST::FreeTree( allExpressions );
-		allExpressions.clear();
 
 		finishUsage = Memory::GetVirtualMemoryUsage();
 
