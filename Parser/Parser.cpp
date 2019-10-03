@@ -334,7 +334,7 @@ namespace Parser
 							parserState.NextSymbol();
 						}
 
-						return new AST::CListExpression( expressionList, symbol.m_Symbol, symbol.m_Location );
+						return new AST::CListExpression( expressionList, Grammar::Symbol::S_SCOPE, symbol.m_Location );
 					};
 					break;
 				}
