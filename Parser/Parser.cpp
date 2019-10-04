@@ -1,4 +1,4 @@
-﻿#include <functional>
+#include <functional>
 #include <algorithm>
 #include "Parser.h"
 #include "Exception.h"
@@ -257,8 +257,8 @@ namespace Parser
 				{
 					symbol.m_LeftBind = [ &nextExpression ]( const ParserSymbol_t& symbol, AST::IExpression* left ) -> AST::IExpression*
 					{
-						if ( !AST::IsNameConstant( left ) )
-							throw ParseException( left->Location(), "Expcected a variable, got: \"" + left->Location().m_SrcToken + "\"" );
+						if ( !AST::IsVariable( left ) )
+							throw ParseException( left->Location(), "Expected a variable, got: \"" + left->Location().m_SrcToken + "\"" );
 
 						return new AST::CComplexExpression( left, NULL, symbol.m_Symbol, symbol.m_Location );
 					};
@@ -267,8 +267,8 @@ namespace Parser
 					{
 						auto right = nextExpression( symbol.m_LBP );
 
-						if ( !AST::IsNameConstant( right ) )
-							throw ParseException( right->Location(), "Expcected a variable, got: \"" + right->Location().m_SrcToken + "\"" );
+						if ( !AST::IsVariable( right ) )
+							throw ParseException( right->Location(), "Expected a variable, got: \"" + right->Location().m_SrcToken + "\"" );
 
 						return new AST::CComplexExpression( NULL, right, symbol.m_Symbol, symbol.m_Location );
 					};
@@ -285,8 +285,16 @@ namespace Parser
 					{
 						auto right = nextExpression( symbol.m_LBP );
 
-						if ( !AST::IsNameConstant( left ) )
-							throw ParseException( left->Location(), "Expcected a variable, got: \"" + left->Location().m_SrcToken + "\"" );
+						if ( symbol.m_Symbol == Grammar::Symbol::S_ASSIGN )
+						{
+							if ( !AST::IsVariable( left ) && left->Symbol() != Grammar::Symbol::S_VAR )
+								throw ParseException( left->Location(), "Expected a variable, got: \"" + left->Location().m_SrcToken + "\"" );
+						}
+						else
+						{
+							if ( !AST::IsVariable( left ) )
+								throw ParseException( left->Location(), "Expected a variable, got: \"" + left->Location().m_SrcToken + "\"" );
+						}
 
 						return new AST::CComplexExpression( left, right, symbol.m_Symbol, symbol.m_Location );
 					};
@@ -319,7 +327,7 @@ namespace Parser
 						auto right = nextExpression( symbol.m_LBP );
 
 						if ( !AST::IsNameConstant( right ) )
-							throw ParseException( right->Location(), "Expcected a variable, got: \"" + right->Location().m_SrcToken + "\"" );
+							throw ParseException( right->Location(), "Expected a variable name, got: \"" + right->Location().m_SrcToken + "\"" );
 
 						return new AST::CSimpleExpression( right, symbol.m_Symbol, symbol.m_Location );
 					};

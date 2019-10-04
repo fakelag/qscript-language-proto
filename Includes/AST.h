@@ -123,4 +123,14 @@ namespace AST
 
 		return true;
 	}
+
+	FORCEINLINE bool IsVariable( AST::IExpression* expression )
+	{
+		auto rightExpr = expression;
+
+		while ( rightExpr->Symbol() == Grammar::Symbol::S_DOT )
+			rightExpr = static_cast< CComplexExpression* >( rightExpr )->Rhs();
+
+		return IsNameConstant( rightExpr );
+	}
 }
