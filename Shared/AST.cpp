@@ -26,8 +26,8 @@ namespace AST
 		std::string output = std::string( indent - 1 < 0 ? indent : indent - 1, '\t' ) + "{\n";
 		output += std::string( indent, '\t' ) + "type: COMPLEX\n";
 		output += std::string( indent, '\t' ) + "token: " + token + "\n";
-		output += std::string( indent, '\t' ) + "lhs: \n" + m_LHS->ToString( indent + 1 );
-		output += std::string( indent, '\t' ) + "rhs: \n" + m_RHS->ToString( indent + 1 );
+		output += std::string( indent, '\t' ) + "lhs: " + ( m_LHS ? "\n" + m_LHS->ToString( indent + 1 ) : "NULL\n" );
+		output += std::string( indent, '\t' ) + "rhs: " + ( m_RHS ? "\n" + m_RHS->ToString( indent + 1 ) : "NULL\n" );
 		output += std::string( indent - 1 < 0 ? indent : indent - 1, '\t' ) + "}\n";
 		return output;
 	}
@@ -50,7 +50,7 @@ namespace AST
 		std::string output = std::string( indent - 1 < 0 ? indent : indent - 1, '\t' ) + "{\n";
 		output += std::string( indent, '\t' ) + "type: SIMPLE\n";
 		output += std::string( indent, '\t' ) + "token: " + token + "\n";
-		output += std::string( indent, '\t' ) + "expression: \n" + m_Expression->ToString( indent + 1 );
+		output += std::string( indent, '\t' ) + "expression: " + ( m_Expression ? "\n" + m_Expression->ToString( indent + 1 ) : "NULL\n" );
 		output += std::string( indent - 1 < 0 ? indent : indent - 1, '\t' ) + "}\n";
 		return output;
 	}
@@ -93,7 +93,7 @@ namespace AST
 		output += std::string( indent, '\t' ) + "items: [\n";
 
 		for ( auto expression : m_List )
-			output += expression->ToString( indent + 1 );
+			output += expression ? expression->ToString( indent + 1 ) : "NULL\n";
 
 		output += std::string( indent - 1 < 0 ? indent : indent - 1, '\t' ) + "]\n" + "}\n";
 		return output;
