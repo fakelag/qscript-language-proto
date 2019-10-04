@@ -1,4 +1,4 @@
-#include <functional>
+﻿#include <functional>
 #include <algorithm>
 #include "Parser.h"
 #include "Exception.h"
@@ -116,7 +116,7 @@ namespace Parser
 		void AddExpression( AST::IExpression* expression )
 		{
 			if ( expression )
-			m_Expressions.push_back( expression );
+				m_Expressions.push_back( expression );
 		}
 
 		const std::vector< AST::IExpression* >& GetExpressions() const
@@ -141,6 +141,10 @@ namespace Parser
 		// m_LeftBind and m_RightBind to form a tree like structure
 		auto nextExpression = [ &parserState ]( int rbp = 0 /* Right binding power */ ) -> AST::IExpression*
 		{
+			// Skip surplus semicolons
+			if ( parserState.CurrentSymbol().m_Symbol == Grammar::Symbol::S_SEMICOLON )
+				return NULL;
+
 			// Get the current symbol (and advance to the next one)
 			auto curSymbol = parserState.NextSymbol();
 
