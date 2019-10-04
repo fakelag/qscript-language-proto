@@ -127,7 +127,7 @@ namespace AST
 			case ET_VALUE:
 				break;
 			default:
-				throw new Exception( "Unknown expression type: " + std::to_string( expression->Type() ) );
+				throw Exception( "Unknown expression type: " + std::to_string( expression->Type() ) );
 		}
 
 		delete expression;

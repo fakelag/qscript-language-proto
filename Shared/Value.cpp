@@ -82,7 +82,7 @@ namespace Value
 			}
 		}
 		default:
-			throw "Invalid CValue type";
+			throw Exception( "Invalid CValue type" );
 		}
 	}
 
@@ -97,7 +97,7 @@ namespace Value
 		case VT_STRING:
 			return m_StringValue.length() > 0;
 		default:
-			throw "Invalid CValue type";
+			throw Exception( "Invalid CValue type" );
 		}
 	}
 
@@ -112,7 +112,7 @@ namespace Value
 		case VT_STRING:
 			return m_StringValue.length() > 0 ? 1.0 : 0.0;
 		default:
-			throw "Invalid CValue type";
+			throw Exception( "Invalid CValue type" );
 		}
 	}
 

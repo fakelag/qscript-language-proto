@@ -61,7 +61,7 @@ namespace Parser
 		const ParserSymbol_t& CurrentSymbol() const
 		{
 			if ( IsFinished() )
-				throw "Reading tokens past end of stream";
+				throw Exception( "Reading tokens past end of stream" );
 
 			return m_Symbols[ m_CurrentSymbol ];
 		}
@@ -83,6 +83,9 @@ namespace Parser
 			m_HasErrors = true;
 			m_Exception.AddError( location, exception );
 
+			// Continue parsing from a stable spot.
+			// This is so we can catch multiple mistakes
+			// in the code at the same time
 			while ( !IsFinished() )
 			{
 				switch ( m_Symbols[ m_CurrentSymbol ].m_Symbol )
@@ -100,7 +103,7 @@ namespace Parser
 			}
 		}
 
-		const ParseException& Exception() const
+		const ParseException& GetException() const
 		{
 			return m_Exception;
 		}
@@ -115,7 +118,7 @@ namespace Parser
 			m_Expressions.push_back( expression );
 		}
 
-		const std::vector< AST::IExpression* >& Expressions() const
+		const std::vector< AST::IExpression* >& GetExpressions() const
 		{
 			return m_Expressions;
 		}
@@ -374,9 +377,12 @@ namespace Parser
 
 		// Propagate all the accumulated errors to the caller, if any
 		if ( parserState.HasErrors() )
-			throw parserState.Exception();
+		{
+			ParseException exception = parserState.GetException();
+			throw exception;
+		}
 
-		return parserState.Expressions();
+		return parserState.GetExpressions();
 	}
 
 	std::string Stringify( const std::vector< AST::IExpression* >& expressions )
