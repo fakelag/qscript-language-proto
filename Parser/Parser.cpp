@@ -115,6 +115,7 @@ namespace Parser
 
 		void AddExpression( AST::IExpression* expression )
 		{
+			if ( expression )
 			m_Expressions.push_back( expression );
 		}
 
@@ -320,6 +321,25 @@ namespace Parser
 					};
 					break;
 				}
+				case Grammar::Symbol::S_DOT:
+				{
+					symbol.m_LeftBind = [ &nextExpression ]( const ParserSymbol_t& symbol, AST::IExpression* left ) -> AST::IExpression*
+					{
+						auto right = nextExpression( symbol.m_LBP );
+
+						if ( left->Symbol() == Grammar::Symbol::S_INTCNST && right->Symbol() == Grammar::Symbol::S_INTCNST )
+						{
+							auto leftValue = static_cast< AST::CValueExpression* >( left )->Value().GetString();
+							auto rightValue = static_cast< AST::CValueExpression* >( right )->Value().GetString();
+
+							Value::CValue dblValue( std::stod( leftValue + "." + rightValue ) );
+							return new AST::CValueExpression( dblValue, Grammar::Symbol::S_DBLCNST, symbol.m_Location );
+						}
+
+						return new AST::CComplexExpression( left, right, symbol.m_Symbol, symbol.m_Location );
+					};
+					break;
+				}
 				case Grammar::Symbol::S_VAR:
 				{
 					symbol.m_RightBind = [ &nextExpression ]( const ParserSymbol_t& symbol ) -> AST::IExpression*
@@ -330,6 +350,26 @@ namespace Parser
 							throw ParseException( right->Location(), "Expected a variable name, got: \"" + right->Location().m_SrcToken + "\"" );
 
 						return new AST::CSimpleExpression( right, symbol.m_Symbol, symbol.m_Location );
+					};
+					break;
+				}
+				case Grammar::Symbol::S_COMMA:
+				{
+					symbol.m_LeftBind = [ &nextExpression, &parserState ]( const ParserSymbol_t& symbol, AST::IExpression* left ) -> AST::IExpression*
+					{
+						std::vector< AST::IExpression* > expressionList = { left };
+
+						while ( true )
+						{
+							expressionList.push_back( nextExpression( symbol.m_LBP ) );
+
+							if ( parserState.CurrentSymbol().m_Symbol != Grammar::Symbol::S_COMMA )
+								break;
+
+							parserState.NextSymbol();
+						}
+
+						return new AST::CListExpression( expressionList, Grammar::Symbol::S_SCOPE, symbol.m_Location );
 					};
 					break;
 				}
