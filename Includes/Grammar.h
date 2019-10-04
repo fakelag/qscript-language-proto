@@ -1,4 +1,5 @@
 #pragma once
+
 #include <string>
 #include <map>
 
@@ -40,7 +41,6 @@ namespace Grammar
 		S_STRCNST,
 		S_INTCNST,
 		S_DBLCNST,
-
 		S_ASSIGN,
 		S_ASSIGN_ADD,
 		S_ASSIGN_SUB,
@@ -77,10 +77,10 @@ namespace Grammar
 		S_VAR,
 		S_FUNC,
 		S_RETURN,
-		S_BREAK,
 		S_TRUE,
 		S_FALSE,
 		S_SCOPE,
+		S_BREAK,
 	};
 
 	static const std::map<Symbol, SymbolInfo_t> LanguageSymbols = {

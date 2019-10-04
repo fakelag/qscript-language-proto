@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include "Exception.h"
 
 #if defined(_WIN32)
 #ifndef FORCEINLINE
@@ -57,7 +58,7 @@ namespace Value
 				SetDouble( other.m_DoubleValue );
 				return *this;
 			default:
-				throw "Invalid operation";
+				throw Exception( "Invalid operation" );
 			}
 		}
 

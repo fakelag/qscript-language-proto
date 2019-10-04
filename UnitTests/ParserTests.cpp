@@ -240,7 +240,7 @@ void RunParserTests()
 
 		UTEST_ASSERT( syntaxTree.size() == 3 );
 		UTEST_ASSERT( syntaxTree[ 0 ]->Type() == AST::ExpressionType::ET_LIST );
-		UTEST_ASSERT( syntaxTree[ 0 ]->Symbol() == Grammar::Symbol::S_BRACKET_OPEN );
+		UTEST_ASSERT( syntaxTree[ 0 ]->Symbol() == Grammar::Symbol::S_SCOPE );
 		UTEST_ASSERT( syntaxTree[ 1 ]->Type() == AST::ExpressionType::ET_LIST );
 		UTEST_ASSERT( syntaxTree[ 2 ]->Type() == AST::ExpressionType::ET_LIST );
 

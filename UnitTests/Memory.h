@@ -8,8 +8,12 @@
 #include <mach/mach_init.h>
 #endif
 
-#ifdef _WINDOWS
+#if defined(_WIN32) || defined(_WIN64)
+#ifndef WIN32_LEAN_AND_MEAN
+#define WIN32_LEAN_AND_MEAN
+#endif
 #include <windows.h>
+#include <Psapi.h>
 #else
 #include <sys/resource.h>
 #endif
@@ -50,7 +54,7 @@ namespace Memory
 		mach_msg_type_number_t t_info_count = TASK_BASIC_INFO_COUNT;
 		task_info( current_task(), TASK_BASIC_INFO, (task_info_t)&t_info, &t_info_count );
 		return t_info.resident_size;
-#elif defined(_WINDOWS)
+#elif defined(_WIN32)
 		PROCESS_MEMORY_COUNTERS counters;
 
 		if ( GetProcessMemoryInfo ( GetCurrentProcess(), &counters, sizeof(counters) ) )

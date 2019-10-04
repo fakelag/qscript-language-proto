@@ -137,6 +137,7 @@
     <ClInclude Include="..\Includes\Lexer.h" />
     <ClInclude Include="..\Includes\Parser.h" />
     <ClInclude Include="..\Includes\Value.h" />
+    <ClInclude Include="Memory.h" />
     <ClInclude Include="Tests.h" />
     <ClInclude Include="UnitTests.h" />
   </ItemGroup>
