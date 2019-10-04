@@ -7,19 +7,21 @@ namespace Grammar
 {
 	enum LeftBindingPower
 	{
-		LBP_NAME			= 0,
-		LBP_FEATURE			= 0, // TODO: Split this into multiple (e.g LBP_FORLOOP)
-		LBP_SEMICOLON		= 0,
-		LBP_LOGIC_NOT		= 0,
-		LBP_LOGIC			= 10,
-		LBP_ASSIGN			= 10,
-		LBP_EQUALITY		= 20,
-		LBP_COLON			= 30,
-		LBP_ARITHMETIC_1	= 40,
-		LBP_ARITHMETIC_2	= 50,
-		LBP_ARITHMETIC_3	= 60,
-		LBP_INCDEC			= 70,
-		LBP_OPENBRACKET		= 80,
+		LBP_IMMEDIATE		= -1,
+		LBP_NORMAL			= 0,
+		LBP_NAME			= LBP_NORMAL,
+		LBP_SEMICOLON		= LBP_NORMAL,
+		LBP_COMMA			= 10,
+		LBP_LOGIC_NOT		= 20,
+		LBP_LOGIC			= 30,
+		LBP_ASSIGN			= 30,
+		LBP_EQUALITY		= 40,
+		LBP_ARITHMETIC_1	= 60,
+		LBP_ARITHMETIC_2	= 70,
+		LBP_ARITHMETIC_3	= 80,
+		LBP_INCDEC			= 90,
+		LBP_OPENBRACKET		= 100,
+		LBP_DOT				= 110,
 	};
 
 	struct SymbolLoc_t
@@ -71,7 +73,8 @@ namespace Grammar
 		S_POW,
 		S_MOD,
 		S_SEMICOLON,
-		S_COLON,
+		S_COMMA,
+		S_DOT,
 		S_IF,
 		S_WHILE,
 		S_VAR,
@@ -127,16 +130,17 @@ namespace Grammar
 
 		// Separators
 		{ S_SEMICOLON,		{ ";",			LBP_SEMICOLON,		} },
-		{ S_COLON,			{ ",",			LBP_COLON,			} },
+		{ S_COMMA,			{ ",",			LBP_COMMA,			} },
+		{ S_DOT,			{ ".",			LBP_DOT,			} },
 
 		// Language Features
-		{ S_IF,				{ "if",			LBP_FEATURE,		} },
-		{ S_WHILE,			{ "while",		LBP_FEATURE,		} },
-		{ S_VAR,			{ "var",		-1,					} },
-		{ S_FUNC,			{ "function",	LBP_FEATURE,		} },
-		{ S_RETURN,			{ "return",		LBP_FEATURE,		} },
-		{ S_BREAK,			{ "break",		LBP_FEATURE,		} },
-		{ S_TRUE,			{ "true",		LBP_FEATURE,		} },
-		{ S_FALSE,			{ "false",		LBP_FEATURE,		} },
+		{ S_IF,				{ "if",			LBP_NORMAL,			} },
+		{ S_WHILE,			{ "while",		LBP_NORMAL,			} },
+		{ S_VAR,			{ "var",		LBP_IMMEDIATE,		} },
+		{ S_FUNC,			{ "function",	LBP_NORMAL,			} },
+		{ S_RETURN,			{ "return",		LBP_NORMAL,			} },
+		{ S_BREAK,			{ "break",		LBP_NORMAL,			} },
+		{ S_TRUE,			{ "true",		LBP_NORMAL,			} },
+		{ S_FALSE,			{ "false",		LBP_NORMAL,			} },
 	};
 }

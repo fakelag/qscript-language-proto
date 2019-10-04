@@ -115,7 +115,8 @@ namespace Parser
 
 		void AddExpression( AST::IExpression* expression )
 		{
-			m_Expressions.push_back( expression );
+			if ( expression )
+				m_Expressions.push_back( expression );
 		}
 
 		const std::vector< AST::IExpression* >& GetExpressions() const
@@ -140,6 +141,10 @@ namespace Parser
 		// m_LeftBind and m_RightBind to form a tree like structure
 		auto nextExpression = [ &parserState ]( int rbp = 0 /* Right binding power */ ) -> AST::IExpression*
 		{
+			// Skip surplus semicolons
+			if ( parserState.CurrentSymbol().m_Symbol == Grammar::Symbol::S_SEMICOLON )
+				return NULL;
+
 			// Get the current symbol (and advance to the next one)
 			auto curSymbol = parserState.NextSymbol();
 
@@ -257,8 +262,8 @@ namespace Parser
 				{
 					symbol.m_LeftBind = [ &nextExpression ]( const ParserSymbol_t& symbol, AST::IExpression* left ) -> AST::IExpression*
 					{
-						if ( !AST::IsNameConstant( left ) )
-							throw ParseException( left->Location(), "Expcected a variable, got: \"" + left->Location().m_SrcToken + "\"" );
+						if ( !AST::IsVariable( left ) )
+							throw ParseException( left->Location(), "Expected a variable, got: \"" + left->Location().m_SrcToken + "\"" );
 
 						return new AST::CComplexExpression( left, NULL, symbol.m_Symbol, symbol.m_Location );
 					};
@@ -267,8 +272,8 @@ namespace Parser
 					{
 						auto right = nextExpression( symbol.m_LBP );
 
-						if ( !AST::IsNameConstant( right ) )
-							throw ParseException( right->Location(), "Expcected a variable, got: \"" + right->Location().m_SrcToken + "\"" );
+						if ( !AST::IsVariable( right ) )
+							throw ParseException( right->Location(), "Expected a variable, got: \"" + right->Location().m_SrcToken + "\"" );
 
 						return new AST::CComplexExpression( NULL, right, symbol.m_Symbol, symbol.m_Location );
 					};
@@ -285,8 +290,16 @@ namespace Parser
 					{
 						auto right = nextExpression( symbol.m_LBP );
 
-						if ( !AST::IsNameConstant( left ) )
-							throw ParseException( left->Location(), "Expcected a variable, got: \"" + left->Location().m_SrcToken + "\"" );
+						if ( symbol.m_Symbol == Grammar::Symbol::S_ASSIGN )
+						{
+							if ( !AST::IsVariable( left ) && left->Symbol() != Grammar::Symbol::S_VAR )
+								throw ParseException( left->Location(), "Expected a variable, got: \"" + left->Location().m_SrcToken + "\"" );
+						}
+						else
+						{
+							if ( !AST::IsVariable( left ) )
+								throw ParseException( left->Location(), "Expected a variable, got: \"" + left->Location().m_SrcToken + "\"" );
+						}
 
 						return new AST::CComplexExpression( left, right, symbol.m_Symbol, symbol.m_Location );
 					};
@@ -312,6 +325,25 @@ namespace Parser
 					};
 					break;
 				}
+				case Grammar::Symbol::S_DOT:
+				{
+					symbol.m_LeftBind = [ &nextExpression ]( const ParserSymbol_t& symbol, AST::IExpression* left ) -> AST::IExpression*
+					{
+						auto right = nextExpression( symbol.m_LBP );
+
+						if ( left->Symbol() == Grammar::Symbol::S_INTCNST && right->Symbol() == Grammar::Symbol::S_INTCNST )
+						{
+							auto leftValue = static_cast< AST::CValueExpression* >( left )->Value().GetString();
+							auto rightValue = static_cast< AST::CValueExpression* >( right )->Value().GetString();
+
+							Value::CValue dblValue( std::stod( leftValue + "." + rightValue ) );
+							return new AST::CValueExpression( dblValue, Grammar::Symbol::S_DBLCNST, symbol.m_Location );
+						}
+
+						return new AST::CComplexExpression( left, right, symbol.m_Symbol, symbol.m_Location );
+					};
+					break;
+				}
 				case Grammar::Symbol::S_VAR:
 				{
 					symbol.m_RightBind = [ &nextExpression ]( const ParserSymbol_t& symbol ) -> AST::IExpression*
@@ -319,9 +351,29 @@ namespace Parser
 						auto right = nextExpression( symbol.m_LBP );
 
 						if ( !AST::IsNameConstant( right ) )
-							throw ParseException( right->Location(), "Expcected a variable, got: \"" + right->Location().m_SrcToken + "\"" );
+							throw ParseException( right->Location(), "Expected a variable name, got: \"" + right->Location().m_SrcToken + "\"" );
 
 						return new AST::CSimpleExpression( right, symbol.m_Symbol, symbol.m_Location );
+					};
+					break;
+				}
+				case Grammar::Symbol::S_COMMA:
+				{
+					symbol.m_LeftBind = [ &nextExpression, &parserState ]( const ParserSymbol_t& symbol, AST::IExpression* left ) -> AST::IExpression*
+					{
+						std::vector< AST::IExpression* > expressionList = { left };
+
+						while ( true )
+						{
+							expressionList.push_back( nextExpression( symbol.m_LBP ) );
+
+							if ( parserState.CurrentSymbol().m_Symbol != Grammar::Symbol::S_COMMA )
+								break;
+
+							parserState.NextSymbol();
+						}
+
+						return new AST::CListExpression( expressionList, Grammar::Symbol::S_SCOPE, symbol.m_Location );
 					};
 					break;
 				}

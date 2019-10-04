@@ -17,7 +17,7 @@ public:
 	}
 
 	const char* what() const _NOEXCEPT { return m_What.c_str(); }
-private:
+protected:
 	std::string m_What;
 };
 
@@ -49,6 +49,19 @@ public:
 
 	const std::vector< Grammar::SymbolLoc_t >& locations() const { return m_Locations; }
 	const std::vector< std::string >& errors() const { return m_Errors; }
+
+	ParseException operator=( const ParseException& other )
+	{
+		m_Errors.clear();
+		m_Locations.clear();
+
+		m_What = other.m_What;
+
+		std::copy( other.m_Errors.begin(), other.m_Errors.end(), std::back_inserter( m_Errors ) );
+		std::copy( other.m_Locations.begin(), other.m_Locations.end(), std::back_inserter( m_Locations ) );
+
+		return *this;
+	}
 private:
 	std::vector< Grammar::SymbolLoc_t >		m_Locations;
 	std::vector< std::string >				m_Errors;
