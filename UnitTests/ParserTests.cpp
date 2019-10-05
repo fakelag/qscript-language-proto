@@ -20,19 +20,19 @@ void RunParserTests()
 		UTEST_ASSERT(
 			static_cast< AST::CComplexExpression* >(
 				static_cast< AST::CComplexExpression* >( syntaxTree[ 0 ] )->Lhs()
-			)->Lhs()->Type() == AST::ExpressionType::ET_VALUE );
+				)->Lhs()->Type() == AST::ExpressionType::ET_VALUE );
 
 		UTEST_ASSERT(
 			static_cast< AST::CComplexExpression* >(
 				static_cast< AST::CComplexExpression* >( syntaxTree[ 0 ] )->Lhs()
-			)->Rhs()->Type() == AST::ExpressionType::ET_COMPLEX );
+				)->Rhs()->Type() == AST::ExpressionType::ET_COMPLEX );
 
 		UTEST_ASSERT(
 			static_cast< AST::CComplexExpression* >(
 				static_cast< AST::CComplexExpression* >(
 					static_cast< AST::CComplexExpression* >( syntaxTree[ 0 ] )->Lhs()
-				)->Rhs()
-			)->Symbol() == Grammar::Symbol::S_MUL );
+					)->Rhs()
+				)->Symbol() == Grammar::Symbol::S_MUL );
 
 		UTEST_CASE_CLOSED();
 	}( );
@@ -49,12 +49,12 @@ void RunParserTests()
 
 		UTEST_THROW_EXCEPTION(
 			auto syntaxTree = Parser::Parse( Lexer::Parse( "var a = = 1;" ) );
-			, const ParseException& e, e.errors().size() == 1
-		);
+		, const ParseException& e, e.errors().size() == 1
+			);
 
 		UTEST_THROW_EXCEPTION(
 			auto syntaxTree = Parser::Parse( Lexer::Parse( "var a = = 1; a = = 2;" ) );
-			, const ParseException& e,
+		, const ParseException& e,
 			e.errors().size() == 2
 			&& e.locations()[ 0 ].m_LineNr == 0
 			&& e.locations()[ 0 ].m_ColNr == 8
@@ -62,7 +62,7 @@ void RunParserTests()
 			&& e.locations()[ 1 ].m_LineNr == 0
 			&& e.locations()[ 1 ].m_ColNr == 17
 			&& e.locations()[ 1 ].m_SrcToken == "="
-		);
+			);
 
 		UTEST_CASE_CLOSED();
 	}( );
@@ -90,12 +90,12 @@ void RunParserTests()
 		UTEST_ASSERT(
 			static_cast< AST::IExpression* >(
 				static_cast< AST::CComplexExpression* >( syntaxTree[ 0 ] )->Lhs()
-			)->Type() == AST::ExpressionType::ET_VALUE );
+				)->Type() == AST::ExpressionType::ET_VALUE );
 
 		UTEST_ASSERT(
 			static_cast< AST::IExpression* >(
 				static_cast< AST::CComplexExpression* >( syntaxTree[ 0 ] )->Rhs()
-			)->Type() == AST::ExpressionType::ET_VALUE );
+				)->Type() == AST::ExpressionType::ET_VALUE );
 
 		UTEST_ASSERT( static_cast< AST::CComplexExpression* >( syntaxTree[ 6 ] )->Lhs()->Type() == AST::ExpressionType::ET_VALUE );
 		UTEST_ASSERT( static_cast< AST::CComplexExpression* >( syntaxTree[ 6 ] )->Rhs()->Type() == AST::ExpressionType::ET_COMPLEX );
@@ -103,7 +103,7 @@ void RunParserTests()
 		UTEST_ASSERT(
 			static_cast< AST::CValueExpression* >(
 				static_cast< AST::CComplexExpression* >( syntaxTree[ 6 ] )->Lhs()
-			)->Type() == AST::ExpressionType::ET_VALUE );
+				)->Type() == AST::ExpressionType::ET_VALUE );
 
 		UTEST_ASSERT(
 			static_cast< AST::CComplexExpression* >(
@@ -136,17 +136,17 @@ void RunParserTests()
 		UTEST_ASSERT(
 			static_cast< AST::IExpression* >(
 				static_cast< AST::CComplexExpression* >( syntaxTree[ 6 ] )->Lhs()
-			)->Type() == AST::ExpressionType::ET_VALUE );
+				)->Type() == AST::ExpressionType::ET_VALUE );
 
 		UTEST_ASSERT(
 			static_cast< AST::IExpression* >(
 				static_cast< AST::CComplexExpression* >( syntaxTree[ 6 ] )->Rhs()
-			)->Type() == AST::ExpressionType::ET_COMPLEX );
+				)->Type() == AST::ExpressionType::ET_COMPLEX );
 
 		UTEST_ASSERT(
 			static_cast< AST::CComplexExpression* >(
 				static_cast< AST::CComplexExpression* >( syntaxTree[ 6 ] )->Rhs()
-			)->Symbol() == Grammar::Symbol::S_EQUALS );
+				)->Symbol() == Grammar::Symbol::S_EQUALS );
 
 		UTEST_CASE_CLOSED();
 	}( );
@@ -167,17 +167,17 @@ void RunParserTests()
 		UTEST_ASSERT(
 			static_cast< AST::IExpression* >(
 				static_cast< AST::CComplexExpression* >( syntaxTree[ 0 ] )->Lhs()
-			)->Type() == AST::ExpressionType::ET_COMPLEX );
+				)->Type() == AST::ExpressionType::ET_COMPLEX );
 
 		UTEST_ASSERT(
 			static_cast< AST::CComplexExpression* >(
 				static_cast< AST::CComplexExpression* >( syntaxTree[ 0 ] )->Lhs()
-			)->Rhs()->Type() == AST::ExpressionType::ET_VALUE );
+				)->Rhs()->Type() == AST::ExpressionType::ET_VALUE );
 
 		UTEST_ASSERT(
 			static_cast< AST::IExpression* >(
 				static_cast< AST::CSimpleExpression* >( syntaxTree[ 2 ] )->Expression()
-			)->Type() == AST::ExpressionType::ET_VALUE );
+				)->Type() == AST::ExpressionType::ET_VALUE );
 
 		UTEST_CASE_CLOSED();
 	}( );
@@ -281,10 +281,10 @@ void RunParserTests()
 				static_cast< AST::CComplexExpression* >( syntaxTree[ 0 ] )->Lhs()
 				)->Lhs()->Symbol() == Grammar::Symbol::S_NAME );
 		UTEST_ASSERT(
-			static_cast< AST::CValueExpression* >( 
+			static_cast< AST::CValueExpression* >(
 				static_cast< AST::CComplexExpression* >(
 					static_cast< AST::CComplexExpression* >( syntaxTree[ 0 ] )->Lhs()
-				)->Lhs() )->Value().GetType() == Value::ValueType::VT_STRING );
+					)->Lhs() )->Value().GetType() == Value::ValueType::VT_STRING );
 		UTEST_ASSERT(
 			static_cast< AST::CValueExpression* >(
 				static_cast< AST::CComplexExpression* >(
@@ -303,7 +303,7 @@ void RunParserTests()
 		UTEST_ASSERT(
 			static_cast< AST::CValueExpression* >(
 				static_cast< AST::CComplexExpression* >( syntaxTree[ 0 ] )->Rhs()
-			)->Value().GetType() == Value::ValueType::VT_DOUBLE );
+				)->Value().GetType() == Value::ValueType::VT_DOUBLE );
 		UTEST_ASSERT(
 			static_cast< AST::CValueExpression* >(
 				static_cast< AST::CComplexExpression* >( syntaxTree[ 0 ] )->Rhs()
@@ -319,7 +319,7 @@ void RunParserTests()
 			static_cast< AST::CValueExpression* >(
 				static_cast< AST::CComplexExpression* >(
 					static_cast< AST::CComplexExpression* >( syntaxTree[ 1 ] )->Lhs()
-				)->Rhs() )->Value().GetType() == Value::ValueType::VT_STRING );
+					)->Rhs() )->Value().GetType() == Value::ValueType::VT_STRING );
 		UTEST_ASSERT(
 			static_cast< AST::CValueExpression* >(
 				static_cast< AST::CComplexExpression* >(
@@ -379,6 +379,145 @@ void RunParserTests()
 		UTEST_ASSERT( static_cast< AST::CListExpression* >( syntaxTree[ 0 ] )->List()[ 2 ]->Type() == AST::ExpressionType::ET_COMPLEX );
 		UTEST_ASSERT( static_cast< AST::CListExpression* >( syntaxTree[ 0 ] )->List()[ 2 ]->Symbol() == Grammar::Symbol::S_ADD );
 		UTEST_ASSERT( static_cast< AST::CListExpression* >( syntaxTree[ 0 ] )->List()[ 3 ]->Symbol() == Grammar::Symbol::S_EQUALS );
+
+		UTEST_CASE_CLOSED();
+	}( );
+
+	UTEST_CASE( "Array operator ([])" )
+	{
+		auto syntaxTree = Parser::Parse( Lexer::Parse( "var a = []; [1, 2, 3, a + 2]; [1, [2, 3], 4]; [ [ [1, 2], [1, 2] ], [ [1, 2 ] ] ];" ) );
+
+		UTEST_ASSERT( syntaxTree.size() == 4 );
+		UTEST_ASSERT( syntaxTree[ 0 ]->Type() == AST::ExpressionType::ET_COMPLEX );
+		UTEST_ASSERT( syntaxTree[ 1 ]->Type() == AST::ExpressionType::ET_LIST );
+		UTEST_ASSERT( syntaxTree[ 2 ]->Type() == AST::ExpressionType::ET_LIST );
+		UTEST_ASSERT( syntaxTree[ 3 ]->Type() == AST::ExpressionType::ET_LIST );
+		UTEST_ASSERT( static_cast< AST::CListExpression* >( syntaxTree[ 1 ] )->List().size() == 4 );
+		UTEST_ASSERT( static_cast< AST::CListExpression* >( syntaxTree[ 2 ] )->List().size() == 3 );
+		UTEST_ASSERT( static_cast< AST::CListExpression* >( syntaxTree[ 3 ] )->List().size() == 2 );
+
+		UTEST_ASSERT(
+			static_cast< AST::CListExpression* >(
+				static_cast< AST::CComplexExpression* >( syntaxTree[ 0 ] )->Rhs()
+				)->List().size() == 0 );
+
+		UTEST_ASSERT( static_cast< AST::CListExpression* >( syntaxTree[ 1 ] )->List()[ 0 ]->Symbol() == Grammar::Symbol::S_INTCNST );
+		UTEST_ASSERT( static_cast< AST::CListExpression* >( syntaxTree[ 1 ] )->List()[ 1 ]->Symbol() == Grammar::Symbol::S_INTCNST );
+		UTEST_ASSERT( static_cast< AST::CListExpression* >( syntaxTree[ 1 ] )->List()[ 2 ]->Symbol() == Grammar::Symbol::S_INTCNST );
+		UTEST_ASSERT( static_cast< AST::CListExpression* >( syntaxTree[ 1 ] )->List()[ 3 ]->Symbol() == Grammar::Symbol::S_ADD );
+
+		UTEST_ASSERT(
+			static_cast< AST::CValueExpression* >(
+				static_cast< AST::CListExpression* >( syntaxTree[ 1 ] )->List()[ 0 ]
+				)->Value().GetInt() == 1 );
+
+		UTEST_ASSERT(
+			static_cast< AST::CValueExpression* >(
+				static_cast< AST::CListExpression* >( syntaxTree[ 1 ] )->List()[ 1 ]
+				)->Value().GetInt() == 2 );
+
+		UTEST_ASSERT( static_cast< AST::CListExpression* >( syntaxTree[ 2 ] )->List()[ 0 ]->Symbol() == Grammar::Symbol::S_INTCNST );
+		UTEST_ASSERT( static_cast< AST::CListExpression* >( syntaxTree[ 2 ] )->List()[ 1 ]->Symbol() == Grammar::Symbol::S_ARRAY );
+		UTEST_ASSERT( static_cast< AST::CListExpression* >( syntaxTree[ 2 ] )->List()[ 2 ]->Symbol() == Grammar::Symbol::S_INTCNST );
+
+		UTEST_ASSERT(
+			static_cast< AST::CListExpression* >(
+				static_cast< AST::CListExpression* >( syntaxTree[ 2 ] )->List()[ 1 ]
+				)->List().size() == 2 );
+
+		UTEST_ASSERT(
+			static_cast< AST::CListExpression* >(
+				static_cast< AST::CListExpression* >( syntaxTree[ 2 ] )->List()[ 1 ]
+				)->List()[ 0 ]->Symbol() == Grammar::Symbol::S_INTCNST );
+
+		UTEST_ASSERT( static_cast< AST::CListExpression* >( syntaxTree[ 3 ] )->List()[ 0 ]->Symbol() == Grammar::Symbol::S_ARRAY );
+
+		UTEST_ASSERT(
+			static_cast< AST::CListExpression* >(
+				static_cast< AST::CListExpression* >( syntaxTree[ 3 ] )->List()[ 0 ]
+				)->List()[ 1 ]->Symbol() == Grammar::Symbol::S_ARRAY );
+
+		UTEST_ASSERT(
+			static_cast< AST::CListExpression* >(
+				static_cast< AST::CListExpression* >(
+					static_cast< AST::CListExpression* >( syntaxTree[ 3 ] )->List()[ 0 ]
+					)->List()[ 1 ] )->List().size() == 2 );
+
+		UTEST_ASSERT(
+			static_cast< AST::CListExpression* >(
+				static_cast< AST::CListExpression* >(
+					static_cast< AST::CListExpression* >( syntaxTree[ 3 ] )->List()[ 0 ]
+					)->List()[ 1 ] )->List()[ 1 ]->Symbol() == Grammar::Symbol::S_INTCNST );
+
+		UTEST_CASE_CLOSED();
+	}( );
+
+	UTEST_CASE( "Access operator ([])" )
+	{
+		auto syntaxTree = Parser::Parse( Lexer::Parse( "a[ 1 ]; a[ b[ 1 + a[ 1 ] ] ];" ) );
+
+		UTEST_ASSERT( syntaxTree.size() == 2 );
+		UTEST_ASSERT( syntaxTree[ 0 ]->Type() == AST::ExpressionType::ET_COMPLEX );
+		UTEST_ASSERT( syntaxTree[ 1 ]->Type() == AST::ExpressionType::ET_COMPLEX );
+		UTEST_ASSERT( static_cast< AST::CComplexExpression* >( syntaxTree[ 0 ] )->Lhs()->Symbol() == Grammar::Symbol::S_NAME );
+		UTEST_ASSERT( static_cast< AST::CComplexExpression* >( syntaxTree[ 0 ] )->Rhs()->Symbol() == Grammar::Symbol::S_INTCNST );
+
+		UTEST_ASSERT( static_cast< AST::CComplexExpression* >( syntaxTree[ 1 ] )->Lhs()->Symbol() == Grammar::Symbol::S_NAME );
+		UTEST_ASSERT( static_cast< AST::CComplexExpression* >( syntaxTree[ 1 ] )->Rhs()->Symbol() == Grammar::Symbol::S_ACCESS );
+
+		UTEST_ASSERT(
+			static_cast< AST::CComplexExpression* >(
+				static_cast< AST::CComplexExpression* >( syntaxTree[ 1 ] )->Rhs()
+				)->Rhs()->Symbol() == Grammar::Symbol::S_ADD );
+
+		UTEST_CASE_CLOSED();
+	}( );
+
+	UTEST_CASE( "Parenthesis (())" )
+	{
+		auto syntaxTree = Parser::Parse( Lexer::Parse( "a * (4 - 2) / 5; print(); print(x); print(x, y + 1, z);" ) );
+
+		UTEST_ASSERT( syntaxTree.size() == 4 );
+		UTEST_ASSERT( syntaxTree[ 0 ]->Type() == AST::ExpressionType::ET_COMPLEX );
+		UTEST_ASSERT( syntaxTree[ 1 ]->Type() == AST::ExpressionType::ET_COMPLEX );
+		UTEST_ASSERT( syntaxTree[ 2 ]->Type() == AST::ExpressionType::ET_COMPLEX );
+		UTEST_ASSERT( syntaxTree[ 3 ]->Type() == AST::ExpressionType::ET_COMPLEX );
+		UTEST_ASSERT( static_cast< AST::CComplexExpression* >( syntaxTree[ 0 ] )->Symbol() == Grammar::Symbol::S_DIV );
+		UTEST_ASSERT( static_cast< AST::CComplexExpression* >( syntaxTree[ 0 ] )->Lhs()->Symbol() == Grammar::Symbol::S_MUL );
+
+		UTEST_ASSERT(
+			static_cast< AST::CComplexExpression* >( 
+				static_cast< AST::CComplexExpression* >( syntaxTree[ 0 ] )->Lhs()
+				)->Lhs()->Symbol() == Grammar::Symbol::S_NAME );
+
+		UTEST_ASSERT(
+			static_cast< AST::CComplexExpression* >(
+				static_cast< AST::CComplexExpression* >( syntaxTree[ 0 ] )->Lhs()
+				)->Rhs()->Symbol() == Grammar::Symbol::S_SUB );
+
+		UTEST_ASSERT( syntaxTree[ 1 ]->Symbol() == Grammar::Symbol::S_CALL );
+		UTEST_ASSERT( static_cast< AST::CComplexExpression* >( syntaxTree[ 1 ] )->Lhs()->Symbol() == Grammar::Symbol::S_NAME );
+		UTEST_ASSERT( static_cast< AST::CComplexExpression* >( syntaxTree[ 2 ] )->Lhs()->Symbol() == Grammar::Symbol::S_NAME );
+		UTEST_ASSERT( static_cast< AST::CComplexExpression* >( syntaxTree[ 3 ] )->Lhs()->Symbol() == Grammar::Symbol::S_NAME );
+
+		UTEST_ASSERT( static_cast< AST::CComplexExpression* >( syntaxTree[ 1 ] )->Rhs()->Symbol() == Grammar::Symbol::S_LIST );
+		UTEST_ASSERT( static_cast< AST::CComplexExpression* >( syntaxTree[ 2 ] )->Rhs()->Symbol() == Grammar::Symbol::S_LIST );
+		UTEST_ASSERT( static_cast< AST::CComplexExpression* >( syntaxTree[ 3 ] )->Rhs()->Symbol() == Grammar::Symbol::S_LIST );
+
+		UTEST_ASSERT(
+			static_cast< AST::CListExpression* >(
+				static_cast< AST::CComplexExpression* >( syntaxTree[ 1 ] )->Rhs()
+				)->List().size() == 0 );
+
+		UTEST_ASSERT(
+			static_cast< AST::CListExpression* >(
+				static_cast< AST::CComplexExpression* >( syntaxTree[ 2 ] )->Rhs()
+				)->List().size() == 1 );
+
+		UTEST_ASSERT(
+			static_cast< AST::CListExpression* >(
+				static_cast< AST::CComplexExpression* >( syntaxTree[ 3 ] )->Rhs()
+				)->List().size() == 3 );
 
 		UTEST_CASE_CLOSED();
 	}( );
