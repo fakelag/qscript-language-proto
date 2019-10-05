@@ -3,7 +3,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
-#include <exception>
+#include "Exception.h"
 
 struct TestResult_t
 {
@@ -18,11 +18,30 @@ struct TestResult_t
 
 #define UTEST_BEGIN( name ) \
 std::string testName = name; \
-std::vector< TestResult_t > testResults;
+std::vector< TestResult_t > testResults; \
+std::vector< std::string > exceptionLines; \
+try {
 
 #define UTEST_END() \
+} catch ( const ParseException& parseException ) { \
+	exceptionLines.push_back( "\t\033[31m[Parser Exception]\033[39m " + testResults[ testResults.size() - 1 ].m_TestDescription + ": " ); \
+	auto errors = parseException.errors(); \
+	auto locations = parseException.locations(); \
+	for ( size_t i = 0; i < errors.size(); ++i ) \
+	{ \
+		exceptionLines.push_back( "\t\t " + errors[ i ] + " at line " + std::to_string( locations[ i ].m_LineNr ) \
+			+ " col " + std::to_string( locations[ i ].m_ColNr ) ); \
+	} \
+} \
+catch ( const std::exception& exception ) { \
+	exceptionLines.push_back( "\t\033[31m[Exception]\033[39m " + std::string( exception.what() ) ); \
+} \
+catch ( const std::string& exception ) { \
+	exceptionLines.push_back( "\t\033[31m[Exception]\033[39m " + exception ); \
+} \
+{ \
 std::cout << "[Unit Tests] " << testName << std::endl; \
-for ( TestResult_t result : testResults) { \
+for ( TestResult_t result : testResults ) { \
 	if ( result.m_Passed ) { \
 		std::cout << "\t\033[32m[Passed]\033[39m " << result.m_TestDescription << std::endl; \
 	} else { \
@@ -30,6 +49,12 @@ for ( TestResult_t result : testResults) { \
 		for ( std::string failedCondition : result.m_FailedConditions) \
 			std::cout << "\t\t " << failedCondition << std::endl; \
 	} \
+} \
+if ( exceptionLines.size() > 0 ) \
+{ \
+	std::cout << "\n\t\033[31mUnhandled exceptions occurred\033[39m" << std::endl; \
+	for ( auto line : exceptionLines ) std::cout << line << std::endl; \
+} \
 }
 
 #define UTEST_CASE( description ) \

@@ -39,6 +39,7 @@ namespace Grammar
 
 	enum Symbol
 	{
+		// Physical symbols
 		S_NAME,
 		S_STRCNST,
 		S_INTCNST,
@@ -82,8 +83,23 @@ namespace Grammar
 		S_RETURN,
 		S_TRUE,
 		S_FALSE,
-		S_SCOPE,
 		S_BREAK,
+
+		// Pseudo-symbols
+		S_SCOPE,
+		S_CALL,
+
+		// List symbols are used for any kind of comma separated sequences of expressions.
+		// e.g Function calls, print( "foo: ", foo )
+		S_LIST,
+
+		// Array symbols are used strictly for initializing new arrays
+		// e.g [1, 2, 3]
+		// Although the array literal could contain a list, it is removed
+		// by the parser, and the body of the list is appended directly to
+		// the array expression
+		S_ARRAY,
+		S_ACCESS,
 	};
 
 	static const std::map<Symbol, SymbolInfo_t> LanguageSymbols = {
