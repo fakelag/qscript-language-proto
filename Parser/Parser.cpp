@@ -345,6 +345,73 @@ namespace Parser
 					};
 					break;
 				}
+				case Grammar::Symbol::S_RETURN:
+				case Grammar::Symbol::S_BREAK:
+				{
+					symbol.m_RightBind = [ &nextExpression ]( const ParserSymbol_t& symbol ) -> AST::IExpression*
+					{
+						auto retValue = symbol.m_Symbol == Grammar::Symbol::S_RETURN ? nextExpression() : NULL;
+						return new AST::CSimpleExpression( retValue, symbol.m_Symbol, symbol.m_Location );
+					};
+					break;
+				}
+				case Grammar::Symbol::S_TRUE:
+				case Grammar::Symbol::S_FALSE:
+				{
+					symbol.m_RightBind = [ &nextExpression ]( const ParserSymbol_t& symbol ) -> AST::IExpression*
+					{
+						Value::CValue boolValue( symbol.m_Symbol == Grammar::Symbol::S_TRUE ? true : false );
+						return new AST::CValueExpression( boolValue, symbol.m_Symbol, symbol.m_Location );
+					};
+					break;
+				}
+				case Grammar::Symbol::S_WHILE:
+				case Grammar::Symbol::S_IF:
+				{
+					symbol.m_RightBind = [ &nextExpression ]( const ParserSymbol_t& symbol ) -> AST::IExpression*
+					{
+						auto condition = nextExpression();
+						auto body = nextExpression();
+
+						// Append a scope for single line bodies
+						if ( body->Symbol() != Grammar::Symbol::S_SCOPE )
+							body = new AST::CListExpression( { body }, Grammar::Symbol::S_SCOPE, symbol.m_Location );
+
+						return new AST::CComplexExpression( condition, body, symbol.m_Symbol, symbol.m_Location );
+					};
+					break;
+				}
+				case Grammar::Symbol::S_FUNC:
+				{
+					symbol.m_RightBind = [ &nextExpression, &parserState ]( const ParserSymbol_t& symbol ) -> AST::IExpression*
+					{
+						auto name = nextExpression( -1 );
+
+						if ( !AST::IsNameConstant( name ) )
+							throw ParseException( name->Location(), "Expected a function name, got: \"" + name->Location().m_SrcToken + "\"" );
+
+						auto args = nextExpression();
+
+						// Function takes no arguments (empty parenthesis)
+						if ( args == NULL )
+							args = new AST::CListExpression( {}, Grammar::Symbol::S_LIST, symbol.m_Location );
+
+						auto body = nextExpression();
+
+						// Append a scope for single line bodies
+						if ( body->Symbol() != Grammar::Symbol::S_SCOPE )
+							body = new AST::CListExpression( { body }, Grammar::Symbol::S_SCOPE, symbol.m_Location );
+
+						// Force args into a list, if it isn't already
+						if ( args->Type() != AST::ExpressionType::ET_LIST )
+							args = new AST::CListExpression( { args }, Grammar::Symbol::S_LIST, symbol.m_Location );
+
+						auto funcExpr = new AST::CComplexExpression( name, args, Grammar::Symbol::S_FUNCDEF, name->Location() );
+						auto bodyExpr = new AST::CSimpleExpression( body, Grammar::Symbol::S_FUNCBODY, body->Location() );
+						return new AST::CComplexExpression( funcExpr, bodyExpr, Grammar::Symbol::S_FUNC, symbol.m_Location );
+					};
+					break;
+				}
 				case Grammar::Symbol::S_VAR:
 				{
 					symbol.m_RightBind = [ &nextExpression ]( const ParserSymbol_t& symbol ) -> AST::IExpression*
@@ -471,13 +538,14 @@ namespace Parser
 
 					symbol.m_RightBind = [ &nextExpression, &parserState ]( const ParserSymbol_t& symbol ) -> AST::IExpression*
 					{
-						auto right = nextExpression();
 
-						if ( right->Symbol() == Grammar::Symbol::S_PARENT_CLOSE )
+						if ( parserState.CurrentSymbol().m_Symbol == Grammar::Symbol::S_PARENT_CLOSE )
 						{
-							auto token = Grammar::LanguageSymbols.at( Grammar::Symbol::S_PARENT_CLOSE ).m_Token;
-							throw ParseException( right->Location(), "Expected an expression, got: \"" + token + "\"" );
+							parserState.NextSymbol();
+							return NULL;
 						}
+
+						auto right = nextExpression();
 
 						if ( parserState.NextSymbol().m_Symbol != Grammar::Symbol::S_PARENT_CLOSE )
 						{

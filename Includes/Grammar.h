@@ -88,6 +88,8 @@ namespace Grammar
 		// Pseudo-symbols
 		S_SCOPE,
 		S_CALL,
+		S_FUNCDEF,
+		S_FUNCBODY,
 
 		// List symbols are used for any kind of comma separated sequences of expressions.
 		// e.g Function calls, print( "foo: ", foo )
