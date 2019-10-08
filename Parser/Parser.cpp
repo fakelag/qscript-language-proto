@@ -1,4 +1,4 @@
-﻿#include <functional>
+#include <functional>
 #include <algorithm>
 #include "Grammar.h"
 #include "Parser.h"
@@ -481,6 +481,7 @@ namespace Parser
 						if ( parserState.CurrentSymbol().m_Symbol == Grammar::Symbol::S_SBRACKET_CLOSE )
 						{
 							// Empty list
+							parserState.NextSymbol();
 							return new AST::CListExpression( {}, Grammar::Symbol::S_ARRAY, symbol.m_Location );
 						}
 						else
