@@ -583,6 +583,73 @@ void RunParserTests()
 		UTEST_CASE_CLOSED();
 	}( );
 
+	UTEST_CASE( "For clause (for)" )
+	{
+		auto syntaxTree = Parser::Parse( Lexer::Parse( "for ( var i = 0; i < 10; ++i) { i; };" ) );
+
+		UTEST_ASSERT( syntaxTree.size() == 1 );
+		UTEST_ASSERT( syntaxTree[ 0 ]->Type() == AST::ExpressionType::ET_LIST );
+		UTEST_ASSERT( syntaxTree[ 0 ]->Symbol() == Grammar::Symbol::S_FOR );
+		UTEST_ASSERT( static_cast< AST::CListExpression* >( syntaxTree[ 0 ] )->List().size() == 4 );
+		UTEST_ASSERT( static_cast< AST::CListExpression* >( syntaxTree[ 0 ] )->List()[ 0 ]->Symbol() == Grammar::Symbol::S_ASSIGN );
+		UTEST_ASSERT( static_cast< AST::CListExpression* >( syntaxTree[ 0 ] )->List()[ 1 ]->Symbol() == Grammar::Symbol::S_LESSTHAN );
+		UTEST_ASSERT( static_cast< AST::CListExpression* >( syntaxTree[ 0 ] )->List()[ 2 ]->Symbol() == Grammar::Symbol::S_INCREMENT );
+		UTEST_ASSERT( static_cast< AST::CListExpression* >( syntaxTree[ 0 ] )->List()[ 3 ]->Symbol() == Grammar::Symbol::S_SCOPE );
+
+		UTEST_ASSERT(
+			static_cast< AST::CListExpression* >(
+				static_cast< AST::CListExpression* >( syntaxTree[ 0 ] )->List()[ 3 ]
+				)->List().size() == 1 );
+
+		UTEST_ASSERT(
+			static_cast< AST::CListExpression* >(
+				static_cast< AST::CListExpression* >( syntaxTree[ 0 ] )->List()[ 3 ]
+				)->List()[ 0 ]->Symbol() == Grammar::Symbol::S_NAME );
+
+		syntaxTree = Parser::Parse( Lexer::Parse( "for(var i = 0, var a, x = []; i < 10 && a == true; ++i) { i; };" ) );
+
+		UTEST_ASSERT( syntaxTree.size() == 1 );
+		UTEST_ASSERT( syntaxTree[ 0 ]->Type() == AST::ExpressionType::ET_LIST );
+		UTEST_ASSERT( syntaxTree[ 0 ]->Symbol() == Grammar::Symbol::S_FOR );
+		UTEST_ASSERT( static_cast< AST::CListExpression* >( syntaxTree[ 0 ] )->List().size() == 4 );
+		UTEST_ASSERT( static_cast< AST::CListExpression* >( syntaxTree[ 0 ] )->List()[ 0 ]->Symbol() == Grammar::Symbol::S_LIST );
+		UTEST_ASSERT( static_cast< AST::CListExpression* >( syntaxTree[ 0 ] )->List()[ 1 ]->Symbol() == Grammar::Symbol::S_LOGIC_AND );
+		UTEST_ASSERT( static_cast< AST::CListExpression* >( syntaxTree[ 0 ] )->List()[ 2 ]->Symbol() == Grammar::Symbol::S_INCREMENT );
+		UTEST_ASSERT( static_cast< AST::CListExpression* >( syntaxTree[ 0 ] )->List()[ 3 ]->Symbol() == Grammar::Symbol::S_SCOPE );
+
+		UTEST_ASSERT(
+			static_cast< AST::CListExpression* >(
+				static_cast< AST::CListExpression* >( syntaxTree[ 0 ] )->List()[ 3 ]
+				)->List().size() == 1 );
+
+		UTEST_ASSERT(
+			static_cast< AST::CListExpression* >(
+				static_cast< AST::CListExpression* >( syntaxTree[ 0 ] )->List()[ 3 ]
+				)->List()[ 0 ]->Symbol() == Grammar::Symbol::S_NAME );
+
+		UTEST_ASSERT(
+			static_cast< AST::CListExpression* >(
+				static_cast< AST::CListExpression* >( syntaxTree[ 0 ] )->List()[ 0 ]
+			)->List().size() == 3 );
+
+		UTEST_ASSERT(
+			static_cast< AST::CListExpression* >(
+				static_cast< AST::CListExpression* >( syntaxTree[ 0 ] )->List()[ 0 ]
+			)->List()[ 0 ]->Symbol() == Grammar::Symbol::S_ASSIGN );
+
+		UTEST_ASSERT(
+			static_cast< AST::CListExpression* >(
+				static_cast< AST::CListExpression* >( syntaxTree[ 0 ] )->List()[ 0 ]
+			)->List()[ 1 ]->Symbol() == Grammar::Symbol::S_VAR );
+
+		UTEST_ASSERT(
+			static_cast< AST::CListExpression* >(
+				static_cast< AST::CListExpression* >( syntaxTree[ 0 ] )->List()[ 0 ]
+			)->List()[ 2 ]->Symbol() == Grammar::Symbol::S_ASSIGN );
+
+		UTEST_CASE_CLOSED();
+	}( );
+
 	UTEST_CASE( "Break operator (break)" )
 	{
 		auto syntaxTree = Parser::Parse( Lexer::Parse( "while ( a > 1 ) break;" ) );

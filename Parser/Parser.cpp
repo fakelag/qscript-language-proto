@@ -67,6 +67,17 @@ namespace Parser
 			return m_Symbols[ m_CurrentSymbol ];
 		}
 
+		const ParserSymbol_t* PreviousSymbol( int offset ) const
+		{
+			if ( m_CurrentSymbol - offset < 0 )
+				return NULL;
+
+			if ( IsFinished() )
+				throw Exception( "Reading tokens past end of stream" );
+
+			return &m_Symbols[ m_CurrentSymbol - offset ];
+		}
+
 		// Increments the current symbol index & returns the previous symbol
 		const ParserSymbol_t& NextSymbol()
 		{
@@ -104,11 +115,6 @@ namespace Parser
 			}
 		}
 
-		const ParseException& GetException() const
-		{
-			return m_Exception;
-		}
-
 		bool HasErrors() const
 		{
 			return m_HasErrors;
@@ -118,6 +124,11 @@ namespace Parser
 		{
 			if ( expression )
 				m_Expressions.push_back( expression );
+		}
+
+		const ParseException& GetException() const
+		{
+			return m_Exception;
 		}
 
 		const std::vector< AST::IExpression* >& GetExpressions() const
@@ -381,6 +392,37 @@ namespace Parser
 					};
 					break;
 				}
+				case Grammar::Symbol::S_FOR:
+				{
+					symbol.m_RightBind = [ &nextExpression, &parserState ]( const ParserSymbol_t& symbol ) -> AST::IExpression*
+					{
+						auto head = nextExpression();
+
+						if ( head->Type() != AST::ExpressionType::ET_LIST )
+							throw ParseException( head->Location(), "Expected a for loop declaration, got: \"" + head->Location().m_SrcToken + "\"" );
+
+						auto body = nextExpression();
+
+						// Append a scope for single line bodies
+						if ( body->Symbol() != Grammar::Symbol::S_SCOPE )
+							body = new AST::CListExpression( { body }, Grammar::Symbol::S_SCOPE, symbol.m_Location );
+
+						std::vector< AST::IExpression* > forLoop = static_cast< AST::CListExpression* >( head )->List();
+
+						// Remove surplus semicolons (and other NULL expressions)
+						forLoop.erase(std::remove_if( forLoop.begin(), forLoop.end(), []( AST::IExpression* expr ) {
+							return expr == NULL;
+						} ), forLoop.end());
+
+						forLoop.push_back( body );
+
+						// remove the head node, and append it's content to the for node
+						delete head;
+
+						return new AST::CListExpression( forLoop, Grammar::Symbol::S_FOR, symbol.m_Location );
+					};
+					break;
+				}
 				case Grammar::Symbol::S_FUNC:
 				{
 					symbol.m_RightBind = [ &nextExpression, &parserState ]( const ParserSymbol_t& symbol ) -> AST::IExpression*
@@ -481,6 +523,7 @@ namespace Parser
 						if ( parserState.CurrentSymbol().m_Symbol == Grammar::Symbol::S_SBRACKET_CLOSE )
 						{
 							// Empty list
+							parserState.NextSymbol();
 							return new AST::CListExpression( {}, Grammar::Symbol::S_ARRAY, symbol.m_Location );
 						}
 						else
@@ -538,29 +581,50 @@ namespace Parser
 
 					symbol.m_RightBind = [ &nextExpression, &parserState ]( const ParserSymbol_t& symbol ) -> AST::IExpression*
 					{
+						auto previousSymbol = parserState.PreviousSymbol( 2 );
 
-						if ( parserState.CurrentSymbol().m_Symbol == Grammar::Symbol::S_PARENT_CLOSE )
+						if ( previousSymbol && previousSymbol->m_Symbol == Grammar::Symbol::S_FOR )
 						{
-							parserState.NextSymbol();
-							return NULL;
+							if ( parserState.CurrentSymbol().m_Symbol == Grammar::Symbol::S_PARENT_CLOSE )
+								throw ParseException( parserState.CurrentSymbol().m_Location, "Expected a for loop, got: \"" + parserState.CurrentSymbol().m_Token + "\"" );
+
+							std::vector< AST::IExpression* > expressionList ={};
+
+							while ( true )
+							{
+								expressionList.push_back( nextExpression() );
+
+								if ( parserState.NextSymbol().m_Symbol == Grammar::Symbol::S_PARENT_CLOSE )
+									break;
+							}
+
+							return new AST::CListExpression( expressionList, Grammar::Symbol::S_LIST, symbol.m_Location );
 						}
-
-						auto right = nextExpression();
-
-						if ( parserState.NextSymbol().m_Symbol != Grammar::Symbol::S_PARENT_CLOSE )
+						else
 						{
-							auto curSymbol = parserState.CurrentSymbol();
-							throw ParseException( right->Location(), "Expected an end of expression, got: \"" + curSymbol.m_Token + "\"" );
-						}
+							if ( parserState.CurrentSymbol().m_Symbol == Grammar::Symbol::S_PARENT_CLOSE )
+							{
+								parserState.NextSymbol();
+								return NULL;
+							}
 
-						return right;
+							auto right = nextExpression();
+
+							if ( parserState.NextSymbol().m_Symbol != Grammar::Symbol::S_PARENT_CLOSE )
+							{
+								auto curSymbol = parserState.CurrentSymbol();
+								throw ParseException( right->Location(), "Expected an end of expression, got: \"" + curSymbol.m_Token + "\"" );
+							}
+
+							return right;
+						}
 					};
 					break;
 				}
+				case Grammar::Symbol::S_SEMICOLON:
 				case Grammar::Symbol::S_PARENT_CLOSE:
 				case Grammar::Symbol::S_SBRACKET_CLOSE:
 				case Grammar::Symbol::S_BRACKET_CLOSE:
-				case Grammar::Symbol::S_SEMICOLON:
 					break;
 				default:
 					throw ParseException( lexerSymbol.m_Location, "Unknown symbol: " + std::to_string( lexerSymbol.m_Symbol ) );

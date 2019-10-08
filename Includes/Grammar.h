@@ -8,9 +8,7 @@ namespace Grammar
 	enum LeftBindingPower
 	{
 		LBP_IMMEDIATE		= -1,
-		LBP_NORMAL			= 0,
-		LBP_NAME			= LBP_NORMAL,
-		LBP_SEMICOLON		= LBP_NORMAL,
+		LBP_NONE			= 0,
 		LBP_COMMA			= 10,
 		LBP_LOGIC_NOT		= 20,
 		LBP_LOGIC			= 30,
@@ -78,6 +76,7 @@ namespace Grammar
 		S_DOT,
 		S_IF,
 		S_WHILE,
+		S_FOR,
 		S_VAR,
 		S_FUNC,
 		S_RETURN,
@@ -131,12 +130,12 @@ namespace Grammar
 		{ S_DECREMENT,		{ "--",			LBP_INCDEC,			} },
 
 		// Brackets
-		{ S_BRACKET_OPEN,	{ "{",			0,					} },
-		{ S_BRACKET_CLOSE,	{ "}",			0,					} },
+		{ S_BRACKET_OPEN,	{ "{",			LBP_NONE,			} },
+		{ S_BRACKET_CLOSE,	{ "}",			LBP_NONE,			} },
 		{ S_SBRACKET_OPEN,	{ "[",			LBP_OPENBRACKET,	} },
-		{ S_SBRACKET_CLOSE,	{ "]",			0,					} },
+		{ S_SBRACKET_CLOSE,	{ "]",			LBP_NONE,			} },
 		{ S_PARENT_OPEN,	{ "(",			LBP_OPENBRACKET,	} },
-		{ S_PARENT_CLOSE,	{ ")",			0,					} },
+		{ S_PARENT_CLOSE,	{ ")",			LBP_NONE,			} },
 
 		// Arithmetics
 		{ S_ADD,			{ "+",			LBP_ARITHMETIC_1,	} },
@@ -147,18 +146,19 @@ namespace Grammar
 		{ S_POW,			{ "**",			LBP_ARITHMETIC_3,	} },
 
 		// Separators
-		{ S_SEMICOLON,		{ ";",			LBP_SEMICOLON,		} },
+		{ S_SEMICOLON,		{ ";",			LBP_NONE,			} },
 		{ S_COMMA,			{ ",",			LBP_COMMA,			} },
 		{ S_DOT,			{ ".",			LBP_DOT,			} },
 
 		// Language Features
-		{ S_IF,				{ "if",			LBP_NORMAL,			} },
-		{ S_WHILE,			{ "while",		LBP_NORMAL,			} },
+		{ S_IF,				{ "if",			LBP_NONE,			} },
+		{ S_WHILE,			{ "while",		LBP_NONE,			} },
+		{ S_FOR, 			{ "for", 		LBP_NONE, 			} },
 		{ S_VAR,			{ "var",		LBP_IMMEDIATE,		} },
-		{ S_FUNC,			{ "function",	LBP_NORMAL,			} },
-		{ S_RETURN,			{ "return",		LBP_NORMAL,			} },
-		{ S_BREAK,			{ "break",		LBP_NORMAL,			} },
-		{ S_TRUE,			{ "true",		LBP_NORMAL,			} },
-		{ S_FALSE,			{ "false",		LBP_NORMAL,			} },
+		{ S_FUNC,			{ "function",	LBP_NONE,			} },
+		{ S_RETURN,			{ "return",		LBP_NONE,			} },
+		{ S_BREAK,			{ "break",		LBP_NONE,			} },
+		{ S_TRUE,			{ "true",		LBP_NONE,			} },
+		{ S_FALSE,			{ "false",		LBP_NONE,			} },
 	};
 }
