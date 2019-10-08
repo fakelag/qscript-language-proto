@@ -50,7 +50,7 @@ namespace Lexer
 			symbols.push_back( LexerSymbol_t {
 				symbolType,
 				Grammar::SymbolLoc_t { currentLineNr, currentColNr, stringBuffer },
-				Grammar::LBP_NAME,
+				Grammar::LBP_NONE,
 				stringBuffer,
 				} );
 
