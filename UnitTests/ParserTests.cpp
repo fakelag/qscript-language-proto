@@ -797,5 +797,93 @@ void RunParserTests()
 		UTEST_CASE_CLOSED();
 	}( );
 
+	UTEST_CASE( "Class clause 1" )
+	{
+		auto syntaxTree = Parser::Parse( Lexer::Parse( "\
+			class Value 								\
+			{											\
+														\
+			}											\
+		" ) );
+
+		UTEST_ASSERT( syntaxTree.size() == 1 );
+		UTEST_ASSERT( syntaxTree[ 0 ]->Type() == AST::ExpressionType::ET_LIST );
+		UTEST_ASSERT( syntaxTree[ 0 ]->Symbol() == Grammar::Symbol::S_CLASS );
+		UTEST_ASSERT( static_cast< AST::CListExpression* >( syntaxTree[ 0 ] )->List().size() == 3 );
+		UTEST_ASSERT( static_cast< AST::CListExpression* >( syntaxTree[ 0 ] )->List()[ 0 ]->Type() == AST::ExpressionType::ET_VALUE );
+		UTEST_ASSERT( static_cast< AST::CListExpression* >( syntaxTree[ 0 ] )->List()[ 1 ]->Type() == AST::ExpressionType::ET_LIST );
+		UTEST_ASSERT( static_cast< AST::CListExpression* >( syntaxTree[ 0 ] )->List()[ 2 ]->Type() == AST::ExpressionType::ET_LIST );
+
+		UTEST_ASSERT( static_cast< AST::CListExpression* >( syntaxTree[ 0 ] )->List()[ 0 ]->Symbol() == Grammar::Symbol::S_NAME );
+		UTEST_ASSERT( static_cast< AST::CListExpression* >( syntaxTree[ 0 ] )->List()[ 1 ]->Symbol() == Grammar::Symbol::S_LIST );
+		UTEST_ASSERT( static_cast< AST::CListExpression* >( syntaxTree[ 0 ] )->List()[ 2 ]->Symbol() == Grammar::Symbol::S_CLASSBODY );
+
+		UTEST_ASSERT(
+			static_cast< AST::CListExpression* >(
+				static_cast< AST::CListExpression* >( syntaxTree[ 0 ] )
+			->List()[ 1 ] )->List().size() == 0 );
+
+		UTEST_ASSERT(
+			static_cast< AST::CListExpression* >(
+				static_cast< AST::CListExpression* >( syntaxTree[ 0 ] )
+			->List()[ 2 ] )->List().size() == 0 );
+
+		syntaxTree = Parser::Parse( Lexer::Parse( "		\
+			class Value : BaseClass						\
+			{											\
+														\
+			}											\
+		" ) );
+
+		UTEST_ASSERT(
+			static_cast< AST::CListExpression* >(
+				static_cast< AST::CListExpression* >( syntaxTree[ 0 ] )
+			->List()[ 1 ] )->List().size() == 1 );
+
+		UTEST_ASSERT(
+			static_cast< AST::CListExpression* >(
+				static_cast< AST::CListExpression* >( syntaxTree[ 0 ] )
+			->List()[ 1 ] )->List()[ 0 ]->Symbol() == Grammar::Symbol::S_NAME );
+
+		UTEST_ASSERT(
+			static_cast< AST::CListExpression* >(
+				static_cast< AST::CListExpression* >( syntaxTree[ 0 ] )
+			->List()[ 2 ] )->List().size() == 0 );
+
+		syntaxTree = Parser::Parse( Lexer::Parse( "				\
+			class Value : BaseClass1, BaseClass2, BaseClass3	\
+			{													\
+																\
+			}													\
+		" ) );
+
+		UTEST_ASSERT(
+			static_cast< AST::CListExpression* >(
+				static_cast< AST::CListExpression* >( syntaxTree[ 0 ] )
+			->List()[ 1 ] )->List().size() == 3 );
+
+		UTEST_ASSERT(
+			static_cast< AST::CListExpression* >(
+				static_cast< AST::CListExpression* >( syntaxTree[ 0 ] )
+			->List()[ 1 ] )->List()[ 0 ]->Symbol() == Grammar::Symbol::S_NAME );
+
+		UTEST_ASSERT(
+			static_cast< AST::CListExpression* >(
+				static_cast< AST::CListExpression* >( syntaxTree[ 0 ] )
+			->List()[ 1 ] )->List()[ 1 ]->Symbol() == Grammar::Symbol::S_NAME );
+
+		UTEST_ASSERT(
+			static_cast< AST::CListExpression* >(
+				static_cast< AST::CListExpression* >( syntaxTree[ 0 ] )
+			->List()[ 1 ] )->List()[ 2 ]->Symbol() == Grammar::Symbol::S_NAME );
+
+		UTEST_ASSERT(
+			static_cast< AST::CListExpression* >(
+				static_cast< AST::CListExpression* >( syntaxTree[ 0 ] )
+			->List()[ 2 ] )->List().size() == 0 );
+
+		UTEST_CASE_CLOSED();
+	}( );
+
 	UTEST_END();
 }
