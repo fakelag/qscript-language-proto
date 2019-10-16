@@ -438,18 +438,19 @@ namespace Parser
 						if ( args == NULL )
 							args = new AST::CListExpression( {}, Grammar::Symbol::S_LIST, symbol.m_Location );
 
-						auto body = nextExpression();
-
-						// Append a scope for single line bodies
-						if ( body->Symbol() != Grammar::Symbol::S_SCOPE )
-							body = new AST::CListExpression( { body }, Grammar::Symbol::S_SCOPE, symbol.m_Location );
-
 						// Force args into a list, if it isn't already
 						if ( args->Type() != AST::ExpressionType::ET_LIST )
 							args = new AST::CListExpression( { args }, Grammar::Symbol::S_LIST, symbol.m_Location );
 
+						// The body of a function may also be NULL
+						auto body = nextExpression();
+
+						// Append a scope for single line bodies
+						if ( body && body->Symbol() != Grammar::Symbol::S_SCOPE )
+							body = new AST::CListExpression( { body }, Grammar::Symbol::S_SCOPE, symbol.m_Location );
+
 						auto funcExpr = new AST::CComplexExpression( name, args, Grammar::Symbol::S_FUNCDEF, name->Location() );
-						auto bodyExpr = new AST::CSimpleExpression( body, Grammar::Symbol::S_FUNCBODY, body->Location() );
+						auto bodyExpr = new AST::CSimpleExpression( body, Grammar::Symbol::S_FUNCBODY, body ? body->Location() : name->Location() );
 						return new AST::CComplexExpression( funcExpr, bodyExpr, Grammar::Symbol::S_FUNC, symbol.m_Location );
 					};
 					break;
