@@ -797,6 +797,36 @@ void RunParserTests()
 		UTEST_CASE_CLOSED();
 	}( );
 
+	UTEST_CASE( "Function prototypes (function)" )
+	{
+		auto syntaxTree = Parser::Parse( Lexer::Parse( "function ABC();" ) );
+
+		UTEST_ASSERT( syntaxTree.size() == 1 );
+		UTEST_ASSERT( syntaxTree[ 0 ]->Type() == AST::ExpressionType::ET_COMPLEX );
+
+		UTEST_ASSERT( syntaxTree[ 0 ]->Symbol() == Grammar::Symbol::S_FUNC );
+
+		UTEST_ASSERT( static_cast< AST::CComplexExpression* >( syntaxTree[ 0 ] )->Lhs()->Symbol() == Grammar::Symbol::S_FUNCDEF );
+		UTEST_ASSERT( static_cast< AST::CComplexExpression* >( syntaxTree[ 0 ] )->Rhs()->Symbol() == Grammar::Symbol::S_FUNCBODY );
+
+		UTEST_ASSERT(
+			static_cast< AST::CComplexExpression* >(
+				static_cast< AST::CComplexExpression* >( syntaxTree[ 0 ] )->Lhs()
+				)->Lhs()->Symbol() == Grammar::Symbol::S_NAME );
+
+		UTEST_ASSERT(
+			static_cast< AST::CComplexExpression* >(
+				static_cast< AST::CComplexExpression* >( syntaxTree[ 0 ] )->Lhs()
+				)->Rhs()->Symbol() == Grammar::Symbol::S_LIST );
+
+		UTEST_ASSERT(
+			static_cast< AST::CSimpleExpression* >(
+				static_cast< AST::CComplexExpression* >( syntaxTree[ 0 ] )->Rhs()
+				)->Expression() == NULL );
+
+		UTEST_CASE_CLOSED();
+	}( );
+
 	UTEST_CASE( "Class clause 1" )
 	{
 		auto syntaxTree = Parser::Parse( Lexer::Parse( "\
