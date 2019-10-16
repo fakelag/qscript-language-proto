@@ -63,6 +63,8 @@ int main( int argc, const char** argv )
 		RunParserTests();
 	}
 
+#ifdef _WIN32
 	std::getchar();
+#endif
 	return 0;
 }

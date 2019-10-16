@@ -447,19 +447,85 @@ namespace Parser
 						if ( args == NULL )
 							args = new AST::CListExpression( {}, Grammar::Symbol::S_LIST, symbol.m_Location );
 
-						auto body = nextExpression();
-
-						// Append a scope for single line bodies
-						if ( body->Symbol() != Grammar::Symbol::S_SCOPE )
-							body = new AST::CListExpression( { body }, Grammar::Symbol::S_SCOPE, symbol.m_Location );
-
 						// Force args into a list, if it isn't already
 						if ( args->Type() != AST::ExpressionType::ET_LIST )
 							args = new AST::CListExpression( { args }, Grammar::Symbol::S_LIST, symbol.m_Location );
 
+						// The body of a function may also be NULL
+						auto body = nextExpression();
+
+						// Append a scope for single line bodies
+						if ( body && body->Symbol() != Grammar::Symbol::S_SCOPE )
+							body = new AST::CListExpression( { body }, Grammar::Symbol::S_SCOPE, symbol.m_Location );
+
 						auto funcExpr = new AST::CComplexExpression( name, args, Grammar::Symbol::S_FUNCDEF, name->Location() );
-						auto bodyExpr = new AST::CSimpleExpression( body, Grammar::Symbol::S_FUNCBODY, body->Location() );
+						auto bodyExpr = new AST::CSimpleExpression( body, Grammar::Symbol::S_FUNCBODY, body ? body->Location() : name->Location() );
 						return new AST::CComplexExpression( funcExpr, bodyExpr, Grammar::Symbol::S_FUNC, symbol.m_Location );
+					};
+					break;
+				}
+				case Grammar::Symbol::S_CLASS:
+				{
+					symbol.m_RightBind = [ &nextExpression ]( const ParserSymbol_t& symbol ) -> AST::IExpression*
+					{
+						AST::IExpression* name = nextExpression();
+						AST::IExpression* parent = NULL;
+						AST::IExpression* body = NULL;
+
+						if ( !AST::IsNameConstant( name ) )
+							throw ParseException( name->Location(), "Expected a class name, got: \"" + name->Location().m_SrcToken + "\"" );
+
+						auto next = nextExpression();
+						switch ( next->Symbol() )
+						{
+						case Grammar::Symbol::S_NAME:
+						{
+							// Convert the single name into a list, and then handle it as a list of names
+							next = new AST::CListExpression({ next }, Grammar::Symbol::S_LIST, next->Location() );
+
+							/* Fall through! Treat the expression as a list */
+						}
+						case Grammar::Symbol::S_LIST:
+						{
+							// There is an inheritance chain, add it
+							parent = next;
+
+							// Parse the class body
+							auto bodyExpr = nextExpression();
+
+							if ( bodyExpr->Symbol() != Grammar::Symbol::S_SCOPE )
+								throw ParseException( bodyExpr->Location(), "Expected a class definition, got: \"" + bodyExpr->Location().m_SrcToken + "\"" );
+
+							// Replace S_SCOPE with S_CLASSBODY
+							auto exprList = static_cast< AST::CListExpression* >( bodyExpr )->List();
+
+							// Create body expression
+							body = new AST::CListExpression( exprList, Grammar::Symbol::S_CLASSBODY, bodyExpr->Location() );
+
+							// Remove scope expression
+							delete bodyExpr;
+							break;
+						}
+						case Grammar::Symbol::S_SCOPE:
+						{
+							// Replace S_SCOPE with S_CLASSBODY
+							auto exprList = static_cast< AST::CListExpression* >( next )->List();
+
+							// Create body expression
+							body = new AST::CListExpression( exprList, Grammar::Symbol::S_CLASSBODY, next->Location() );
+
+							// Create an empty inheritence chain
+							parent = new AST::CListExpression({}, Grammar::Symbol::S_LIST, symbol.m_Location );
+
+							// Remove scope expression
+							delete next;
+							break;
+						}
+						default:
+							throw ParseException( next->Location(), "Expected a class definition, got: \"" + next->Location().m_SrcToken + "\"" );
+						}
+
+						return new AST::CListExpression( { name, parent, body }, symbol.m_Symbol, symbol.m_Location );
 					};
 					break;
 				}
@@ -473,6 +539,14 @@ namespace Parser
 							throw ParseException( right->Location(), "Expected a variable name, got: \"" + right->Location().m_SrcToken + "\"" );
 
 						return new AST::CSimpleExpression( right, symbol.m_Symbol, symbol.m_Location );
+					};
+					break;
+				}
+				case Grammar::Symbol::S_COLON:
+				{
+					symbol.m_RightBind = [ &nextExpression ]( const ParserSymbol_t& symbol ) -> AST::IExpression*
+					{
+						return nextExpression();
 					};
 					break;
 				}

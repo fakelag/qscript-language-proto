@@ -73,6 +73,7 @@ namespace Grammar
 		S_MOD,
 		S_SEMICOLON,
 		S_COMMA,
+		S_COLON,
 		S_DOT,
 		S_IF,
 		S_WHILE,
@@ -90,6 +91,9 @@ namespace Grammar
 		S_CALL,
 		S_FUNCDEF,
 		S_FUNCBODY,
+
+		S_CLASS,
+		S_CLASSBODY,
 
 		// List symbols are used for any kind of comma separated sequences of expressions.
 		// e.g Function calls, print( "foo: ", foo )
@@ -150,6 +154,7 @@ namespace Grammar
 		{ S_SEMICOLON,		{ ";",			LBP_NONE,			} },
 		{ S_COMMA,			{ ",",			LBP_COMMA,			} },
 		{ S_DOT,			{ ".",			LBP_DOT,			} },
+		{ S_COLON, 			{ ":", 			LBP_NONE, 			} },
 
 		// Language Features
 		{ S_IF,				{ "if",			LBP_NONE,			} },
@@ -161,6 +166,7 @@ namespace Grammar
 		{ S_BREAK,			{ "break",		LBP_NONE,			} },
 		{ S_TRUE,			{ "true",		LBP_NONE,			} },
 		{ S_FALSE,			{ "false",		LBP_NONE,			} },
+		{ S_CLASS, 			{ "class", 		LBP_NONE, 			} },
 		{ S_DEFER, 			{ "defer", 		LBP_NONE, 			} },
 	};
 }
