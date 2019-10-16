@@ -984,6 +984,20 @@ void RunParserTests()
 				static_cast< AST::CListExpression* >( syntaxTree[ 0 ] )
 			->List()[ 2 ] )->List()[ 2 ]->Symbol() == Grammar::Symbol::S_VAR );
 
+	UTEST_CASE( "Defer operator (defer)" )
+	{
+		auto syntaxTree = Parser::Parse( Lexer::Parse( "print(x); defer print(x); defer { print(x); print(y); };" ) );
+
+		UTEST_ASSERT( syntaxTree.size() == 3 );
+		UTEST_ASSERT( syntaxTree[ 0 ]->Type() == AST::ExpressionType::ET_COMPLEX );
+		UTEST_ASSERT( syntaxTree[ 1 ]->Type() == AST::ExpressionType::ET_SIMPLE );
+		UTEST_ASSERT( syntaxTree[ 2 ]->Type() == AST::ExpressionType::ET_SIMPLE );
+		UTEST_ASSERT( syntaxTree[ 0 ]->Symbol() == Grammar::Symbol::S_CALL );
+		UTEST_ASSERT( syntaxTree[ 1 ]->Symbol() == Grammar::Symbol::S_DEFER );
+		UTEST_ASSERT( syntaxTree[ 2 ]->Symbol() == Grammar::Symbol::S_DEFER );
+		UTEST_ASSERT( static_cast< AST::CSimpleExpression* >( syntaxTree[ 1 ] )->Expression()->Symbol() == Grammar::Symbol::S_CALL );
+		UTEST_ASSERT( static_cast< AST::CSimpleExpression* >( syntaxTree[ 2 ] )->Expression()->Symbol() == Grammar::Symbol::S_SCOPE );
+
 		UTEST_CASE_CLOSED();
 	}( );
 

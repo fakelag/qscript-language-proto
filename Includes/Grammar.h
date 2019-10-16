@@ -84,6 +84,7 @@ namespace Grammar
 		S_TRUE,
 		S_FALSE,
 		S_BREAK,
+		S_DEFER,
 
 		// Pseudo-symbols
 		S_SCOPE,
@@ -166,5 +167,6 @@ namespace Grammar
 		{ S_TRUE,			{ "true",		LBP_NONE,			} },
 		{ S_FALSE,			{ "false",		LBP_NONE,			} },
 		{ S_CLASS, 			{ "class", 		LBP_NONE, 			} },
+		{ S_DEFER, 			{ "defer", 		LBP_NONE, 			} },
 	};
 }

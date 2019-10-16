@@ -376,6 +376,15 @@ namespace Parser
 					};
 					break;
 				}
+				case Grammar::Symbol::S_DEFER:
+				{
+					symbol.m_RightBind = [ &nextExpression ]( const ParserSymbol_t& symbol ) -> AST::IExpression*
+					{
+						auto right = nextExpression();
+						return new AST::CSimpleExpression( right, symbol.m_Symbol, symbol.m_Location );
+					};
+					break;
+				}
 				case Grammar::Symbol::S_WHILE:
 				case Grammar::Symbol::S_IF:
 				{
