@@ -8,6 +8,6 @@
 
 namespace Parser
 {
-	std::vector< AST::IExpression* > Parse( const std::vector< Lexer::LexerSymbol_t >& symbols );
+	std::vector< AST::IExpression* > Parse( const std::vector< Lexer::LexerSymbol_t >& symbols, bool autoFreeMemory = true );
 	std::string Stringify( const std::vector< AST::IExpression* >& expressions );
 }
