@@ -7,12 +7,62 @@
 
 namespace AST
 {
+	// Refactor this into some kind of class
+	bool trackAlloc = false;
+	std::vector< IExpression* > allocatedExpressions;
+
+	void TrackAlloc()
+	{
+		allocatedExpressions.clear();
+		trackAlloc = true;
+	}
+
+	void StopAllocTracking()
+	{
+		trackAlloc = false;
+	}
+
+	void ExpressionAllocated( IExpression* expr )
+	{
+		if ( trackAlloc )
+			allocatedExpressions.push_back( expr );
+	}
+
+	void ExpressionFreed( void* expr )
+	{
+		if ( trackAlloc )
+		{
+			auto position = std::find( allocatedExpressions.begin(), allocatedExpressions.end(), expr );
+
+			if ( position != allocatedExpressions.end() )
+				allocatedExpressions.erase( position );
+		}
+	}
+
+	const std::vector< IExpression* >& AllocatedExpressions()
+	{
+		return allocatedExpressions;
+	}
+
 	CComplexExpression::CComplexExpression( IExpression* lhs, IExpression* rhs, Grammar::Symbol symbol, const Grammar::SymbolLoc_t& loc )
 	{
 		m_LHS = lhs;
 		m_RHS = rhs;
 		m_Loc = loc;
 		m_Symbol = symbol;
+	}
+
+	void* CComplexExpression::operator new ( size_t size )
+	{
+		auto p = ::new CComplexExpression();
+		ExpressionAllocated(p);
+		return p;
+	}
+
+	void CComplexExpression::operator delete ( void* p )
+	{
+		ExpressionFreed( p );
+		free( p );
 	}
 
 	std::string CComplexExpression::ToString( int indent )
@@ -39,6 +89,19 @@ namespace AST
 		m_Symbol = symbol;
 	}
 
+	void* CSimpleExpression::operator new ( size_t size )
+	{
+		auto p = ::new CSimpleExpression();
+		ExpressionAllocated( p );
+		return p;
+	}
+
+	void CSimpleExpression::operator delete ( void* p )
+	{
+		ExpressionFreed( p );
+		free( p );
+	}
+
 	std::string CSimpleExpression::ToString( int indent )
 	{
 		std::string token = "UNKNOWN";
@@ -62,6 +125,19 @@ namespace AST
 		m_Symbol = symbol;
 	}
 
+	void* CValueExpression::operator new ( size_t size )
+	{
+		auto p = ::new CValueExpression();
+		ExpressionAllocated( p );
+		return p;
+	}
+
+	void CValueExpression::operator delete ( void* p )
+	{
+		ExpressionFreed( p );
+		free( p );
+	}
+
 	std::string CValueExpression::ToString( int indent )
 	{
 		static const char* s_ValueTypes[] ={
@@ -83,6 +159,19 @@ namespace AST
 		m_List = list;
 		m_Loc = loc;
 		m_Symbol = symbol;
+	}
+
+	void* CListExpression::operator new ( size_t size )
+	{
+		auto p = ::new CListExpression();
+		ExpressionAllocated( p );
+		return p;
+	}
+
+	void CListExpression::operator delete ( void* p )
+	{
+		ExpressionFreed( p );
+		free( p );
 	}
 
 	std::string CListExpression::ToString( int indent )

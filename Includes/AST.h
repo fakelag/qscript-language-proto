@@ -47,6 +47,12 @@ namespace AST
 		IExpression* 					Lhs() 			const { return m_LHS; }
 		IExpression* 					Rhs() 			const { return m_RHS; }
 
+		void* operator new ( size_t size );
+		void operator delete ( void* p );
+
+	protected:
+		CComplexExpression() {}
+
 	private:
 		IExpression*			m_LHS;
 		IExpression*			m_RHS;
@@ -65,6 +71,12 @@ namespace AST
 		const Grammar::SymbolLoc_t& 	Location() 		const { return m_Loc; }
 		IExpression*					Expression() 	const { return m_Expression; }
 
+		void* operator new ( size_t size );
+		void operator delete ( void* p );
+
+	protected:
+		CSimpleExpression() {}
+
 	private:
 		IExpression*			m_Expression;
 		Grammar::SymbolLoc_t	m_Loc;
@@ -82,6 +94,12 @@ namespace AST
 		const Grammar::SymbolLoc_t& 	Location() 		const { return m_Loc; }
 		Value::CValue&					Value()			{ return m_Value; }
 
+		void* operator new ( size_t size );
+		void operator delete ( void* p );
+
+	protected:
+		CValueExpression() {}
+
 	private:
 		Value::CValue			m_Value;
 		Grammar::SymbolLoc_t	m_Loc;
@@ -98,6 +116,12 @@ namespace AST
 		Grammar::Symbol 				Symbol()		const { return m_Symbol; }
 		const Grammar::SymbolLoc_t& 	Location() 		const { return m_Loc; }
 		std::vector< IExpression* >&	List()			{ return m_List; }
+
+		void* operator new ( size_t size );
+		void operator delete ( void* p );
+
+		protected:
+			CListExpression() {}
 
 	private:
 		std::vector< IExpression* >		m_List;
@@ -133,4 +157,8 @@ namespace AST
 
 		return IsNameConstant( rightExpr );
 	}
+
+	void TrackAlloc();
+	void StopAllocTracking();
+	const std::vector< IExpression* >& AllocatedExpressions();
 }
