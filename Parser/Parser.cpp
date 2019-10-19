@@ -145,8 +145,13 @@ namespace Parser
 		ParseException								m_Exception;
 	};
 
-	std::vector< AST::IExpression* > Parse( const std::vector< Lexer::LexerSymbol_t >& symbols )
+	std::vector< AST::IExpression* > Parse( const std::vector< Lexer::LexerSymbol_t >& symbols, bool autoFreeMemory )
 	{
+		// Start tracking node allocations
+		if ( autoFreeMemory )
+			AST::PushTrackAlloc();
+
+		// Create parser state object
 		CParserState parserState;
 
 		// Traverses the flat token array and gets called recursively by
@@ -349,6 +354,10 @@ namespace Parser
 							auto rightValue = static_cast< AST::CValueExpression* >( right )->Value().GetString();
 
 							Value::CValue dblValue( std::stod( leftValue + "." + rightValue ) );
+
+							delete left;
+							delete right;
+
 							return new AST::CValueExpression( dblValue, Grammar::Symbol::S_DBLCNST, symbol.m_Location );
 						}
 
@@ -740,9 +749,27 @@ namespace Parser
 			}
 		}
 
+		std::vector< AST::IExpression* > allocatedExpressions;
+
+		if ( autoFreeMemory )
+		{
+			// Fetch everything allocated
+			allocatedExpressions = AST::AllocatedExpressions();
+
+			// Stop tracking
+			AST::PopAllocTracking();
+		}
+
 		// Propagate all the accumulated errors to the caller, if any
 		if ( parserState.HasErrors() )
 		{
+			if ( autoFreeMemory )
+			{
+				// Free all allocated expressions
+				for ( auto expr : allocatedExpressions )
+					delete expr;
+			}
+
 			ParseException exception = parserState.GetException();
 			throw exception;
 		}

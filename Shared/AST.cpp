@@ -7,12 +7,62 @@
 
 namespace AST
 {
+	std::vector< std::vector< IExpression* > > allocationTrack;
+
+	void PushTrackAlloc()
+	{
+		allocationTrack.push_back( {} );
+	}
+
+	void PopAllocTracking()
+	{
+		allocationTrack.pop_back();
+	}
+
+	void ExpressionAllocated( IExpression* expr )
+	{
+		for ( size_t i = 0; i < allocationTrack.size(); ++i )
+			allocationTrack[ i ].push_back( expr );
+	}
+
+	void ExpressionFreed( void* expr )
+	{
+		for ( size_t i = 0; i < allocationTrack.size(); ++i )
+		{
+			auto position = std::find( allocationTrack[ i ].begin(), allocationTrack[ i ].end(), expr );
+
+			if ( position != allocationTrack[ i ].end() )
+				allocationTrack[ i ].erase( position );
+		}
+	}
+
+	const std::vector< IExpression* >& AllocatedExpressions()
+	{
+		if ( allocationTrack.size() > 0 )
+			return allocationTrack[ allocationTrack.size() - 1 ];
+		else
+			throw new Exception( "No tracked expressions" );
+	}
+
 	CComplexExpression::CComplexExpression( IExpression* lhs, IExpression* rhs, Grammar::Symbol symbol, const Grammar::SymbolLoc_t& loc )
 	{
 		m_LHS = lhs;
 		m_RHS = rhs;
 		m_Loc = loc;
 		m_Symbol = symbol;
+	}
+
+	void* CComplexExpression::operator new ( size_t size )
+	{
+		auto p = ::new CComplexExpression();
+		ExpressionAllocated(p);
+		return p;
+	}
+
+	void CComplexExpression::operator delete ( void* p )
+	{
+		ExpressionFreed( p );
+		free( p );
 	}
 
 	std::string CComplexExpression::ToString( int indent )
@@ -39,6 +89,19 @@ namespace AST
 		m_Symbol = symbol;
 	}
 
+	void* CSimpleExpression::operator new ( size_t size )
+	{
+		auto p = ::new CSimpleExpression();
+		ExpressionAllocated( p );
+		return p;
+	}
+
+	void CSimpleExpression::operator delete ( void* p )
+	{
+		ExpressionFreed( p );
+		free( p );
+	}
+
 	std::string CSimpleExpression::ToString( int indent )
 	{
 		std::string token = "UNKNOWN";
@@ -60,6 +123,19 @@ namespace AST
 		m_Value = Value::CValue( value );
 		m_Loc = loc;
 		m_Symbol = symbol;
+	}
+
+	void* CValueExpression::operator new ( size_t size )
+	{
+		auto p = ::new CValueExpression();
+		ExpressionAllocated( p );
+		return p;
+	}
+
+	void CValueExpression::operator delete ( void* p )
+	{
+		ExpressionFreed( p );
+		free( p );
 	}
 
 	std::string CValueExpression::ToString( int indent )
@@ -85,6 +161,19 @@ namespace AST
 		m_Symbol = symbol;
 	}
 
+	void* CListExpression::operator new ( size_t size )
+	{
+		auto p = ::new CListExpression();
+		ExpressionAllocated( p );
+		return p;
+	}
+
+	void CListExpression::operator delete ( void* p )
+	{
+		ExpressionFreed( p );
+		free( p );
+	}
+
 	std::string CListExpression::ToString( int indent )
 	{
 		std::string output = std::string( indent - 1 < 0 ? indent : indent - 1, '\t' ) + "{\n";
@@ -107,7 +196,11 @@ namespace AST
 			{
 				auto list = static_cast< CListExpression* >( expression )->List();
 				for ( auto expr : list )
-					FreeNode( expr );
+				{
+					if ( expr )
+						FreeNode( expr );
+				}
+
 				break;
 			}
 			case ET_COMPLEX:
