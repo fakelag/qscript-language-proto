@@ -90,5 +90,47 @@ void RunValueTests()
 		UTEST_CASE_CLOSED();
 	}( );
 
+	UTEST_CASE( "Value addition (operator+)" )
+	{
+		Value::CValue rhs( 2 );
+		Value::CValue lhs( 5 );
+
+		UTEST_ASSERT( ( lhs + rhs ).GetType() == Value::ValueType::VT_INTEGER );
+		UTEST_ASSERT( ( lhs + rhs ).GetInt() == 7 );
+
+		rhs.SetInt( 5 );
+		UTEST_ASSERT( ( lhs + rhs ).GetType() == Value::ValueType::VT_INTEGER );
+		UTEST_ASSERT( ( lhs + rhs ).GetInt() == 10 );
+
+		rhs.SetInt( -10 );
+		UTEST_ASSERT( ( lhs + rhs ).GetType() == Value::ValueType::VT_INTEGER );
+		UTEST_ASSERT( ( lhs + rhs ).GetInt() == -5 );
+
+		rhs.SetDouble( 4.2 );
+		UTEST_ASSERT( ( lhs + rhs ).GetType() == Value::ValueType::VT_DOUBLE );
+		UTEST_ASSERT( ( lhs + rhs ).GetDouble() == 9.2 );
+
+		rhs.SetInt( 2 );
+		lhs.SetDouble( 3.2 );
+		UTEST_ASSERT( ( lhs + rhs ).GetType() == Value::ValueType::VT_DOUBLE );
+		UTEST_ASSERT( ( lhs + rhs ).GetDouble() == 5.2 );
+
+		lhs.SetString( "Ping" );
+		UTEST_ASSERT( ( lhs + rhs ).GetType() == Value::ValueType::VT_STRING );
+		UTEST_ASSERT( ( lhs + rhs ).GetString() == "Ping2" );
+
+		lhs.SetInt( 2 );
+		rhs.SetString( "Pong" );
+		UTEST_ASSERT( ( lhs + rhs ).GetType() == Value::ValueType::VT_STRING );
+		UTEST_ASSERT( ( lhs + rhs ).GetString() == "2Pong" );
+
+		lhs.SetString( "Ping" );
+		rhs.SetString( "Pong" );
+		UTEST_ASSERT( ( lhs + rhs ).GetType() == Value::ValueType::VT_STRING );
+		UTEST_ASSERT( ( lhs + rhs ).GetString() == "PingPong" );
+
+		UTEST_CASE_CLOSED();
+	}( );
+
 	UTEST_END();
 }
