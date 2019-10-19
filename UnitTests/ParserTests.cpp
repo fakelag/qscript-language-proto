@@ -9,6 +9,8 @@ void RunParserTests()
 {
 	UTEST_BEGIN( "Parser Tests" );
 
+	AST::PushTrackAlloc();
+
 	UTEST_CASE( "Generate symbols from a sentence" )
 	{
 		auto syntaxTree = Parser::Parse( Lexer::Parse( "5 + 3* 1- 2;" ) );
@@ -34,6 +36,7 @@ void RunParserTests()
 					)->Rhs()
 				)->Symbol() == Grammar::Symbol::S_MUL );
 
+		AST::FreeTree( syntaxTree );
 		UTEST_CASE_CLOSED();
 	}( );
 
@@ -110,6 +113,7 @@ void RunParserTests()
 				static_cast< AST::CComplexExpression* >( syntaxTree[ 6 ] )->Rhs()
 				)->Symbol() == Grammar::Symbol::S_ADD );
 
+		AST::FreeTree( syntaxTree );
 		UTEST_CASE_CLOSED();
 	}( );
 
@@ -148,6 +152,7 @@ void RunParserTests()
 				static_cast< AST::CComplexExpression* >( syntaxTree[ 6 ] )->Rhs()
 				)->Symbol() == Grammar::Symbol::S_EQUALS );
 
+		AST::FreeTree( syntaxTree );
 		UTEST_CASE_CLOSED();
 	}( );
 
@@ -179,6 +184,7 @@ void RunParserTests()
 				static_cast< AST::CSimpleExpression* >( syntaxTree[ 2 ] )->Expression()
 				)->Type() == AST::ExpressionType::ET_VALUE );
 
+		AST::FreeTree( syntaxTree );
 		UTEST_CASE_CLOSED();
 	}( );
 
@@ -231,6 +237,7 @@ void RunParserTests()
 				static_cast< AST::CComplexExpression* >( syntaxTree[ 0 ] )->Rhs()
 				)->Lhs() == NULL );
 
+		AST::FreeTree( syntaxTree );
 		UTEST_CASE_CLOSED();
 	}( );
 
@@ -253,6 +260,7 @@ void RunParserTests()
 		UTEST_ASSERT( static_cast< AST::CListExpression* >( syntaxTree[ 2 ] )->List().size() == 1 );
 		UTEST_ASSERT( static_cast< AST::CListExpression* >( syntaxTree[ 2 ] )->List()[ 0 ]->Symbol() == Grammar::Symbol::S_NAME );
 
+		AST::FreeTree( syntaxTree );
 		UTEST_CASE_CLOSED();
 	}( );
 
@@ -353,6 +361,7 @@ void RunParserTests()
 		UTEST_ASSERT( static_cast< AST::CComplexExpression* >( syntaxTree[ 1 ] )->Rhs()->Type() == AST::ExpressionType::ET_COMPLEX );
 		UTEST_ASSERT( static_cast< AST::CComplexExpression* >( syntaxTree[ 1 ] )->Rhs()->Symbol() == Grammar::Symbol::S_INCREMENT );
 
+		AST::FreeTree( syntaxTree );
 		UTEST_CASE_CLOSED();
 	}( );
 
@@ -362,6 +371,7 @@ void RunParserTests()
 
 		UTEST_ASSERT( syntaxTree.size() == 0 );
 
+		AST::FreeTree( syntaxTree );
 		syntaxTree = Parser::Parse( Lexer::Parse( "a, b, c + 1, c * 2 == 4;" ) );
 
 		UTEST_ASSERT( syntaxTree.size() == 1 );
@@ -380,6 +390,7 @@ void RunParserTests()
 		UTEST_ASSERT( static_cast< AST::CListExpression* >( syntaxTree[ 0 ] )->List()[ 2 ]->Symbol() == Grammar::Symbol::S_ADD );
 		UTEST_ASSERT( static_cast< AST::CListExpression* >( syntaxTree[ 0 ] )->List()[ 3 ]->Symbol() == Grammar::Symbol::S_EQUALS );
 
+		AST::FreeTree( syntaxTree );
 		UTEST_CASE_CLOSED();
 	}( );
 
@@ -449,6 +460,7 @@ void RunParserTests()
 					static_cast< AST::CListExpression* >( syntaxTree[ 3 ] )->List()[ 0 ]
 					)->List()[ 1 ] )->List()[ 1 ]->Symbol() == Grammar::Symbol::S_INTCNST );
 
+		AST::FreeTree( syntaxTree );
 		UTEST_CASE_CLOSED();
 	}( );
 
@@ -470,6 +482,7 @@ void RunParserTests()
 				static_cast< AST::CComplexExpression* >( syntaxTree[ 1 ] )->Rhs()
 				)->Rhs()->Symbol() == Grammar::Symbol::S_ADD );
 
+		AST::FreeTree( syntaxTree );
 		UTEST_CASE_CLOSED();
 	}( );
 
@@ -519,6 +532,7 @@ void RunParserTests()
 				static_cast< AST::CComplexExpression* >( syntaxTree[ 3 ] )->Rhs()
 				)->List().size() == 3 );
 
+		AST::FreeTree( syntaxTree );
 		UTEST_CASE_CLOSED();
 	}( );
 
@@ -532,6 +546,7 @@ void RunParserTests()
 		UTEST_ASSERT( syntaxTree[ 0 ]->Symbol() == Grammar::Symbol::S_TRUE );
 		UTEST_ASSERT( syntaxTree[ 1 ]->Symbol() == Grammar::Symbol::S_FALSE );
 
+		AST::FreeTree( syntaxTree );
 		UTEST_CASE_CLOSED();
 	}( );
 
@@ -556,6 +571,7 @@ void RunParserTests()
 				static_cast< AST::CComplexExpression* >( syntaxTree[ 0 ] )->Rhs()
 				)->List()[ 0 ]->Symbol() == Grammar::Symbol::S_NAME );
 
+		AST::FreeTree( syntaxTree );
 		UTEST_CASE_CLOSED();
 	}( );
 
@@ -580,6 +596,7 @@ void RunParserTests()
 				static_cast< AST::CComplexExpression* >( syntaxTree[ 0 ] )->Rhs()
 				)->List()[ 0 ]->Symbol() == Grammar::Symbol::S_NAME );
 
+		AST::FreeTree( syntaxTree );
 		UTEST_CASE_CLOSED();
 	}( );
 
@@ -606,6 +623,7 @@ void RunParserTests()
 				static_cast< AST::CListExpression* >( syntaxTree[ 0 ] )->List()[ 3 ]
 				)->List()[ 0 ]->Symbol() == Grammar::Symbol::S_NAME );
 
+		AST::FreeTree( syntaxTree );
 		syntaxTree = Parser::Parse( Lexer::Parse( "for(var i = 0, var a, x = []; i < 10 && a == true; ++i) { i; };" ) );
 
 		UTEST_ASSERT( syntaxTree.size() == 1 );
@@ -647,6 +665,7 @@ void RunParserTests()
 				static_cast< AST::CListExpression* >( syntaxTree[ 0 ] )->List()[ 0 ]
 			)->List()[ 2 ]->Symbol() == Grammar::Symbol::S_ASSIGN );
 
+		AST::FreeTree( syntaxTree );
 		UTEST_CASE_CLOSED();
 	}( );
 
@@ -683,6 +702,7 @@ void RunParserTests()
 					)->List()[ 0 ]
 				)->Expression() == NULL );
 
+		AST::FreeTree( syntaxTree );
 		UTEST_CASE_CLOSED();
 	}( );
 
@@ -698,6 +718,7 @@ void RunParserTests()
 		UTEST_ASSERT( static_cast< AST::CSimpleExpression* >( syntaxTree[ 0 ] )->Expression() == NULL );
 		UTEST_ASSERT( static_cast< AST::CSimpleExpression* >( syntaxTree[ 1 ] )->Expression()->Symbol() == Grammar::Symbol::S_ADD );
 
+		AST::FreeTree( syntaxTree );
 		UTEST_CASE_CLOSED();
 	}( );
 
@@ -794,6 +815,7 @@ void RunParserTests()
 					)->Expression()
 				)->List().size() == 1 );
 
+		AST::FreeTree( syntaxTree );
 		UTEST_CASE_CLOSED();
 	}( );
 
@@ -824,6 +846,7 @@ void RunParserTests()
 				static_cast< AST::CComplexExpression* >( syntaxTree[ 0 ] )->Rhs()
 				)->Expression() == NULL );
 
+		AST::FreeTree( syntaxTree );
 		UTEST_CASE_CLOSED();
 	}( );
 
@@ -858,6 +881,7 @@ void RunParserTests()
 				static_cast< AST::CListExpression* >( syntaxTree[ 0 ] )
 			->List()[ 2 ] )->List().size() == 0 );
 
+		AST::FreeTree( syntaxTree );
 		syntaxTree = Parser::Parse( Lexer::Parse( "		\
 			class Value : BaseClass						\
 			{											\
@@ -880,6 +904,7 @@ void RunParserTests()
 				static_cast< AST::CListExpression* >( syntaxTree[ 0 ] )
 			->List()[ 2 ] )->List().size() == 0 );
 
+		AST::FreeTree( syntaxTree );
 		syntaxTree = Parser::Parse( Lexer::Parse( "				\
 			class Value : BaseClass1, BaseClass2, BaseClass3	\
 			{													\
@@ -912,6 +937,7 @@ void RunParserTests()
 				static_cast< AST::CListExpression* >( syntaxTree[ 0 ] )
 			->List()[ 2 ] )->List().size() == 0 );
 
+		AST::FreeTree( syntaxTree );
 		UTEST_CASE_CLOSED();
 	}( );
 
@@ -984,6 +1010,7 @@ void RunParserTests()
 				static_cast< AST::CListExpression* >( syntaxTree[ 0 ] )
 			->List()[ 2 ] )->List()[ 2 ]->Symbol() == Grammar::Symbol::S_VAR );
 
+		AST::FreeTree( syntaxTree );
 		UTEST_CASE_CLOSED();
 	}( );
 
@@ -1001,8 +1028,18 @@ void RunParserTests()
 		UTEST_ASSERT( static_cast< AST::CSimpleExpression* >( syntaxTree[ 1 ] )->Expression()->Symbol() == Grammar::Symbol::S_CALL );
 		UTEST_ASSERT( static_cast< AST::CSimpleExpression* >( syntaxTree[ 2 ] )->Expression()->Symbol() == Grammar::Symbol::S_SCOPE );
 
+		AST::FreeTree( syntaxTree );
 		UTEST_CASE_CLOSED();
 	}( );
+
+	UTEST_CASE( "Parser memory management" )
+	{
+		auto leakedNodes = AST::AllocatedExpressions();
+		UTEST_ASSERT( leakedNodes.size() == 0 );
+		UTEST_CASE_CLOSED();
+	}( );
+
+	AST::PopAllocTracking();
 
 	UTEST_END();
 }
