@@ -158,7 +158,7 @@ namespace AST
 		return IsNameConstant( rightExpr );
 	}
 
-	void TrackAlloc();
-	void StopAllocTracking();
+	void PushTrackAlloc();
+	void PopAllocTracking();
 	const std::vector< IExpression* >& AllocatedExpressions();
 }

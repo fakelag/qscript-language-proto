@@ -7,41 +7,41 @@
 
 namespace AST
 {
-	// Refactor this into some kind of class
-	bool trackAlloc = false;
-	std::vector< IExpression* > allocatedExpressions;
+	std::vector< std::vector< IExpression* > > allocationTrack;
 
-	void TrackAlloc()
+	void PushTrackAlloc()
 	{
-		allocatedExpressions.clear();
-		trackAlloc = true;
+		allocationTrack.push_back( {} );
 	}
 
-	void StopAllocTracking()
+	void PopAllocTracking()
 	{
-		trackAlloc = false;
+		allocationTrack.pop_back();
 	}
 
 	void ExpressionAllocated( IExpression* expr )
 	{
-		if ( trackAlloc )
-			allocatedExpressions.push_back( expr );
+		for ( size_t i = 0; i < allocationTrack.size(); ++i )
+			allocationTrack[ i ].push_back( expr );
 	}
 
 	void ExpressionFreed( void* expr )
 	{
-		if ( trackAlloc )
+		for ( size_t i = 0; i < allocationTrack.size(); ++i )
 		{
-			auto position = std::find( allocatedExpressions.begin(), allocatedExpressions.end(), expr );
+			auto position = std::find( allocationTrack[ i ].begin(), allocationTrack[ i ].end(), expr );
 
-			if ( position != allocatedExpressions.end() )
-				allocatedExpressions.erase( position );
+			if ( position != allocationTrack[ i ].end() )
+				allocationTrack[ i ].erase( position );
 		}
 	}
 
 	const std::vector< IExpression* >& AllocatedExpressions()
 	{
-		return allocatedExpressions;
+		if ( allocationTrack.size() > 0 )
+			return allocationTrack[ allocationTrack.size() - 1 ];
+		else
+			throw new Exception( "No tracked expressions" );
 	}
 
 	CComplexExpression::CComplexExpression( IExpression* lhs, IExpression* rhs, Grammar::Symbol symbol, const Grammar::SymbolLoc_t& loc )
@@ -196,7 +196,11 @@ namespace AST
 			{
 				auto list = static_cast< CListExpression* >( expression )->List();
 				for ( auto expr : list )
-					FreeNode( expr );
+				{
+					if ( expr )
+						FreeNode( expr );
+				}
+
 				break;
 			}
 			case ET_COMPLEX:
