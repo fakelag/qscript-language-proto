@@ -55,28 +55,6 @@ int main( int argc, const char** argv )
 		std::cout << "Memory usage when finished: " << Memory::FormatBytes( finishUsage ) << std::endl;
 		std::cout << "Difference: " << Memory::FormatBytes( finishUsage - beginUsage ) << std::endl;
 	}
-	else if ( HasArg( "-memtest1", argc, argv ) )
-	{
-		AST::TrackAlloc();
-
-		auto parsed = Parser::Parse( Lexer::Parse( "{ a = 1 + 2 * 2 + -5; a = a || 8; } \
-			{ a; b; a++ || b; }												\
-			class A : B, C, D { function x(x, y) { return 1 + 2; } }		\
-			call(a, ++b);													\
-			arr = [1, 2, 3, 4, [5, 6]];										\
-			arr[0+1];														\
-			a.b.c.d.e.f.g.h.i.k = 1;										\
-			defer { a; };													\
-			for (var a = []; a.length < 2; a += [1, 2]) { a[0]; }			\
-			while(true) { break; }											\
-		" ), false );
-
-		std::cout << "Allocated " << AST::AllocatedExpressions().size() << " nodes" << std::endl;
-
-		AST::FreeTree( parsed );
-
-		std::cout << "Nodes leaked: " << AST::AllocatedExpressions().size() << std::endl;
-	}
 	else
 	{
 		// Call tests

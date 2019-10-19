@@ -86,12 +86,12 @@ namespace Lexer
 				return 0;
 			};
 
-			int nCommonLength = findSymbol( source.substr( std::distance( source.cbegin(), srcIt ), longestToken ) );
+			int commonLength = findSymbol( source.substr( std::distance( source.cbegin(), srcIt ), longestToken ) );
 
-			if ( nCommonLength > 0 )
+			if ( commonLength > 0 )
 			{
 				// Increment the iterator by the amount of characters in the symbol
-				srcIt += nCommonLength - 1;
+				srcIt += commonLength - 1;
 				continue;
 			}
 
