@@ -149,7 +149,7 @@ namespace Parser
 	{
 		// Start tracking node allocations
 		if ( autoFreeMemory )
-			AST::TrackAlloc();
+			AST::PushTrackAlloc();
 
 		// Create parser state object
 		CParserState parserState;
@@ -354,6 +354,10 @@ namespace Parser
 							auto rightValue = static_cast< AST::CValueExpression* >( right )->Value().GetString();
 
 							Value::CValue dblValue( std::stod( leftValue + "." + rightValue ) );
+
+							delete left;
+							delete right;
+
 							return new AST::CValueExpression( dblValue, Grammar::Symbol::S_DBLCNST, symbol.m_Location );
 						}
 
@@ -753,7 +757,7 @@ namespace Parser
 			allocatedExpressions = AST::AllocatedExpressions();
 
 			// Stop tracking
-			AST::StopAllocTracking();
+			AST::PopAllocTracking();
 		}
 
 		// Propagate all the accumulated errors to the caller, if any
