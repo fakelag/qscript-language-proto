@@ -36,6 +36,18 @@
     <ClCompile Include="Funcdef.cpp">
       <Filter>Core</Filter>
     </ClCompile>
+    <ClCompile Include="Funcbody.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Scope.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="List.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Name.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Includes\AST.h">
@@ -54,7 +66,7 @@
       <Filter>Shared</Filter>
     </ClInclude>
     <ClInclude Include="RuntimeInternal.h">
-      <Filter>Core</Filter>
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -52,6 +52,22 @@ private: \
 	Grammar::SymbolLoc_t		m_Loc; \
 };
 
+#define RTI_LIST_HANDLER( symbol ) \
+class CExec_##symbol : public Runtime::IExec \
+{ \
+public: \
+	CExec_##symbol( const std::vector< Runtime::IExec* >& list, const Grammar::SymbolLoc_t& loc ) \
+	{ \
+		m_List = list; \
+		m_Loc = loc; \
+		Grammar::Symbol::##symbol; \
+	} \
+	Runtime::Statement_t Execute( Runtime::CContext& context ); \
+private: \
+	std::vector< Runtime::IExec* >	m_List; \
+	Grammar::SymbolLoc_t			m_Loc; \
+};
+
 #define RTI_EXECFN( symbol ) \
 Runtime::Statement_t RuntimeInternal::CExec_##symbol::Execute( Runtime::CContext& context )
 
@@ -63,5 +79,9 @@ namespace RuntimeInternal
 
 	RTI_SIMPLE_HANDLER( S_FUNCBODY );
 
+	RTI_LIST_HANDLER( S_SCOPE );
+	RTI_LIST_HANDLER( S_LIST );
+
 	RTI_VALUE_HANDLER( S_INTCNST );
+	RTI_VALUE_HANDLER( S_NAME );
 }

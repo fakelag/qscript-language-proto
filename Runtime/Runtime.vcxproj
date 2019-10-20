@@ -122,9 +122,13 @@
   <ItemGroup>
     <ClCompile Include="Add.cpp" />
     <ClCompile Include="Func.cpp" />
+    <ClCompile Include="Funcbody.cpp" />
     <ClCompile Include="Funcdef.cpp" />
     <ClCompile Include="Intcnst.cpp" />
+    <ClCompile Include="List.cpp" />
+    <ClCompile Include="Name.cpp" />
     <ClCompile Include="Runtime.cpp" />
+    <ClCompile Include="Scope.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Includes\AST.h" />
