@@ -73,13 +73,22 @@ int main( int argc, const char** argv )
 				auto symbols = Lexer::Parse( command );
 				auto syntaxTree = Parser::Parse( symbols );
 
-				auto context = Runtime::CreateDefaultContext();
+				auto context = Runtime::CreateDefaultContext( true );
 				auto statements = Runtime::Execute( syntaxTree, context );
 
 				for ( auto stmt : statements )
 				{
 					std::cout << stmt.m_Value.GetString() << std::endl;
 				}
+			}
+			catch ( const RuntimeException& exception )
+			{
+				std::cout << exception.what() << std::endl;
+				std::cout << exception.error()
+					<< " token \"" << exception.location().m_SrcToken << "\""
+					<< " at line "<< exception.location().m_LineNr
+					<< " col " << exception.location().m_ColNr << std::endl;
+
 			}
 			catch ( const ParseException& exception )
 			{
@@ -94,6 +103,10 @@ int main( int argc, const char** argv )
 				}
 			}
 			catch ( const Exception& exception )
+			{
+				std::cout << exception.what() << std::endl;
+			}
+			catch ( const std::exception& exception )
 			{
 				std::cout << exception.what() << std::endl;
 			}
