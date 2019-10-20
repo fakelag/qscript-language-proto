@@ -58,7 +58,7 @@ namespace Value
 				SetDouble( other.m_DoubleValue );
 				return *this;
 			default:
-				throw Exception( "Invalid value type" );
+				throw Exception( "Invalid CValue type" );
 			}
 		}
 
@@ -73,7 +73,7 @@ namespace Value
 				case VT_STRING: return CValue( m_StringValue + other.m_StringValue );
 				case VT_INTEGER: return CValue( m_StringValue + std::to_string( other.m_IntValue ) );
 				case VT_DOUBLE: return CValue( m_StringValue + std::to_string( other.m_DoubleValue ) );
-				default: throw Exception( "Invalid value type" );
+				default: throw Exception( "Invalid CValue type" );
 				}
 			}
 			case VT_INTEGER:
@@ -83,7 +83,7 @@ namespace Value
 				case VT_STRING: return CValue( std::to_string( m_IntValue ) + other.m_StringValue );
 				case VT_INTEGER: return CValue( m_IntValue + other.m_IntValue );
 				case VT_DOUBLE: return CValue( ( double ) m_IntValue + other.m_DoubleValue );
-				default: throw Exception( "Invalid value type" );
+				default: throw Exception( "Invalid CValue type" );
 				}
 			}
 			case VT_DOUBLE:
@@ -93,11 +93,11 @@ namespace Value
 				case VT_STRING: return CValue( std::to_string( m_DoubleValue ) + other.m_StringValue );
 				case VT_INTEGER: return CValue( m_DoubleValue + ( double ) other.m_IntValue );
 				case VT_DOUBLE: return CValue( m_DoubleValue + other.m_DoubleValue );
-				default: throw Exception( "Invalid value type" );
+				default: throw Exception( "Invalid CValue type" );
 				}
 			}
 			default:
-				throw Exception( "Invalid value type" );
+				throw Exception( "Invalid CValue type" );
 			}
 		}
 
