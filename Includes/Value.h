@@ -17,9 +17,11 @@ namespace Value
 {
 	enum ValueType
 	{
+		VT_UNINITIALIZED = -1,
 		VT_STRING = 0,
 		VT_INTEGER,
 		VT_DOUBLE,
+		VT_ARRAY,
 	};
 
 	class CValue
@@ -32,17 +34,27 @@ namespace Value
 		CValue( int integer );
 		CValue( double decimal );
 		CValue( bool boolean );
+		CValue( const std::vector< CValue >& values );
 
 		FORCEINLINE void					SetString( const std::string& string ) { m_StringValue = string; m_ValueType = VT_STRING; };
 		FORCEINLINE void					SetInt( int integer ) { m_IntValue = integer; m_ValueType = VT_INTEGER; };
 		FORCEINLINE void					SetDouble( double decimal ) { m_DoubleValue = decimal; m_ValueType = VT_DOUBLE; };
 		FORCEINLINE void					SetBool( bool boolean ) { SetInt( boolean ? 1 : 0 ); };
+		FORCEINLINE void					SetArray( const std::vector< CValue >& values ) { m_ArrayValue = values; m_ValueType = VT_ARRAY; };
 
-		const std::string&		GetString();		// GetString uses internal optimization
-		int						GetInt()			const;
-		double					GetDouble()			const;
-		bool					GetBool()			const;
-		ValueType				GetType()			const;
+		const std::string&				GetString();		// GetString uses internal optimization
+		const std::vector< CValue >&	GetArray()			const;
+		int								GetInt()			const;
+		double							GetDouble()			const;
+		bool							GetBool()			const;
+		ValueType						GetType()			const;
+		FORCEINLINE bool				IsInitialized()		const { return m_ValueType != VT_UNINITIALIZED; }
+
+		// Array functions
+		void							ArrayPush( const CValue& value );
+		void							ArrayConcat( const CValue& array );
+		void							ArrayClear();
+		size_t							ArraySize();
 
 		FORCEINLINE CValue operator=( const CValue& other )
 		{
@@ -56,6 +68,9 @@ namespace Value
 				return *this;
 			case VT_DOUBLE:
 				SetDouble( other.m_DoubleValue );
+				return *this;
+			case VT_ARRAY:
+				SetArray( other.m_ArrayValue );
 				return *this;
 			default:
 				throw Exception( "Invalid CValue type" );
@@ -73,6 +88,7 @@ namespace Value
 				case VT_STRING: return CValue( m_StringValue + other.m_StringValue );
 				case VT_INTEGER: return CValue( m_StringValue + std::to_string( other.m_IntValue ) );
 				case VT_DOUBLE: return CValue( m_StringValue + std::to_string( other.m_DoubleValue ) );
+				case VT_ARRAY: throw Exception( "Invalid operation on an array" );
 				default: throw Exception( "Invalid CValue type" );
 				}
 			}
@@ -83,6 +99,7 @@ namespace Value
 				case VT_STRING: return CValue( std::to_string( m_IntValue ) + other.m_StringValue );
 				case VT_INTEGER: return CValue( m_IntValue + other.m_IntValue );
 				case VT_DOUBLE: return CValue( ( double ) m_IntValue + other.m_DoubleValue );
+				case VT_ARRAY: throw Exception( "Invalid operation on an array" );
 				default: throw Exception( "Invalid CValue type" );
 				}
 			}
@@ -93,22 +110,39 @@ namespace Value
 				case VT_STRING: return CValue( std::to_string( m_DoubleValue ) + other.m_StringValue );
 				case VT_INTEGER: return CValue( m_DoubleValue + ( double ) other.m_IntValue );
 				case VT_DOUBLE: return CValue( m_DoubleValue + other.m_DoubleValue );
+				case VT_ARRAY: throw Exception( "Invalid operation on an array" );
 				default: throw Exception( "Invalid CValue type" );
 				}
+			}
+			case VT_ARRAY:
+			{
+				throw Exception( "Invalid operation on an array" );
 			}
 			default:
 				throw Exception( "Invalid CValue type" );
 			}
 		}
 
+		FORCEINLINE CValue& operator[]( int index )
+		{
+			if ( m_ValueType != VT_ARRAY )
+				throw Exception( "CValue is not an array" );
+
+			if ( m_ArrayValue.size() <= ( size_t ) index )
+				throw Exception( "CValue array index out of bounds" );
+
+			return m_ArrayValue[ index ];
+		}
+
 	private:
-		std::string			m_StringValue;
-		int					m_IntValue;
-		double				m_DoubleValue;
-		enum ValueType		m_ValueType;
+		std::string				m_StringValue;
+		int						m_IntValue;
+		double					m_DoubleValue;
+		std::vector< CValue >	m_ArrayValue;
+		enum ValueType			m_ValueType;
 
 		// Stringcaching
-		double				m_StringDouble;
-		int					m_StringInt;
+		double					m_StringDouble;
+		int						m_StringInt;
 	};
 }

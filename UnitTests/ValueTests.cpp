@@ -129,6 +129,70 @@ void RunValueTests()
 		UTEST_ASSERT( ( lhs + rhs ).GetType() == Value::ValueType::VT_STRING );
 		UTEST_ASSERT( ( lhs + rhs ).GetString() == "PingPong" );
 
+		lhs.SetArray( { Value::CValue( 1 ) } );
+		UTEST_THROW( lhs + rhs );
+
+		UTEST_CASE_CLOSED();
+	}( );
+
+	UTEST_CASE( "Array values" )
+	{
+		Value::CValue val1( 5 );
+		Value::CValue val2( 10 );
+
+		Value::CValue valArray( { val1, val2 } );
+
+		UTEST_ASSERT( valArray.ArraySize() == 2 );
+		UTEST_ASSERT( valArray[ 0 ].GetType() == Value::ValueType::VT_INTEGER );
+		UTEST_ASSERT( valArray[ 0 ].GetInt() == 5 );
+		
+		valArray[ 0 ].SetInt( 10 );
+		UTEST_ASSERT( valArray[ 0 ].GetInt() == 10 );
+		UTEST_ASSERT( val1.GetInt() == 5 );
+
+		UTEST_ASSERT( valArray.GetString() == "[10, 10]" );
+
+		valArray.ArrayPush( Value::CValue( 20 ) );
+		UTEST_ASSERT( valArray[ 0 ].GetInt() == 10 );
+		UTEST_ASSERT( valArray[ 1 ].GetInt() == 10 );
+		UTEST_ASSERT( valArray[ 2 ].GetInt() == 20 );
+		UTEST_THROW( valArray[ 3 ] );
+
+		Value::CValue valArray2( { Value::CValue( 20 ), Value::CValue( "a string" ) } );
+		valArray.ArrayConcat( valArray2 );
+
+		UTEST_ASSERT( valArray.ArraySize() == 5 );
+		UTEST_ASSERT( valArray[ 0 ].GetInt() == 10 );
+		UTEST_ASSERT( valArray[ 1 ].GetInt() == 10 );
+		UTEST_ASSERT( valArray[ 2 ].GetInt() == 20 );
+		UTEST_ASSERT( valArray[ 3 ].GetInt() == 20 );
+		UTEST_ASSERT( valArray[ 4 ].GetType() == Value::ValueType::VT_STRING );
+		UTEST_ASSERT( valArray[ 4 ].GetString() == "a string" );
+		UTEST_THROW( valArray[ 5 ] );
+
+		valArray.ArrayPush( Value::CValue( { val1, val2 } ) );
+		UTEST_ASSERT( valArray.ArraySize() == 6 );
+		UTEST_ASSERT( valArray[ 5 ].GetType() == Value::ValueType::VT_ARRAY );
+		UTEST_ASSERT( valArray[ 5 ][ 0 ].GetType() == Value::ValueType::VT_INTEGER );
+		UTEST_ASSERT( valArray[ 5 ][ 0 ].GetInt() == 5 );
+
+
+		UTEST_CASE_CLOSED();
+	}( );
+
+	UTEST_CASE( "Initialized/Uninitialized values" )
+	{
+		Value::CValue init1( 5 );
+		Value::CValue uninit1;
+
+		UTEST_ASSERT( init1.IsInitialized() == true );
+		UTEST_ASSERT( uninit1.IsInitialized() == false );
+
+		UTEST_THROW( uninit1.GetInt() );
+
+		uninit1 = init1;
+		UTEST_ASSERT( uninit1.IsInitialized() == true );
+
 		UTEST_CASE_CLOSED();
 	}( );
 
