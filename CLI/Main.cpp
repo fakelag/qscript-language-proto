@@ -26,7 +26,7 @@ int main( int argc, const char** argv )
 	std::string target;
 	if ( !GetArg( "-target", target, argc, argv ) )
 	{
-		std::cout << "Usage: " << argv[ 0 ] << " -target <lexer/parser/bytecode/runtime>" << std::endl;
+		std::cout << "Usage: " << argv[ 0 ] << " -target <lexer/parser/bytecode/repl/interpreter>" << std::endl;
 		return 0;
 	}
 
@@ -66,14 +66,14 @@ int main( int argc, const char** argv )
 				}
 			}
 		}
-		else if ( target == "runtime" )
+		else if ( target == "repl" || target == "interpreter" )
 		{
 			try
 			{
 				auto symbols = Lexer::Parse( command );
 				auto syntaxTree = Parser::Parse( symbols );
 
-				auto context = Runtime::CreateDefaultContext( true );
+				auto context = Runtime::CreateDefaultContext( target == "repl" );
 				auto statements = Runtime::Execute( syntaxTree, context );
 
 				for ( auto stmt : statements )
@@ -85,9 +85,10 @@ int main( int argc, const char** argv )
 			{
 				std::cout << exception.what() << std::endl;
 				std::cout << exception.error()
-					<< " token \"" << exception.location().m_SrcToken << "\""
-					<< " at line "<< exception.location().m_LineNr
-					<< " col " << exception.location().m_ColNr << std::endl;
+					<< std::endl
+					<< "\ttoken=\"" << exception.location().m_SrcToken << "\""	<< std::endl
+					<< "\tat line "<< exception.location().m_LineNr				<< std::endl
+					<< "\tcol " << exception.location().m_ColNr					<< std::endl;
 
 			}
 			catch ( const ParseException& exception )
