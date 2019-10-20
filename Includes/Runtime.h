@@ -5,23 +5,33 @@
 
 namespace Runtime
 {
+	class IExec;
+
 	struct Statement_t
-	{
-		Value::CValue m_Value;
+	{	
+		Value::CValue			m_Value;
 	};
 
-	struct Context_t
+	class CContext
 	{
+	public:
+		struct Scope_t
+		{
+			std::map< std::string, IExec* >				m_Functions;
+			std::map< std::string, Value::CValue >		m_Variables;
+		};
 
+		bool					m_Repl;
+		std::vector< Scope_t >	m_Scopes;
 	};
 
 	class IExec
 	{
 	public:
 		virtual ~IExec() {}
-		virtual Statement_t Execute( Context_t& context ) = 0;
+		virtual Statement_t Execute( CContext& context ) = 0;
 	};
 
-	Context_t CreateDefaultContext();
-	std::vector< Statement_t > Execute( const std::vector< AST::IExpression* >& expressions, Context_t& context );
+	CContext CreateDefaultContext( bool isRepl );
+	std::vector< Statement_t > Execute( const std::vector< AST::IExpression* >& expressions, CContext& context );
 }

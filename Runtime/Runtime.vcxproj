@@ -121,6 +121,8 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Add.cpp" />
+    <ClCompile Include="Func.cpp" />
+    <ClCompile Include="Funcdef.cpp" />
     <ClCompile Include="Intcnst.cpp" />
     <ClCompile Include="Runtime.cpp" />
   </ItemGroup>

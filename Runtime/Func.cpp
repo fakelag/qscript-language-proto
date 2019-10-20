@@ -1,7 +1,8 @@
 #include "Runtime.h"
 #include "RuntimeInternal.h"
 
-RTI_EXECFN( S_INTCNST )
+RTI_EXECFN( S_FUNC )
 {
-	return { m_Value };
+	// context.m_Scopes
+	return {};
 }

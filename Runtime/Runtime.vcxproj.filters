@@ -30,6 +30,12 @@
     <ClCompile Include="Intcnst.cpp">
       <Filter>Core</Filter>
     </ClCompile>
+    <ClCompile Include="Func.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Funcdef.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Includes\AST.h">

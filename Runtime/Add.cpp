@@ -1,7 +1,7 @@
 #include "Runtime.h"
 #include "RuntimeInternal.h"
 
-DEF_EXECFN( S_ADD )
+RTI_EXECFN( S_ADD )
 {
 	auto lhResult = m_LHS->Execute( context );
 	auto rhResult = m_RHS->Execute( context );
