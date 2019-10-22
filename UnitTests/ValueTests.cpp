@@ -140,12 +140,13 @@ void RunValueTests()
 		Value::CValue val1( 5 );
 		Value::CValue val2( 10 );
 
-		Value::CValue valArray( { val1, val2 } );
+		std::vector< Value::CValue > valueList = { val1, val2 };
+		Value::CValue valArray( valueList );
 
 		UTEST_ASSERT( valArray.ArraySize() == 2 );
 		UTEST_ASSERT( valArray[ 0 ].GetType() == Value::ValueType::VT_INTEGER );
 		UTEST_ASSERT( valArray[ 0 ].GetInt() == 5 );
-		
+
 		valArray[ 0 ].SetInt( 10 );
 		UTEST_ASSERT( valArray[ 0 ].GetInt() == 10 );
 		UTEST_ASSERT( val1.GetInt() == 5 );
@@ -158,7 +159,8 @@ void RunValueTests()
 		UTEST_ASSERT( valArray[ 2 ].GetInt() == 20 );
 		UTEST_THROW( valArray[ 3 ] );
 
-		Value::CValue valArray2( { Value::CValue( 20 ), Value::CValue( "a string" ) } );
+		valueList = { Value::CValue( 20 ), Value::CValue( "a string" ) };
+		Value::CValue valArray2( valueList );
 		valArray.ArrayConcat( valArray2 );
 
 		UTEST_ASSERT( valArray.ArraySize() == 5 );
@@ -170,7 +172,8 @@ void RunValueTests()
 		UTEST_ASSERT( valArray[ 4 ].GetString() == "a string" );
 		UTEST_THROW( valArray[ 5 ] );
 
-		valArray.ArrayPush( Value::CValue( { val1, val2 } ) );
+		valueList = { val1, val2 };
+		valArray.ArrayPush( valueList );
 		UTEST_ASSERT( valArray.ArraySize() == 6 );
 		UTEST_ASSERT( valArray[ 5 ].GetType() == Value::ValueType::VT_ARRAY );
 		UTEST_ASSERT( valArray[ 5 ][ 0 ].GetType() == Value::ValueType::VT_INTEGER );
