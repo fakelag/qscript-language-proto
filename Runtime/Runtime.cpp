@@ -5,7 +5,7 @@
 
 #include "RuntimeInternal.h"
 
-#define EXEC_COMPLEX( symbol ) case Grammar::Symbol::##symbol: {\
+#define EXEC_COMPLEX( symbol ) case Grammar::Symbol::symbol: {\
 	auto complex = new RuntimeInternal::CExec_##symbol( \
 		convert( static_cast< AST::CComplexExpression* > ( expression )->Lhs() ), \
 		convert( static_cast< AST::CComplexExpression* > ( expression )->Rhs() ), \
@@ -14,7 +14,7 @@
 	return complex; \
 }
 
-#define EXEC_SIMPLE( symbol ) case Grammar::Symbol::##symbol: {\
+#define EXEC_SIMPLE( symbol ) case Grammar::Symbol::symbol: {\
 	auto simple = new RuntimeInternal::CExec_##symbol( \
 		convert( static_cast< AST::CSimpleExpression* > ( expression )->Expression() ), \
 		expression->Location() ); \
@@ -22,7 +22,7 @@
 	return simple; \
 }
 
-#define EXEC_LIST( symbol ) case Grammar::Symbol::##symbol: {\
+#define EXEC_LIST( symbol ) case Grammar::Symbol::symbol: {\
 	std::vector< IExec* > objects; \
 	auto astList = static_cast< AST::CListExpression* > ( expression )->List(); \
 	std::transform( astList.begin(), astList.end(), std::back_inserter( objects ), convert ); \
@@ -33,7 +33,7 @@
 	return list; \
 }
 
-#define EXEC_VALUE( symbol ) case Grammar::Symbol::##symbol: { \
+#define EXEC_VALUE( symbol ) case Grammar::Symbol::symbol: { \
 	auto value = new RuntimeInternal::CExec_##symbol( static_cast< AST::CValueExpression* > ( expression )->Value(), expression->Location() ); \
 	allocationList->push_back( value ); \
 	return value; \

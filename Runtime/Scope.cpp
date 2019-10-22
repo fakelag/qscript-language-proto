@@ -4,7 +4,7 @@
 RTI_EXECFN( S_SCOPE )
 {
 	context.PushScope( false );
-	
+
 	Value::CValue statementList;
 	statementList.SetArray( {} );
 

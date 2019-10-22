@@ -11,7 +11,7 @@ public: \
 		m_LHS = lhs; \
 		m_RHS = rhs; \
 		m_Loc = loc; \
-		Grammar::Symbol::##symbol; \
+		Grammar::Symbol::symbol; \
 	} \
 	Runtime::Statement_t Execute( Runtime::CContext& context ); \
 private: \
@@ -28,7 +28,7 @@ public: \
 	{ \
 		m_Expr = expr; \
 		m_Loc = loc; \
-		Grammar::Symbol::##symbol; \
+		Grammar::Symbol::symbol; \
 	} \
 	Runtime::Statement_t Execute( Runtime::CContext& context ); \
 private: \
@@ -44,7 +44,7 @@ public: \
 	{ \
 		m_Value = value; \
 		m_Loc = loc; \
-		Grammar::Symbol::##symbol; \
+		Grammar::Symbol::symbol; \
 	} \
 	Runtime::Statement_t Execute( Runtime::CContext& context ); \
 private: \
@@ -60,7 +60,7 @@ public: \
 	{ \
 		m_List = list; \
 		m_Loc = loc; \
-		Grammar::Symbol::##symbol; \
+		Grammar::Symbol::symbol; \
 	} \
 	Runtime::Statement_t Execute( Runtime::CContext& context ); \
 private: \
