@@ -31,6 +31,27 @@ void RunRuntimeTests()
 		UTEST_CASE_CLOSED();
 	}( );
 
+	UTEST_CASE( "Debugging flags" )
+	{
+		auto syntaxTree = Parser::Parse( Lexer::Parse( "\
+			__setFlag();								\
+			__setFlag();								\
+		" ) );
+
+		Runtime::CContext context;
+		Runtime::CreateDefaultContext( true, true, &context );
+
+		auto results = Runtime::Execute( syntaxTree, context );
+
+		UTEST_ASSERT( results.size() == 2 );
+		UTEST_ASSERT( context.m_Flag == 2 );
+		UTEST_ASSERT( results[ 0 ].m_Value == Value::CValue( 1 ) );
+		UTEST_ASSERT( results[ 1 ].m_Value == Value::CValue( 2 ) );
+
+		AST::FreeTree( syntaxTree );
+		UTEST_CASE_CLOSED();
+	}( );
+
 	UTEST_CASE( "Parser/AST memory management" )
 	{
 		auto leakedNodes = AST::AllocatedExpressions();
