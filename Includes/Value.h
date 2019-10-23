@@ -77,7 +77,28 @@ namespace Value
 			}
 		}
 
-		FORCEINLINE CValue operator+( const CValue& other )
+		FORCEINLINE bool operator==( const CValue& other ) const
+		{
+			if ( other.m_ValueType != m_ValueType )
+				return false;
+
+			switch ( m_ValueType )
+			{
+				case VT_UNINITIALIZED: return true;
+				case VT_ARRAY: return false;
+				case VT_INTEGER: return m_IntValue == other.m_IntValue;
+				case VT_DOUBLE: return m_DoubleValue == other.m_DoubleValue;
+				case VT_STRING: return m_StringValue == other.m_StringValue;
+				default: throw Exception( "Invalid CValue type" );
+			}
+		}
+
+		FORCEINLINE bool operator!=( const CValue& other ) const
+		{
+			return !operator==( other );
+		}
+
+		FORCEINLINE CValue operator+( const CValue& other ) const
 		{
 			switch ( m_ValueType )
 			{

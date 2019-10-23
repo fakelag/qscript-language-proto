@@ -199,5 +199,55 @@ void RunValueTests()
 		UTEST_CASE_CLOSED();
 	}( );
 
+	UTEST_CASE( "Value equality (operator==, operator!=)" )
+	{
+		Value::CValue int1( 5 );
+		Value::CValue int2( 5 );
+		Value::CValue int3( 10 );
+
+		Value::CValue string1( "string" );
+		Value::CValue string2( "string" );
+		Value::CValue string3( "not string" );
+
+		Value::CValue double1( 5.0 );
+		Value::CValue double2( 5.0 );
+		Value::CValue double3( 10.0 );
+
+		Value::CValue array1( (std::vector<Value::CValue>){1, 2} );
+		Value::CValue array2( (std::vector<Value::CValue>){1, 2} );
+
+		Value::CValue undefined1;
+		Value::CValue undefined2;
+
+		UTEST_ASSERT( ( int1 == int2 ) == true );
+		UTEST_ASSERT( ( int1 != int2 ) == false );
+		UTEST_ASSERT( ( int1 == undefined1 ) == false );
+
+		UTEST_ASSERT( ( int1 == int3 ) == false );
+		UTEST_ASSERT( ( int1 != int3 ) == true );
+
+		UTEST_ASSERT( ( string1 == string2 ) == true );
+		UTEST_ASSERT( ( string1 != string2 ) == false );
+		UTEST_ASSERT( ( string1 == undefined1 ) == false );
+
+		UTEST_ASSERT( ( string1 == string3 ) == false );
+		UTEST_ASSERT( ( string1 != string3 ) == true );
+
+		UTEST_ASSERT( ( double1 == double2 ) == true );
+		UTEST_ASSERT( ( double1 != double2 ) == false );
+		UTEST_ASSERT( ( double1 == undefined1 ) == false );
+
+		UTEST_ASSERT( ( double1 == double3 ) == false );
+		UTEST_ASSERT( ( double1 != double3 ) == true );
+
+		// Arrays don't have equality
+		UTEST_ASSERT( ( array1 == array2 ) == false );
+		UTEST_ASSERT( ( array1 != array2 ) == true );
+
+		UTEST_ASSERT( ( undefined1 == undefined2 ) == true );
+
+		UTEST_CASE_CLOSED();
+	}( );
+
 	UTEST_END();
 }
