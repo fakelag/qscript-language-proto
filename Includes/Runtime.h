@@ -1,6 +1,7 @@
 #pragma once
 #include "AST.h"
 #include "Value.h"
+#include <unordered_map>
 #include <vector>
 
 namespace Runtime
@@ -8,7 +9,7 @@ namespace Runtime
 	class IExec;
 
 	struct Statement_t
-	{	
+	{
 		Value::CValue m_Value;
 	};
 
@@ -22,9 +23,9 @@ namespace Runtime
 				m_IsGlobal = isGlobal;
 			}
 
-			std::map< std::string, IExec* >				m_Functions;
-			std::map< std::string, Value::CValue >		m_Variables;
-			bool										m_IsGlobal;
+			std::unordered_map< std::string, IExec* >				m_Functions;
+			std::unordered_map< std::string, Value::CValue >		m_Variables;
+			bool													m_IsGlobal;
 		};
 
 		void					PushScope( bool isGlobal );

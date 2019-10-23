@@ -213,7 +213,7 @@ namespace Runtime
 
 	IExec* CContext::FindFunction( const std::string& name )
 	{
-		for ( size_t i = m_Scopes.size() - 1; i > 0; ++i )
+		for ( size_t i = m_Scopes.size() - 1; i >= 0; --i )
 		{
 			auto function = m_Scopes[ i ].m_Functions.find( name );
 			if ( function != m_Scopes[ i ].m_Functions.end() )
@@ -225,7 +225,7 @@ namespace Runtime
 
 	const Value::CValue* CContext::FindVariable( const std::string& name )
 	{
-		for ( size_t i = m_Scopes.size() - 1; i > 0; ++i )
+		for ( size_t i = m_Scopes.size() - 1; i >= 0; --i )
 		{
 			auto function = m_Scopes[ i ].m_Variables.find( name );
 			if ( function != m_Scopes[ i ].m_Variables.end() )
