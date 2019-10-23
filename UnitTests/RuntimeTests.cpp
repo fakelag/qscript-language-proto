@@ -18,7 +18,9 @@ void RunRuntimeTests()
 			1 + (2 + 2) + 5;							\
 		" ) );
 
-		auto context = Runtime::CreateDefaultContext( true );
+		Runtime::CContext context;
+		Runtime::CreateDefaultContext( true, true, &context );
+
 		auto results = Runtime::Execute( syntaxTree, context );
 
 		UTEST_ASSERT( results.size() == 2 );

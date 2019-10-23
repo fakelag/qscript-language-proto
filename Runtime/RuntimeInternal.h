@@ -68,12 +68,23 @@ private: \
 	Grammar::SymbolLoc_t			m_Loc; \
 };
 
+#define RTI_INTERNALFUNC_HANDLER( func ) \
+class CExec_internal_##func : public Runtime::IExec \
+{ \
+public: \
+	Runtime::Statement_t Execute( Runtime::CContext& context ); \
+};
+
 #define RTI_EXECFN( symbol ) \
 Runtime::Statement_t RuntimeInternal::CExec_##symbol::Execute( Runtime::CContext& context )
+
+#define RTI_INTERNALFN( func ) \
+Runtime::Statement_t RuntimeInternal::CExec_internal_##func::Execute( Runtime::CContext& context )
 
 namespace RuntimeInternal
 {
 	RTI_COMPLEX_HANDLER( S_ADD );
+	RTI_COMPLEX_HANDLER( S_CALL );
 	RTI_COMPLEX_HANDLER( S_FUNC );
 	RTI_COMPLEX_HANDLER( S_FUNCDEF );
 
@@ -84,4 +95,9 @@ namespace RuntimeInternal
 
 	RTI_VALUE_HANDLER( S_INTCNST );
 	RTI_VALUE_HANDLER( S_NAME );
+
+	// Debug functions
+#ifdef RTI_DEBUG_ENABLED
+	RTI_INTERNALFUNC_HANDLER( __setFlag );
+#endif
 }

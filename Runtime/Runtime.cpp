@@ -84,17 +84,28 @@ namespace Runtime
 		allocationList->clear();
 	}
 
-	CContext CreateDefaultContext( bool isRepl )
+	void CreateDefaultContext( bool isRepl, bool enableDebugging, CContext* ctx )
 	{
-		auto ctx = CContext();
-
 		// Read-Eval-Print-Loop ?
-		ctx.m_Repl = isRepl;
+		ctx->m_Repl = isRepl;
 
 		// Push global scope into the stack
-		ctx.PushScope( true );
+		ctx->PushScope( true );
 
-		return ctx;
+#ifdef RTI_DEBUG_ENABLED
+		ctx->m_Flag = 0;
+
+		if ( enableDebugging )
+		{
+			// Link debugging functions
+			static auto __setFlag = RuntimeInternal::CExec_internal___setFlag();
+
+			ctx->PushFunction( "__setFlag", &__setFlag, NULL );
+		}
+#else
+		if ( enableDebugging )
+			throw Exception( "Unable to create a debuggable context. Debugging features are disabled." );
+#endif
 	}
 
 	std::vector< Statement_t > Execute( const std::vector< AST::IExpression* >& expressions, CContext& context )

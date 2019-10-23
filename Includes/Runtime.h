@@ -40,6 +40,10 @@ namespace Runtime
 
 		bool					m_Repl;
 		std::vector< Scope_t >	m_Scopes;
+
+#ifdef RTI_DEBUG_ENABLED
+			int 				m_Flag;
+#endif
 	};
 
 	class IExec
@@ -49,6 +53,6 @@ namespace Runtime
 		virtual Statement_t Execute( CContext& context ) = 0;
 	};
 
-	CContext CreateDefaultContext( bool isRepl );
+	void CreateDefaultContext( bool isRepl, bool enableDebugging, CContext* context );
 	std::vector< Statement_t > Execute( const std::vector< AST::IExpression* >& expressions, CContext& context );
 }

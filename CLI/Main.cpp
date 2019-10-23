@@ -73,7 +73,9 @@ int main( int argc, const char** argv )
 				auto symbols = Lexer::Parse( command );
 				auto syntaxTree = Parser::Parse( symbols );
 
-				auto context = Runtime::CreateDefaultContext( target == "repl" );
+				Runtime::CContext context;
+				Runtime::CreateDefaultContext( target == "repl", true, &context );
+
 				auto statements = Runtime::Execute( syntaxTree, context );
 
 				for ( auto stmt : statements )
