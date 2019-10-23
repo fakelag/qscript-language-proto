@@ -61,6 +61,7 @@ int main( int argc, const char** argv )
 		RunLexerTests();
 		RunValueTests();
 		RunParserTests();
+		RunRuntimeTests();
 	}
 
 #ifdef _WIN32

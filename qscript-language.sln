@@ -9,6 +9,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CLI", "CLI\CLI.vcxproj", "{
 	ProjectSection(ProjectDependencies) = postProject
 		{EB784F5A-8D72-466A-B48D-7FE3B695BA72} = {EB784F5A-8D72-466A-B48D-7FE3B695BA72}
 		{91B87EAE-8C60-477F-A709-EA8D1A936B49} = {91B87EAE-8C60-477F-A709-EA8D1A936B49}
+		{05F99FD2-6B96-4358-AB3A-4B28F69A7C9F} = {05F99FD2-6B96-4358-AB3A-4B28F69A7C9F}
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "UnitTests", "UnitTests\UnitTests.vcxproj", "{F8550DD2-5413-49C3-BFFD-606A58DD6828}"
@@ -18,6 +19,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "UnitTests", "UnitTests\Unit
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Parser", "Parser\Parser.vcxproj", "{91B87EAE-8C60-477F-A709-EA8D1A936B49}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Runtime", "Runtime\Runtime.vcxproj", "{05F99FD2-6B96-4358-AB3A-4B28F69A7C9F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -59,6 +62,14 @@ Global
 		{91B87EAE-8C60-477F-A709-EA8D1A936B49}.Release|x64.Build.0 = Release|x64
 		{91B87EAE-8C60-477F-A709-EA8D1A936B49}.Release|x86.ActiveCfg = Release|Win32
 		{91B87EAE-8C60-477F-A709-EA8D1A936B49}.Release|x86.Build.0 = Release|Win32
+		{05F99FD2-6B96-4358-AB3A-4B28F69A7C9F}.Debug|x64.ActiveCfg = Debug|x64
+		{05F99FD2-6B96-4358-AB3A-4B28F69A7C9F}.Debug|x64.Build.0 = Debug|x64
+		{05F99FD2-6B96-4358-AB3A-4B28F69A7C9F}.Debug|x86.ActiveCfg = Debug|Win32
+		{05F99FD2-6B96-4358-AB3A-4B28F69A7C9F}.Debug|x86.Build.0 = Debug|Win32
+		{05F99FD2-6B96-4358-AB3A-4B28F69A7C9F}.Release|x64.ActiveCfg = Release|x64
+		{05F99FD2-6B96-4358-AB3A-4B28F69A7C9F}.Release|x64.Build.0 = Release|x64
+		{05F99FD2-6B96-4358-AB3A-4B28F69A7C9F}.Release|x86.ActiveCfg = Release|Win32
+		{05F99FD2-6B96-4358-AB3A-4B28F69A7C9F}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

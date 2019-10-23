@@ -32,20 +32,20 @@ namespace AST
 		virtual ExpressionType 					Type() const = 0;
 		virtual Grammar::Symbol 				Symbol() const = 0;
 		virtual const Grammar::SymbolLoc_t& 	Location() const = 0;
-		virtual std::string 					ToString( int indent = 1 ) = 0;
+		virtual std::string 					ToString( int indent = 1 ) const = 0;
 	};
 
 	class CComplexExpression : public IExpression
 	{
 	public:
 		CComplexExpression( IExpression* lhs, IExpression* rhs, Grammar::Symbol symbol, const Grammar::SymbolLoc_t& loc );
-		std::string ToString( int indent );
+		std::string ToString( int indent ) const;
 
-		ExpressionType 					Type() 			const { return ET_COMPLEX; };
-		Grammar::Symbol 				Symbol()		const { return m_Symbol; }
-		const Grammar::SymbolLoc_t& 	Location() 		const { return m_Loc; }
-		IExpression* 					Lhs() 			const { return m_LHS; }
-		IExpression* 					Rhs() 			const { return m_RHS; }
+		ExpressionType 					Type() 						const { return ET_COMPLEX; };
+		Grammar::Symbol 				Symbol()					const { return m_Symbol; }
+		const Grammar::SymbolLoc_t& 	Location() 					const { return m_Loc; }
+		IExpression* 					Lhs() 						const { return m_LHS; }
+		IExpression* 					Rhs() 						const { return m_RHS; }
 
 		void* operator new ( size_t size );
 		void operator delete ( void* p );
@@ -64,12 +64,12 @@ namespace AST
 	{
 	public:
 		CSimpleExpression( IExpression* expression, Grammar::Symbol symbol, const Grammar::SymbolLoc_t& loc );
-		std::string ToString( int indent );
+		std::string ToString( int indent ) const;
 
-		ExpressionType 					Type() 			const { return ET_SIMPLE; };
-		Grammar::Symbol 				Symbol()		const { return m_Symbol; }
-		const Grammar::SymbolLoc_t& 	Location() 		const { return m_Loc; }
-		IExpression*					Expression() 	const { return m_Expression; }
+		ExpressionType 					Type() 						const { return ET_SIMPLE; };
+		Grammar::Symbol 				Symbol()					const { return m_Symbol; }
+		const Grammar::SymbolLoc_t& 	Location() 					const { return m_Loc; }
+		IExpression*					Expression() 				const { return m_Expression; }
 
 		void* operator new ( size_t size );
 		void operator delete ( void* p );
@@ -87,12 +87,12 @@ namespace AST
 	{
 	public:
 		CValueExpression( const Value::CValue& value, Grammar::Symbol symbol, const Grammar::SymbolLoc_t& loc );
-		std::string ToString( int indent );
+		std::string ToString( int indent ) const;
 
-		ExpressionType 					Type() 			const { return ET_VALUE; };
-		Grammar::Symbol 				Symbol()		const { return m_Symbol; }
-		const Grammar::SymbolLoc_t& 	Location() 		const { return m_Loc; }
-		Value::CValue&					Value()			{ return m_Value; }
+		ExpressionType 					Type() 					const { return ET_VALUE; };
+		Grammar::Symbol 				Symbol()				const { return m_Symbol; }
+		const Grammar::SymbolLoc_t& 	Location() 				const { return m_Loc; }
+		Value::CValue&					Value()					{ return m_Value; }
 
 		void* operator new ( size_t size );
 		void operator delete ( void* p );
@@ -110,12 +110,12 @@ namespace AST
 	{
 	public:
 		CListExpression( const std::vector< IExpression* >& list, Grammar::Symbol symbol, const Grammar::SymbolLoc_t& loc );
-		std::string ToString( int indent );
+		std::string ToString( int indent ) const;
 
-		ExpressionType 					Type() 			const { return ET_LIST; };
-		Grammar::Symbol 				Symbol()		const { return m_Symbol; }
-		const Grammar::SymbolLoc_t& 	Location() 		const { return m_Loc; }
-		std::vector< IExpression* >&	List()			{ return m_List; }
+		ExpressionType 					Type() 					const { return ET_LIST; };
+		Grammar::Symbol 				Symbol()				const { return m_Symbol; }
+		const Grammar::SymbolLoc_t& 	Location() 				const { return m_Loc; }
+		std::vector< IExpression* >&	List()					{ return m_List; }
 
 		void* operator new ( size_t size );
 		void operator delete ( void* p );

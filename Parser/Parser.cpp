@@ -587,7 +587,12 @@ namespace Parser
 
 						while ( parserState.CurrentSymbol().m_Symbol != Grammar::Symbol::S_BRACKET_CLOSE )
 						{
-							expressionList.push_back( nextExpression() );
+							auto expression = nextExpression();
+
+							// Only add executable expressions to scopes
+							if ( expression )
+								expressionList.push_back( expression );
+
 							parserState.NextSymbol();
 						}
 

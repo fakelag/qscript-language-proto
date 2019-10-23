@@ -21,6 +21,23 @@ protected:
 	std::string m_What;
 };
 
+class RuntimeException : public Exception
+{
+public:
+	RuntimeException( const Grammar::SymbolLoc_t& location, const std::string& error ) : Exception( "Parsing exception" )
+	{
+		m_Location = location;
+		m_Error = error;
+	}
+
+	const Grammar::SymbolLoc_t& location()		const { return m_Location; }
+	const std::string& error()					const { return m_Error; }
+
+private:
+	Grammar::SymbolLoc_t		m_Location;
+	std::string					m_Error;
+};
+
 class ParseException : public Exception
 {
 public:
@@ -47,8 +64,8 @@ public:
 		m_Errors.push_back( error );
 	}
 
-	const std::vector< Grammar::SymbolLoc_t >& locations() const { return m_Locations; }
-	const std::vector< std::string >& errors() const { return m_Errors; }
+	const std::vector< Grammar::SymbolLoc_t >& locations()	const { return m_Locations; }
+	const std::vector< std::string >& errors()				const { return m_Errors; }
 
 	ParseException operator=( const ParseException& other )
 	{

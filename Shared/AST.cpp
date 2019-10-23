@@ -65,7 +65,7 @@ namespace AST
 		free( p );
 	}
 
-	std::string CComplexExpression::ToString( int indent )
+	std::string CComplexExpression::ToString( int indent ) const
 	{
 		std::string token = "UNKNOWN";
 		auto commonSymbol = Grammar::LanguageSymbols.find( m_Symbol );
@@ -102,7 +102,7 @@ namespace AST
 		free( p );
 	}
 
-	std::string CSimpleExpression::ToString( int indent )
+	std::string CSimpleExpression::ToString( int indent ) const
 	{
 		std::string token = "UNKNOWN";
 		auto commonSymbol = Grammar::LanguageSymbols.find( m_Symbol );
@@ -138,7 +138,7 @@ namespace AST
 		free( p );
 	}
 
-	std::string CValueExpression::ToString( int indent )
+	std::string CValueExpression::ToString( int indent ) const
 	{
 		static const char* s_ValueTypes[] ={
 			"STRING",
@@ -148,7 +148,7 @@ namespace AST
 
 		std::string output = std::string( indent - 1 < 0 ? indent : indent - 1, '\t' ) + "{\n";
 		output += std::string( indent, '\t' ) + "type: VALUE\n";
-		output += std::string( indent, '\t' ) + "value: " + m_Value.GetString() + "\n";
+		output += std::string( indent, '\t' ) + "value: " + const_cast< Value::CValue& >( m_Value ).GetString() + "\n";
 		output += std::string( indent, '\t' ) + "valueType: " + std::string( s_ValueTypes[ m_Value.GetType() ] ) + "\n";
 		output += std::string( indent - 1 < 0 ? indent : indent - 1, '\t' ) + "}\n";
 		return output;
@@ -174,7 +174,7 @@ namespace AST
 		free( p );
 	}
 
-	std::string CListExpression::ToString( int indent )
+	std::string CListExpression::ToString( int indent ) const
 	{
 		std::string output = std::string( indent - 1 < 0 ? indent : indent - 1, '\t' ) + "{\n";
 		output += std::string( indent, '\t' ) + "type: LIST\n";
