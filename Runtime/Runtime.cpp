@@ -57,6 +57,7 @@ namespace Runtime
 			switch ( expression->Symbol() )
 			{
 				EXEC_COMPLEX( S_ADD );
+				EXEC_COMPLEX( S_CALL );
 				EXEC_COMPLEX( S_FUNC );
 				EXEC_COMPLEX( S_FUNCDEF );
 				EXEC_SIMPLE( S_FUNCBODY );
