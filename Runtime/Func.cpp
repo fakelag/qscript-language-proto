@@ -1,7 +1,7 @@
 #include "Runtime.h"
 #include "RuntimeInternal.h"
 
-RTI_EXECFN( S_FUNC )
+RTI_EXECFN_COMPLEX( S_FUNC )
 {
 	auto def = m_LHS->Execute( context );
 

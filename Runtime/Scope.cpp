@@ -1,7 +1,7 @@
 #include "Runtime.h"
 #include "RuntimeInternal.h"
 
-RTI_EXECFN( S_SCOPE )
+RTI_EXECFN_LIST( S_SCOPE )
 {
 	context.PushScope( false );
 

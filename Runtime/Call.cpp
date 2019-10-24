@@ -1,7 +1,7 @@
 #include "Runtime.h"
 #include "RuntimeInternal.h"
 
-RTI_EXECFN( S_CALL )
+RTI_EXECFN_COMPLEX( S_CALL )
 {
 	auto funcName = m_LHS->Execute( context );
 

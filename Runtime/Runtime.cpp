@@ -5,8 +5,46 @@
 
 #include "RuntimeInternal.h"
 
-#define EXEC_COMPLEX( symbol ) case Grammar::Symbol::symbol: {\
-	auto complex = new RuntimeInternal::CExec_##symbol( \
+#define EXEC_COMPLEX( symbol ) \
+if ( expression->Symbol() == Grammar::Symbol::symbol && expression->Type() == AST::ExpressionType::ET_COMPLEX ) {\
+	auto complex = new RuntimeInternal::CExec_Complex_##symbol( \
+		convert( static_cast< AST::CComplexExpression* > ( expression )->Lhs() ), \
+		convert( static_cast< AST::CComplexExpression* > ( expression )->Rhs() ), \
+		expression->Location() ); \
+	allocationList->push_back( complex ); \
+	return complex; \
+}
+
+#define EXEC_SIMPLE( symbol ) \
+if ( expression->Symbol() == Grammar::Symbol::symbol && expression->Type() == AST::ExpressionType::ET_SIMPLE ) {\
+	auto simple = new RuntimeInternal::CExec_Simple_##symbol( \
+		convert( static_cast< AST::CSimpleExpression* > ( expression )->Expression() ), \
+		expression->Location() ); \
+	allocationList->push_back( simple ); \
+	return simple; \
+}
+
+#define EXEC_LIST( symbol ) \
+if ( expression->Symbol() == Grammar::Symbol::symbol && expression->Type() == AST::ExpressionType::ET_LIST ) {\
+	std::vector< IExec* > objects; \
+	auto astList = static_cast< AST::CListExpression* > ( expression )->List(); \
+	std::transform( astList.begin(), astList.end(), std::back_inserter( objects ), convert ); \
+	auto list = new RuntimeInternal::CExec_List_##symbol( \
+		objects, \
+		expression->Location() ); \
+	allocationList->push_back( list ); \
+	return list; \
+}
+
+#define EXEC_VALUE( symbol ) \
+if ( expression->Symbol() == Grammar::Symbol::symbol && expression->Type() == AST::ExpressionType::ET_VALUE ) { \
+	auto value = new RuntimeInternal::CExec_Value_##symbol( static_cast< AST::CValueExpression* > ( expression )->Value(), expression->Location() ); \
+	allocationList->push_back( value ); \
+	return value; \
+}
+
+/*#define EXEC_COMPLEX( symbol ) case Grammar::Symbol::symbol: {\
+	auto complex = new RuntimeInternal::CExec_Complex_##symbol( \
 		convert( static_cast< AST::CComplexExpression* > ( expression )->Lhs() ), \
 		convert( static_cast< AST::CComplexExpression* > ( expression )->Rhs() ), \
 		expression->Location() ); \
@@ -15,7 +53,7 @@
 }
 
 #define EXEC_SIMPLE( symbol ) case Grammar::Symbol::symbol: {\
-	auto simple = new RuntimeInternal::CExec_##symbol( \
+	auto simple = new RuntimeInternal::CExec_Simple_##symbol( \
 		convert( static_cast< AST::CSimpleExpression* > ( expression )->Expression() ), \
 		expression->Location() ); \
 	allocationList->push_back( simple ); \
@@ -26,7 +64,7 @@
 	std::vector< IExec* > objects; \
 	auto astList = static_cast< AST::CListExpression* > ( expression )->List(); \
 	std::transform( astList.begin(), astList.end(), std::back_inserter( objects ), convert ); \
-	auto list = new RuntimeInternal::CExec_##symbol( \
+	auto list = new RuntimeInternal::CExec_List_##symbol( \
 		objects, \
 		expression->Location() ); \
 	allocationList->push_back( list ); \
@@ -34,10 +72,10 @@
 }
 
 #define EXEC_VALUE( symbol ) case Grammar::Symbol::symbol: { \
-	auto value = new RuntimeInternal::CExec_##symbol( static_cast< AST::CValueExpression* > ( expression )->Value(), expression->Location() ); \
+	auto value = new RuntimeInternal::CExec_Value_##symbol( static_cast< AST::CValueExpression* > ( expression )->Value(), expression->Location() ); \
 	allocationList->push_back( value ); \
 	return value; \
-}
+}*/
 
 namespace Runtime
 {
@@ -54,20 +92,23 @@ namespace Runtime
 			if ( expression == NULL )
 				return NULL;
 
-			switch ( expression->Symbol() )
-			{
-				EXEC_COMPLEX( S_ADD );
-				EXEC_COMPLEX( S_CALL );
-				EXEC_COMPLEX( S_FUNC );
-				EXEC_COMPLEX( S_FUNCDEF );
-				EXEC_SIMPLE( S_FUNCBODY );
-				EXEC_LIST( S_SCOPE );
-				EXEC_LIST( S_LIST );
-				EXEC_VALUE( S_INTCNST );
-				EXEC_VALUE( S_NAME );
-			default:
-				throw Exception( "Unknown expression: " + std::to_string( expression->Symbol() ) );
-			}
+			EXEC_COMPLEX( S_ADD );
+			EXEC_COMPLEX( S_SUB );
+			EXEC_COMPLEX( S_DIV );
+			EXEC_COMPLEX( S_MUL );
+			EXEC_COMPLEX( S_CALL );
+			EXEC_COMPLEX( S_FUNC );
+			EXEC_COMPLEX( S_FUNCDEF );
+			EXEC_SIMPLE( S_SUB );
+			EXEC_SIMPLE( S_ADD );
+			EXEC_SIMPLE( S_FUNCBODY );
+			EXEC_LIST( S_SCOPE );
+			EXEC_LIST( S_LIST );
+			EXEC_VALUE( S_DBLCNST );
+			EXEC_VALUE( S_INTCNST );
+			EXEC_VALUE( S_NAME );
+
+			throw Exception( "Unknown expression: " + std::to_string( expression->Symbol() ) );
 		};
 
 		std::transform( expressions.begin(), expressions.end(), std::back_inserter( executors ), [ &convert ]( AST::IExpression* expr ) {
@@ -99,7 +140,7 @@ namespace Runtime
 		if ( enableDebugging )
 		{
 			// Link debugging functions
-			static auto __setFlag = RuntimeInternal::CExec_internal___setFlag();
+			static auto __setFlag = RuntimeInternal::CExec_Internal___setFlag();
 
 			ctx->PushFunction( "__setFlag", &__setFlag, NULL );
 		}
