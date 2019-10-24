@@ -8,6 +8,7 @@ RTI_EXECFN_COMPLEX( S_CALL )
 	if ( funcName.m_Value.GetType() != Value::ValueType::VT_STRING )
 		throw RuntimeException( m_Loc, "Invalid function name: " + funcName.m_Value.GetString() );
 
+	// Find the function to execute
 	auto function = context.FindFunction( funcName.m_Value.GetString() );
 
 	if ( function == NULL )

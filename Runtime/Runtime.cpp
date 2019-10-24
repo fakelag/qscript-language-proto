@@ -5,78 +5,6 @@
 
 #include "RuntimeInternal.h"
 
-#define EXEC_COMPLEX( symbol ) \
-if ( expression->Symbol() == Grammar::Symbol::symbol && expression->Type() == AST::ExpressionType::ET_COMPLEX ) {\
-	auto complex = new RuntimeInternal::CExec_Complex_##symbol( \
-		convert( static_cast< AST::CComplexExpression* > ( expression )->Lhs() ), \
-		convert( static_cast< AST::CComplexExpression* > ( expression )->Rhs() ), \
-		expression->Location() ); \
-	allocationList->push_back( complex ); \
-	return complex; \
-}
-
-#define EXEC_SIMPLE( symbol ) \
-if ( expression->Symbol() == Grammar::Symbol::symbol && expression->Type() == AST::ExpressionType::ET_SIMPLE ) {\
-	auto simple = new RuntimeInternal::CExec_Simple_##symbol( \
-		convert( static_cast< AST::CSimpleExpression* > ( expression )->Expression() ), \
-		expression->Location() ); \
-	allocationList->push_back( simple ); \
-	return simple; \
-}
-
-#define EXEC_LIST( symbol ) \
-if ( expression->Symbol() == Grammar::Symbol::symbol && expression->Type() == AST::ExpressionType::ET_LIST ) {\
-	std::vector< IExec* > objects; \
-	auto astList = static_cast< AST::CListExpression* > ( expression )->List(); \
-	std::transform( astList.begin(), astList.end(), std::back_inserter( objects ), convert ); \
-	auto list = new RuntimeInternal::CExec_List_##symbol( \
-		objects, \
-		expression->Location() ); \
-	allocationList->push_back( list ); \
-	return list; \
-}
-
-#define EXEC_VALUE( symbol ) \
-if ( expression->Symbol() == Grammar::Symbol::symbol && expression->Type() == AST::ExpressionType::ET_VALUE ) { \
-	auto value = new RuntimeInternal::CExec_Value_##symbol( static_cast< AST::CValueExpression* > ( expression )->Value(), expression->Location() ); \
-	allocationList->push_back( value ); \
-	return value; \
-}
-
-/*#define EXEC_COMPLEX( symbol ) case Grammar::Symbol::symbol: {\
-	auto complex = new RuntimeInternal::CExec_Complex_##symbol( \
-		convert( static_cast< AST::CComplexExpression* > ( expression )->Lhs() ), \
-		convert( static_cast< AST::CComplexExpression* > ( expression )->Rhs() ), \
-		expression->Location() ); \
-	allocationList->push_back( complex ); \
-	return complex; \
-}
-
-#define EXEC_SIMPLE( symbol ) case Grammar::Symbol::symbol: {\
-	auto simple = new RuntimeInternal::CExec_Simple_##symbol( \
-		convert( static_cast< AST::CSimpleExpression* > ( expression )->Expression() ), \
-		expression->Location() ); \
-	allocationList->push_back( simple ); \
-	return simple; \
-}
-
-#define EXEC_LIST( symbol ) case Grammar::Symbol::symbol: {\
-	std::vector< IExec* > objects; \
-	auto astList = static_cast< AST::CListExpression* > ( expression )->List(); \
-	std::transform( astList.begin(), astList.end(), std::back_inserter( objects ), convert ); \
-	auto list = new RuntimeInternal::CExec_List_##symbol( \
-		objects, \
-		expression->Location() ); \
-	allocationList->push_back( list ); \
-	return list; \
-}
-
-#define EXEC_VALUE( symbol ) case Grammar::Symbol::symbol: { \
-	auto value = new RuntimeInternal::CExec_Value_##symbol( static_cast< AST::CValueExpression* > ( expression )->Value(), expression->Location() ); \
-	allocationList->push_back( value ); \
-	return value; \
-}*/
-
 namespace Runtime
 {
 	// Unknown location
@@ -86,12 +14,14 @@ namespace Runtime
 	{
 		std::vector< IExec* > executors;
 
+		// Convert AST expressions into executor objects
 		std::function< IExec*( AST::IExpression* ) > convert;
 		convert = [ &convert, &allocationList ]( AST::IExpression* expression ) -> IExec*
 		{
 			if ( expression == NULL )
 				return NULL;
 
+			// List all enabled operators with macros
 			EXEC_COMPLEX( S_ADD );
 			EXEC_COMPLEX( S_SUB );
 			EXEC_COMPLEX( S_DIV );
@@ -120,6 +50,7 @@ namespace Runtime
 
 	void FreeExecutionObjects( std::vector< IExec* >* allocationList )
 	{
+		// Release all resources allocated for execution
 		for ( size_t i = 0; i < allocationList->size(); ++i )
 			delete ( *allocationList )[ i ];
 
@@ -135,6 +66,8 @@ namespace Runtime
 		ctx->PushScope( true );
 
 #ifdef RTI_DEBUG_ENABLED
+		// Reset the debugging flag. This flag is used by tests
+		// to verify that certain code paths were properly triggered
 		ctx->m_Flag = 0;
 
 		if ( enableDebugging )
@@ -155,25 +88,31 @@ namespace Runtime
 		std::vector< IExec* > allocationList;
 		std::vector< Statement_t > statementList;
 
+		// Allocate executors
 		std::vector< IExec* > executors = CreateExecutionObjects( expressions, &allocationList );
 
 		try
 		{
 			if ( context.m_Repl )
 			{
+				// For REPL mode, execute all the expressions
+				// and return a statement for each
 				for ( auto node : executors )
 					statementList.push_back( node->Execute( context ) );
 			}
 			else
 			{
+				// Execute top-level code, such as class and function declarations
 				for ( auto node : executors )
 					node->Execute( context );
 
+				// find "main" function
 				auto main = context.m_Scopes[ 0 ].m_Functions.find( "main" );
 
 				if ( main == context.m_Scopes[ 0 ].m_Functions.end() )
 					throw Exception( "Entrypoint not found" );
 
+				// Execute code from the program's main entrypoint
 				statementList.push_back( main->second->Execute( context ) );
 			}
 		}
@@ -188,7 +127,11 @@ namespace Runtime
 			throw exception;
 		}
 
+		// Pop global scope
 		context.PopScope();
+
+		// Free all resources
+		FreeExecutionObjects( &allocationList );
 		return statementList;
 	}
 
@@ -237,6 +180,7 @@ namespace Runtime
 
 		if ( variable == m_Scopes[ m_Scopes.size() - 1 ].m_Variables.end() )
 		{
+			// Insert new variable
 			m_Scopes[ m_Scopes.size() - 1 ].m_Variables.insert( { name, value } );
 		}
 		else

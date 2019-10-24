@@ -4,6 +4,5 @@
 RTI_EXECFN_COMPLEX( S_FUNCDEF )
 {
 	std::vector< Value::CValue > list = { m_LHS->Execute( context ).m_Value, m_RHS->Execute( context ).m_Value };
-	auto definition = Value::CValue( list );
-	return { definition };
+	return { Value::CValue( list ) };
 }
