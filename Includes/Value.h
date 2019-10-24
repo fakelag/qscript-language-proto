@@ -98,6 +98,11 @@ namespace Value
 			return !operator==( other );
 		}
 
+		FORCEINLINE CValue operator!() const
+		{
+			return !GetInt();
+		}
+
 		FORCEINLINE CValue operator+( const CValue& other ) const
 		{
 			switch ( m_ValueType )
@@ -109,7 +114,7 @@ namespace Value
 				case VT_STRING: return CValue( m_StringValue + other.m_StringValue );
 				case VT_INTEGER: return CValue( m_StringValue + std::to_string( other.m_IntValue ) );
 				case VT_DOUBLE: return CValue( m_StringValue + std::to_string( other.m_DoubleValue ) );
-				case VT_ARRAY: throw Exception( "Invalid operation on an array" );
+				case VT_ARRAY: throw Exception( "Invalid CValue type" );
 				default: throw Exception( "Invalid CValue type" );
 				}
 			}
@@ -120,7 +125,7 @@ namespace Value
 				case VT_STRING: return CValue( std::to_string( m_IntValue ) + other.m_StringValue );
 				case VT_INTEGER: return CValue( m_IntValue + other.m_IntValue );
 				case VT_DOUBLE: return CValue( ( double ) m_IntValue + other.m_DoubleValue );
-				case VT_ARRAY: throw Exception( "Invalid operation on an array" );
+				case VT_ARRAY: throw Exception( "Invalid CValue type" );
 				default: throw Exception( "Invalid CValue type" );
 				}
 			}
@@ -131,7 +136,124 @@ namespace Value
 				case VT_STRING: return CValue( std::to_string( m_DoubleValue ) + other.m_StringValue );
 				case VT_INTEGER: return CValue( m_DoubleValue + ( double ) other.m_IntValue );
 				case VT_DOUBLE: return CValue( m_DoubleValue + other.m_DoubleValue );
-				case VT_ARRAY: throw Exception( "Invalid operation on an array" );
+				case VT_ARRAY: throw Exception( "Invalid CValue type" );
+				default: throw Exception( "Invalid CValue type" );
+				}
+			}
+			case VT_ARRAY:
+			{
+				throw Exception( "Invalid CValue type" );
+			}
+			default:
+				throw Exception( "Invalid CValue type" );
+			}
+		}
+
+		FORCEINLINE CValue operator-( const CValue& other ) const
+		{
+			switch ( m_ValueType )
+			{
+			case VT_STRING:
+			{
+				throw Exception( "Invalid CValue type" );
+			}
+			case VT_INTEGER:
+			{
+				switch ( other.m_ValueType )
+				{
+				case VT_STRING: throw Exception( "Invalid CValue type" );
+				case VT_INTEGER: return CValue( m_IntValue - other.m_IntValue );
+				case VT_DOUBLE: return CValue( ( double ) m_IntValue - other.m_DoubleValue );
+				case VT_ARRAY: throw Exception( "Invalid CValue type" );
+				default: throw Exception( "Invalid CValue type" );
+				}
+			}
+			case VT_DOUBLE:
+			{
+				switch ( other.m_ValueType )
+				{
+				case VT_STRING: throw Exception( "Invalid CValue type" );
+				case VT_INTEGER: return CValue( m_DoubleValue - ( double ) other.m_IntValue );
+				case VT_DOUBLE: return CValue( m_DoubleValue - other.m_DoubleValue );
+				case VT_ARRAY: throw Exception( "Invalid CValue type" );
+				default: throw Exception( "Invalid CValue type" );
+				}
+			}
+			case VT_ARRAY:
+			{
+				throw Exception( "Invalid operation on an array" );
+			}
+			default:
+				throw Exception( "Invalid CValue type" );
+			}
+		}
+
+		FORCEINLINE CValue operator/( const CValue& other ) const
+		{
+			switch ( m_ValueType )
+			{
+			case VT_STRING:
+			{
+				throw Exception( "Invalid CValue type" );
+			}
+			case VT_INTEGER:
+			{
+				switch ( other.m_ValueType )
+				{
+				case VT_STRING: throw Exception( "Invalid CValue type" );
+				case VT_INTEGER: return CValue( m_IntValue / other.m_IntValue );
+				case VT_DOUBLE: return CValue( ( double ) m_IntValue / other.m_DoubleValue );
+				case VT_ARRAY: throw Exception( "Invalid CValue type" );
+				default: throw Exception( "Invalid CValue type" );
+				}
+			}
+			case VT_DOUBLE:
+			{
+				switch ( other.m_ValueType )
+				{
+				case VT_STRING: throw Exception( "Invalid CValue type" );
+				case VT_INTEGER: return CValue( m_DoubleValue / ( double ) other.m_IntValue );
+				case VT_DOUBLE: return CValue( m_DoubleValue / other.m_DoubleValue );
+				case VT_ARRAY: throw Exception( "Invalid CValue type" );
+				default: throw Exception( "Invalid CValue type" );
+				}
+			}
+			case VT_ARRAY:
+			{
+				throw Exception( "Invalid operation on an array" );
+			}
+			default:
+				throw Exception( "Invalid CValue type" );
+			}
+		}
+
+		FORCEINLINE CValue operator*( const CValue& other ) const
+		{
+			switch ( m_ValueType )
+			{
+			case VT_STRING:
+			{
+				throw Exception( "Invalid CValue type" );
+			}
+			case VT_INTEGER:
+			{
+				switch ( other.m_ValueType )
+				{
+				case VT_STRING: throw Exception( "Invalid CValue type" );
+				case VT_INTEGER: return CValue( m_IntValue * other.m_IntValue );
+				case VT_DOUBLE: return CValue( ( double ) m_IntValue * other.m_DoubleValue );
+				case VT_ARRAY: throw Exception( "Invalid CValue type" );
+				default: throw Exception( "Invalid CValue type" );
+				}
+			}
+			case VT_DOUBLE:
+			{
+				switch ( other.m_ValueType )
+				{
+				case VT_STRING: throw Exception( "Invalid CValue type" );
+				case VT_INTEGER: return CValue( m_DoubleValue * ( double ) other.m_IntValue );
+				case VT_DOUBLE: return CValue( m_DoubleValue * other.m_DoubleValue );
+				case VT_ARRAY: throw Exception( "Invalid CValue type" );
 				default: throw Exception( "Invalid CValue type" );
 				}
 			}
