@@ -1,7 +1,7 @@
 #include "Runtime.h"
 #include "RuntimeInternal.h"
 
-RTI_EXECFN( S_LIST )
+RTI_EXECFN_LIST( S_LIST )
 {
 	Runtime::Statement_t statement;
 	statement.m_Value.SetArray( {} );

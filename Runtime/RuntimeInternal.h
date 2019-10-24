@@ -3,10 +3,10 @@
 #include "AST.h"
 
 #define RTI_COMPLEX_HANDLER( symbol ) \
-class CExec_##symbol : public Runtime::IExec \
+class CExec_Complex_##symbol : public Runtime::IExec \
 { \
 public: \
-	CExec_##symbol( Runtime::IExec* lhs, Runtime::IExec* rhs, const Grammar::SymbolLoc_t& loc ) \
+	CExec_Complex_##symbol( Runtime::IExec* lhs, Runtime::IExec* rhs, const Grammar::SymbolLoc_t& loc ) \
 	{ \
 		m_LHS = lhs; \
 		m_RHS = rhs; \
@@ -21,10 +21,10 @@ private: \
 };
 
 #define RTI_SIMPLE_HANDLER( symbol ) \
-class CExec_##symbol : public Runtime::IExec \
+class CExec_Simple_##symbol : public Runtime::IExec \
 { \
 public: \
-	CExec_##symbol( Runtime::IExec* expr, const Grammar::SymbolLoc_t& loc ) \
+	CExec_Simple_##symbol( Runtime::IExec* expr, const Grammar::SymbolLoc_t& loc ) \
 	{ \
 		m_Expr = expr; \
 		m_Loc = loc; \
@@ -37,10 +37,10 @@ private: \
 };
 
 #define RTI_VALUE_HANDLER( symbol ) \
-class CExec_##symbol : public Runtime::IExec \
+class CExec_Value_##symbol : public Runtime::IExec \
 { \
 public: \
-	CExec_##symbol( const Value::CValue& value, const Grammar::SymbolLoc_t& loc ) \
+	CExec_Value_##symbol( const Value::CValue& value, const Grammar::SymbolLoc_t& loc ) \
 	{ \
 		m_Value = value; \
 		m_Loc = loc; \
@@ -53,10 +53,10 @@ private: \
 };
 
 #define RTI_LIST_HANDLER( symbol ) \
-class CExec_##symbol : public Runtime::IExec \
+class CExec_List_##symbol : public Runtime::IExec \
 { \
 public: \
-	CExec_##symbol( const std::vector< Runtime::IExec* >& list, const Grammar::SymbolLoc_t& loc ) \
+	CExec_List_##symbol( const std::vector< Runtime::IExec* >& list, const Grammar::SymbolLoc_t& loc ) \
 	{ \
 		m_List = list; \
 		m_Loc = loc; \
@@ -69,30 +69,84 @@ private: \
 };
 
 #define RTI_INTERNALFUNC_HANDLER( func ) \
-class CExec_internal_##func : public Runtime::IExec \
+class CExec_Internal_##func : public Runtime::IExec \
 { \
 public: \
 	Runtime::Statement_t Execute( Runtime::CContext& context ); \
 };
 
-#define RTI_EXECFN( symbol ) \
-Runtime::Statement_t RuntimeInternal::CExec_##symbol::Execute( Runtime::CContext& context )
+#define RTI_EXECFN_COMPLEX( symbol ) \
+Runtime::Statement_t RuntimeInternal::CExec_Complex_##symbol::Execute( Runtime::CContext& context )
 
-#define RTI_INTERNALFN( func ) \
-Runtime::Statement_t RuntimeInternal::CExec_internal_##func::Execute( Runtime::CContext& context )
+#define RTI_EXECFN_SIMPLE( symbol ) \
+Runtime::Statement_t RuntimeInternal::CExec_Simple_##symbol::Execute( Runtime::CContext& context )
+
+#define RTI_EXECFN_VALUE( symbol ) \
+Runtime::Statement_t RuntimeInternal::CExec_Value_##symbol::Execute( Runtime::CContext& context )
+
+#define RTI_EXECFN_LIST( symbol ) \
+Runtime::Statement_t RuntimeInternal::CExec_List_##symbol::Execute( Runtime::CContext& context )
+
+#define RTI_EXECFN_INTERNAL( func ) \
+Runtime::Statement_t RuntimeInternal::CExec_Internal_##func::Execute( Runtime::CContext& context )
+
+#define EXEC_COMPLEX( symbol ) \
+if ( expression->Symbol() == Grammar::Symbol::symbol && expression->Type() == AST::ExpressionType::ET_COMPLEX ) {\
+	auto complex = new RuntimeInternal::CExec_Complex_##symbol( \
+		convert( static_cast< AST::CComplexExpression* > ( expression )->Lhs() ), \
+		convert( static_cast< AST::CComplexExpression* > ( expression )->Rhs() ), \
+		expression->Location() ); \
+	allocationList->push_back( complex ); \
+	return complex; \
+}
+
+#define EXEC_SIMPLE( symbol ) \
+if ( expression->Symbol() == Grammar::Symbol::symbol && expression->Type() == AST::ExpressionType::ET_SIMPLE ) {\
+	auto simple = new RuntimeInternal::CExec_Simple_##symbol( \
+		convert( static_cast< AST::CSimpleExpression* > ( expression )->Expression() ), \
+		expression->Location() ); \
+	allocationList->push_back( simple ); \
+	return simple; \
+}
+
+#define EXEC_LIST( symbol ) \
+if ( expression->Symbol() == Grammar::Symbol::symbol && expression->Type() == AST::ExpressionType::ET_LIST ) {\
+	std::vector< IExec* > objects; \
+	auto astList = static_cast< AST::CListExpression* > ( expression )->List(); \
+	std::transform( astList.begin(), astList.end(), std::back_inserter( objects ), convert ); \
+	auto list = new RuntimeInternal::CExec_List_##symbol( \
+		objects, \
+		expression->Location() ); \
+	allocationList->push_back( list ); \
+	return list; \
+}
+
+#define EXEC_VALUE( symbol ) \
+if ( expression->Symbol() == Grammar::Symbol::symbol && expression->Type() == AST::ExpressionType::ET_VALUE ) { \
+	auto value = new RuntimeInternal::CExec_Value_##symbol( static_cast< AST::CValueExpression* > ( expression )->Value(), expression->Location() ); \
+	allocationList->push_back( value ); \
+	return value; \
+}
 
 namespace RuntimeInternal
 {
+	// Implement RTI executor classes
 	RTI_COMPLEX_HANDLER( S_ADD );
+	RTI_COMPLEX_HANDLER( S_SUB );
+	RTI_COMPLEX_HANDLER( S_DIV );
+	RTI_COMPLEX_HANDLER( S_MUL );
 	RTI_COMPLEX_HANDLER( S_CALL );
 	RTI_COMPLEX_HANDLER( S_FUNC );
 	RTI_COMPLEX_HANDLER( S_FUNCDEF );
 
 	RTI_SIMPLE_HANDLER( S_FUNCBODY );
+	RTI_SIMPLE_HANDLER( S_ADD );
+	RTI_SIMPLE_HANDLER( S_SUB );
 
 	RTI_LIST_HANDLER( S_SCOPE );
 	RTI_LIST_HANDLER( S_LIST );
 
+	RTI_VALUE_HANDLER( S_DBLCNST );
 	RTI_VALUE_HANDLER( S_INTCNST );
 	RTI_VALUE_HANDLER( S_NAME );
 

@@ -269,7 +269,7 @@ namespace Parser
 					// it's tree
 					symbol.m_RightBind = [ &nextExpression ]( const ParserSymbol_t& symbol ) -> AST::IExpression*
 					{
-						auto right = nextExpression( symbol.m_LBP );
+						auto right = nextExpression( -1 );
 						return new AST::CSimpleExpression( right, symbol.m_Symbol, symbol.m_Location );
 					};
 					break;

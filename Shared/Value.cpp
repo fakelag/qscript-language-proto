@@ -13,8 +13,7 @@ namespace Value
 		m_DoubleValue		= 0.0;
 		m_IntValue			= 0;
 		m_ValueType			= VT_UNINITIALIZED;
-		m_StringDouble		= 0.0;
-		m_StringInt			= 0;
+		InitStringCache();
 	}
 
 	CValue::CValue( const CValue& value )
@@ -26,36 +25,52 @@ namespace Value
 		m_StringDouble		= value.m_StringDouble;
 		m_StringInt			= value.m_StringInt;
 		m_ArrayValue		= value.m_ArrayValue;
+		m_StringCacheDouble = value.m_StringCacheDouble;
+		m_StringCacheInt 	= value.m_StringCacheInt;
 	}
 
 	CValue::CValue( const std::string& string )
 	{
 		SetString( string );
+		InitStringCache();
 	}
 
 	CValue::CValue( const char* string )
 	{
 		SetString( std::string( string ) );
+		InitStringCache();
 	}
 
 	CValue::CValue( int integer )
 	{
 		SetInt( integer );
+		InitStringCache();
 	}
 
 	CValue::CValue( double decimal )
 	{
 		SetDouble( decimal );
+		InitStringCache();
 	}
 
 	CValue::CValue( bool boolean )
 	{
 		SetBool( boolean );
+		InitStringCache();
 	}
 
 	CValue::CValue( const std::vector< CValue >& values )
 	{
 		SetArray( values );
+		InitStringCache();
+	}
+
+	void CValue::InitStringCache()
+	{
+		m_StringDouble			= 0.0;
+		m_StringInt				= 0;
+		m_StringCacheDouble 	= "0.0000";
+		m_StringCacheInt 		= "0";
 	}
 
 	const std::string& CValue::GetString()
@@ -69,28 +84,28 @@ namespace Value
 			if ( m_StringDouble == m_DoubleValue )
 			{
 				// A cached value remains from a previous call. Use it.
-				return m_StringValue;
+				return m_StringCacheDouble;
 			}
 			else
 			{
 				// There is no cached value yet, we'll stringify the value and
 				// cache it off for next time
-				m_StringValue = std::to_string( m_DoubleValue );
+				m_StringCacheDouble = std::to_string( m_DoubleValue );
 				m_StringDouble = m_DoubleValue;
-				return m_StringValue;
+				return m_StringCacheDouble;
 			}
 		}
 		case VT_INTEGER:
 		{
 			if ( m_StringInt == m_IntValue )
 			{
-				return m_StringValue;
+				return m_StringCacheInt;
 			}
 			else
 			{
-				m_StringValue = std::to_string( m_IntValue );
+				m_StringCacheInt = std::to_string( m_IntValue );
 				m_StringInt = m_IntValue;
-				return m_StringValue;
+				return m_StringCacheInt;
 			}
 		}
 		case VT_ARRAY:

@@ -135,6 +135,136 @@ void RunValueTests()
 		UTEST_CASE_CLOSED();
 	}( );
 
+	UTEST_CASE( "Value subtraction (operator-)" )
+	{
+		Value::CValue rhs( 2 );
+		Value::CValue lhs( 5 );
+
+		UTEST_ASSERT( ( lhs - rhs ).GetType() == Value::ValueType::VT_INTEGER );
+		UTEST_ASSERT( ( lhs - rhs ).GetInt() == 3 );
+
+		rhs.SetInt( 5 );
+		UTEST_ASSERT( ( lhs - rhs ).GetType() == Value::ValueType::VT_INTEGER );
+		UTEST_ASSERT( ( lhs - rhs ).GetInt() == 0 );
+
+		rhs.SetInt( -10 );
+		UTEST_ASSERT( ( lhs - rhs ).GetType() == Value::ValueType::VT_INTEGER );
+		UTEST_ASSERT( ( lhs - rhs ).GetInt() == 15 );
+
+		rhs.SetDouble( 4.2 );
+		UTEST_ASSERT( ( lhs - rhs ).GetType() == Value::ValueType::VT_DOUBLE );
+		UTEST_ASSERT( ( lhs - rhs ).GetDouble() == 5.0 - 4.2 );
+
+		rhs.SetInt( 2 );
+		lhs.SetDouble( 3.2 );
+		UTEST_ASSERT( ( lhs - rhs ).GetType() == Value::ValueType::VT_DOUBLE );
+		UTEST_ASSERT( ( lhs - rhs ).GetDouble() == 3.2 - 2 );
+
+		lhs.SetString( "Ping" );
+		UTEST_THROW( lhs - rhs );
+
+		lhs.SetArray( { Value::CValue( 1 ) } );
+		UTEST_THROW( lhs - rhs );
+
+		UTEST_CASE_CLOSED();
+	}( );
+
+	UTEST_CASE( "Value subtraction (operator- prefix)" )
+	{
+		Value::CValue value( 2 );
+
+		UTEST_ASSERT( ( -value ) == Value::CValue( -2 ) );
+		UTEST_ASSERT( ( -( -value ) ) == Value::CValue( 2 ) );
+
+		value.SetDouble( 5.0 );
+		UTEST_ASSERT( ( -value ).GetType() == Value::ValueType::VT_DOUBLE );
+		UTEST_ASSERT( ( -value ).GetDouble() == -5.0 );
+
+		value.SetString( "Ping" );
+		UTEST_THROW( -value );
+
+		value.SetArray( { Value::CValue( 1 ) } );
+		UTEST_THROW( -value );
+
+		UTEST_CASE_CLOSED();
+	}( );
+
+	UTEST_CASE( "Value division (operator/)" )
+	{
+		Value::CValue rhs( 2 );
+		Value::CValue lhs( 10 );
+
+		UTEST_ASSERT( ( lhs / rhs ).GetType() == Value::ValueType::VT_INTEGER );
+		UTEST_ASSERT( ( lhs / rhs ).GetInt() == 5 );
+
+		rhs.SetInt( 5 );
+		UTEST_ASSERT( ( lhs / rhs ).GetType() == Value::ValueType::VT_INTEGER );
+		UTEST_ASSERT( ( lhs / rhs ).GetInt() == 2 );
+
+		rhs.SetInt( -10 );
+		UTEST_ASSERT( ( lhs / rhs ).GetType() == Value::ValueType::VT_INTEGER );
+		UTEST_ASSERT( ( lhs / rhs ).GetInt() == 10 / -10 );
+
+		rhs.SetDouble( 3.0 );
+		UTEST_ASSERT( ( lhs / rhs ).GetType() == Value::ValueType::VT_DOUBLE );
+		UTEST_ASSERT( ( lhs / rhs ).GetDouble() == 10 / 3.0 );
+
+		rhs.SetDouble( 4.2 );
+		UTEST_ASSERT( ( lhs / rhs ).GetType() == Value::ValueType::VT_DOUBLE );
+		UTEST_ASSERT( ( lhs / rhs ).GetDouble() == 10.0 / 4.2 );
+
+		rhs.SetInt( 2 );
+		lhs.SetDouble( 3.2 );
+		UTEST_ASSERT( ( lhs / rhs ).GetType() == Value::ValueType::VT_DOUBLE );
+		UTEST_ASSERT( ( lhs / rhs ).GetDouble() == 3.2 / 2.0 );
+
+		lhs.SetString( "Ping" );
+		UTEST_THROW( lhs / rhs );
+
+		lhs.SetArray( { Value::CValue( 1 ) } );
+		UTEST_THROW( lhs / rhs );
+
+		UTEST_CASE_CLOSED();
+	}( );
+
+	UTEST_CASE( "Value multiplication (operator*)" )
+	{
+		Value::CValue rhs( 2 );
+		Value::CValue lhs( 10 );
+
+		UTEST_ASSERT( ( lhs * rhs ).GetType() == Value::ValueType::VT_INTEGER );
+		UTEST_ASSERT( ( lhs * rhs ).GetInt() == 20 );
+
+		rhs.SetInt( 5 );
+		UTEST_ASSERT( ( lhs * rhs ).GetType() == Value::ValueType::VT_INTEGER );
+		UTEST_ASSERT( ( lhs * rhs ).GetInt() == 50 );
+
+		rhs.SetInt( -10 );
+		UTEST_ASSERT( ( lhs * rhs ).GetType() == Value::ValueType::VT_INTEGER );
+		UTEST_ASSERT( ( lhs * rhs ).GetInt() == -100 );
+
+		rhs.SetDouble( 3.0 );
+		UTEST_ASSERT( ( lhs * rhs ).GetType() == Value::ValueType::VT_DOUBLE );
+		UTEST_ASSERT( ( lhs * rhs ).GetDouble() == 10 * 3.0 );
+
+		rhs.SetDouble( 4.2 );
+		UTEST_ASSERT( ( lhs * rhs ).GetType() == Value::ValueType::VT_DOUBLE );
+		UTEST_ASSERT( ( lhs * rhs ).GetDouble() == 10.0 * 4.2 );
+
+		rhs.SetInt( 2 );
+		lhs.SetDouble( 3.2 );
+		UTEST_ASSERT( ( lhs * rhs ).GetType() == Value::ValueType::VT_DOUBLE );
+		UTEST_ASSERT( ( lhs * rhs ).GetDouble() == 3.2 * 2.0 );
+
+		lhs.SetString( "Ping" );
+		UTEST_THROW( lhs * rhs );
+
+		lhs.SetArray( { Value::CValue( 1 ) } );
+		UTEST_THROW( lhs * rhs );
+
+		UTEST_CASE_CLOSED();
+	}( );
+
 	UTEST_CASE( "Array values" )
 	{
 		Value::CValue val1( 5 );

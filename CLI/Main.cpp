@@ -30,6 +30,19 @@ int main( int argc, const char** argv )
 		return 0;
 	}
 
+	bool invalidTarget = true;
+	for ( auto test : std::vector<std::string>{ "lexer", "parser", "bytecode", "repl", "interpreter" })
+	{
+		if (target == test)
+			invalidTarget = false;
+	}
+
+	if ( invalidTarget )
+	{
+		std::cout << "Unknown target: " << target << std::endl;
+		return 0;
+	}
+
 	std::string command;
 	for ( ;; )
 	{
