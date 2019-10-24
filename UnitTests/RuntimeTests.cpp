@@ -7,7 +7,7 @@
 
 void RunRuntimeTests()
 {
-	UTEST_BEGIN( "Parser Tests" );
+	UTEST_BEGIN( "Runtime Tests" );
 
 	AST::PushTrackAlloc();
 
