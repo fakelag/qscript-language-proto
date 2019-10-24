@@ -169,6 +169,26 @@ void RunValueTests()
 		UTEST_CASE_CLOSED();
 	}( );
 
+	UTEST_CASE( "Value subtraction (operator- prefix)" )
+	{
+		Value::CValue value( 2 );
+
+		UTEST_ASSERT( ( -value ) == Value::CValue( -2 ) );
+		UTEST_ASSERT( ( -( -value ) ) == Value::CValue( 2 ) );
+
+		value.SetDouble( 5.0 );
+		UTEST_ASSERT( ( -value ).GetType() == Value::ValueType::VT_DOUBLE );
+		UTEST_ASSERT( ( -value ).GetDouble() == -5.0 );
+
+		value.SetString( "Ping" );
+		UTEST_THROW( -value );
+
+		value.SetArray( { Value::CValue( 1 ) } );
+		UTEST_THROW( -value );
+
+		UTEST_CASE_CLOSED();
+	}( );
+
 	UTEST_CASE( "Value division (operator/)" )
 	{
 		Value::CValue rhs( 2 );

@@ -188,6 +188,31 @@ namespace Value
 			}
 		}
 
+		FORCEINLINE CValue operator-() const
+		{
+			switch ( m_ValueType )
+			{
+			case VT_STRING:
+			{
+				throw Exception( "Invalid CValue type" );
+			}
+			case VT_INTEGER:
+			{
+				return CValue( -m_IntValue );
+			}
+			case VT_DOUBLE:
+			{
+				return CValue( -m_DoubleValue );
+			}
+			case VT_ARRAY:
+			{
+				throw Exception( "Invalid operation on an array" );
+			}
+			default:
+				throw Exception( "Invalid CValue type" );
+			}
+		}
+
 		FORCEINLINE CValue operator/( const CValue& other ) const
 		{
 			switch ( m_ValueType )
@@ -285,6 +310,9 @@ namespace Value
 		enum ValueType			m_ValueType;
 
 		// Stringcaching
+		void 					InitStringCache();
+		std::string 			m_StringCacheDouble;
+		std::string 			m_StringCacheInt;
 		double					m_StringDouble;
 		int						m_StringInt;
 	};
