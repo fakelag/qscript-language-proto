@@ -343,8 +343,11 @@ void RunValueTests()
 		Value::CValue double2( 5.0 );
 		Value::CValue double3( 10.0 );
 
-		Value::CValue array1( (std::vector<Value::CValue>){1, 2} );
-		Value::CValue array2( (std::vector<Value::CValue>){1, 2} );
+		std::vector<Value::CValue> _array1 ={ 1, 2 };
+		std::vector<Value::CValue> _array2 ={ 1, 2 };
+
+		Value::CValue array1( _array1 );
+		Value::CValue array2( _array2 );
 
 		Value::CValue undefined1;
 		Value::CValue undefined2;

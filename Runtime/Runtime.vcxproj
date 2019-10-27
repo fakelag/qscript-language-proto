@@ -77,6 +77,7 @@
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>F:\Projects\qscript-language\Includes;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>RTI_DEBUG_ENABLED;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -99,6 +100,7 @@
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <OmitFramePointers>true</OmitFramePointers>
+      <PreprocessorDefinitions>RTI_DEBUG_ENABLED;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -120,15 +122,21 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Add.cpp" />
-    <ClCompile Include="Func.cpp" />
-    <ClCompile Include="Funcbody.cpp" />
-    <ClCompile Include="Funcdef.cpp" />
-    <ClCompile Include="Intcnst.cpp" />
-    <ClCompile Include="List.cpp" />
-    <ClCompile Include="Name.cpp" />
+    <ClCompile Include="Core\Add.cpp" />
+    <ClCompile Include="Core\Call.cpp" />
+    <ClCompile Include="Core\Dblcnst.cpp" />
+    <ClCompile Include="Core\Debug.cpp" />
+    <ClCompile Include="Core\Div.cpp" />
+    <ClCompile Include="Core\Func.cpp" />
+    <ClCompile Include="Core\Funcbody.cpp" />
+    <ClCompile Include="Core\Funcdef.cpp" />
+    <ClCompile Include="Core\Intcnst.cpp" />
+    <ClCompile Include="Core\List.cpp" />
+    <ClCompile Include="Core\Mul.cpp" />
+    <ClCompile Include="Core\Name.cpp" />
+    <ClCompile Include="Core\Scope.cpp" />
+    <ClCompile Include="Core\Sub.cpp" />
     <ClCompile Include="Runtime.cpp" />
-    <ClCompile Include="Scope.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Includes\AST.h" />
@@ -136,7 +144,7 @@
     <ClInclude Include="..\Includes\Grammar.h" />
     <ClInclude Include="..\Includes\Runtime.h" />
     <ClInclude Include="..\Includes\Value.h" />
-    <ClInclude Include="RuntimeInternal.h" />
+    <ClInclude Include="Core\RuntimeInternal.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
