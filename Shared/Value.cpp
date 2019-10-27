@@ -10,10 +10,7 @@ namespace Value
 {
 	CValue::CValue()
 	{
-		m_DoubleValue		= 0.0;
-		m_IntValue			= 0;
-		m_ValueType			= VT_UNINITIALIZED;
-		InitStringCache();
+		Uninitialize();
 	}
 
 	CValue::CValue( const CValue& value )
@@ -62,6 +59,14 @@ namespace Value
 	CValue::CValue( const std::vector< CValue >& values )
 	{
 		SetArray( values );
+		InitStringCache();
+	}
+
+	void CValue::Uninitialize()
+	{
+		m_DoubleValue		= 0.0;
+		m_IntValue			= 0;
+		m_ValueType			= VT_UNINITIALIZED;
 		InitStringCache();
 	}
 

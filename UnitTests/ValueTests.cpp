@@ -329,6 +329,45 @@ void RunValueTests()
 		UTEST_CASE_CLOSED();
 	}( );
 
+	UTEST_CASE( "Copying values" )
+	{
+		Value::CValue initial( 5 );
+		Value::CValue value2;
+		Value::CValue value3( "string" );
+		Value::CValue value4;
+
+		UTEST_ASSERT( value2.IsInitialized() == false );
+		UTEST_THROW( value2.GetInt() );
+
+		value2 = initial;
+
+		UTEST_ASSERT( value2.IsInitialized() == true );
+		UTEST_ASSERT( value2.GetInt() == initial.GetInt() );
+
+		value3 = initial;
+
+		UTEST_ASSERT( value3.GetType() == initial.GetType() );
+		UTEST_ASSERT( value3.GetInt() == initial.GetInt() );
+
+		std::vector< Value::CValue > list = { 1, 2, 3 };
+		initial.SetArray( list );
+
+		UTEST_ASSERT( value3.GetType() == Value::ValueType::VT_INTEGER );
+		UTEST_ASSERT( initial.GetType() == Value::ValueType::VT_ARRAY );
+
+		value4 = initial;
+		UTEST_ASSERT( value4.IsInitialized() == true );
+		UTEST_ASSERT( value4.GetType() == initial.GetType() );
+		UTEST_ASSERT( value4.GetArray().size() == initial.GetArray().size() );
+		UTEST_ASSERT( value4[ 1 ] == initial[ 1 ] );
+
+		initial[ 1 ] = Value::CValue( 42 );
+		UTEST_ASSERT( initial[ 1 ] == Value::CValue( 42 ) );
+		UTEST_ASSERT( value4[ 1 ] == Value::CValue( 2 ) );
+
+		UTEST_CASE_CLOSED();
+	}( );
+
 	UTEST_CASE( "Value equality (operator==, operator!=)" )
 	{
 		Value::CValue int1( 5 );
