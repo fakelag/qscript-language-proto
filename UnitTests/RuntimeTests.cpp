@@ -27,6 +27,7 @@ void RunRuntimeTests()
 		UTEST_ASSERT( results[ 0 ].m_Value == Value::CValue( 2 ) );
 		UTEST_ASSERT( results[ 1 ].m_Value == Value::CValue( 10 ) );
 
+		context.Release();
 		AST::FreeTree( syntaxTree );
 		UTEST_CASE_CLOSED();
 	}( );
@@ -48,6 +49,7 @@ void RunRuntimeTests()
 		UTEST_ASSERT( results[ 0 ].m_Value == Value::CValue( 1 ) );
 		UTEST_ASSERT( results[ 1 ].m_Value == Value::CValue( 2 ) );
 
+		context.Release();
 		AST::FreeTree( syntaxTree );
 		UTEST_CASE_CLOSED();
 	}( );
@@ -76,6 +78,38 @@ void RunRuntimeTests()
 		UTEST_ASSERT( results[ 4 ].m_Value == Value::CValue( -66 - 30 / 10 * (4 / 2) + 5 ) );
 		UTEST_ASSERT( results[ 5 ].m_Value == Value::CValue( -(3 * ((2 + -4) - 4) / -1 * (((-(3 - 2) + ((2) -2) - 4) * 2)) * 2 + -(6 / (1 + 1 ) - 2 * 2)) ) );
 
+		context.Release();
+		AST::FreeTree( syntaxTree );
+		UTEST_CASE_CLOSED();
+	}( );
+
+	UTEST_CASE( "Variables and assignment (var, =)" )
+	{
+		auto syntaxTree = Parser::Parse( Lexer::Parse( "\
+			var a = 4;									\
+			var b = a * 2;								\
+			var c = a * a;								\
+			a = (18 - 3) * 10 + 2.5;					\
+			a;											\
+			b;											\
+			c;											\
+		" ) );
+
+		Runtime::CContext context;
+		Runtime::CreateDefaultContext( true, true, &context );
+
+		auto results = Runtime::Execute( syntaxTree, context );
+
+		UTEST_ASSERT( results.size() == 7 );
+		UTEST_ASSERT( results[ 0 ].m_Value == Value::CValue( 4 ) );
+		UTEST_ASSERT( results[ 1 ].m_Value == Value::CValue( 8 ) );
+		UTEST_ASSERT( results[ 2 ].m_Value == Value::CValue( 16 ) );
+		UTEST_ASSERT( results[ 3 ].m_Value == Value::CValue( 152.5 ) );
+		UTEST_ASSERT( results[ 4 ].m_Value == Value::CValue( 152.5 ) );
+		UTEST_ASSERT( results[ 5 ].m_Value == Value::CValue( 8 ) );
+		UTEST_ASSERT( results[ 6 ].m_Value == Value::CValue( 16 ) );
+
+		context.Release();
 		AST::FreeTree( syntaxTree );
 		UTEST_CASE_CLOSED();
 	}( );
