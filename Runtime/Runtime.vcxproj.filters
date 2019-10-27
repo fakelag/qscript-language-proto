@@ -24,28 +24,46 @@
     <ClCompile Include="Runtime.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Add.cpp">
+    <ClCompile Include="Core\Add.cpp">
       <Filter>Core</Filter>
     </ClCompile>
-    <ClCompile Include="Intcnst.cpp">
+    <ClCompile Include="Core\Call.cpp">
       <Filter>Core</Filter>
     </ClCompile>
-    <ClCompile Include="Func.cpp">
+    <ClCompile Include="Core\Dblcnst.cpp">
       <Filter>Core</Filter>
     </ClCompile>
-    <ClCompile Include="Funcdef.cpp">
+    <ClCompile Include="Core\Debug.cpp">
       <Filter>Core</Filter>
     </ClCompile>
-    <ClCompile Include="Funcbody.cpp">
+    <ClCompile Include="Core\Div.cpp">
       <Filter>Core</Filter>
     </ClCompile>
-    <ClCompile Include="Scope.cpp">
+    <ClCompile Include="Core\Func.cpp">
       <Filter>Core</Filter>
     </ClCompile>
-    <ClCompile Include="List.cpp">
+    <ClCompile Include="Core\Funcbody.cpp">
       <Filter>Core</Filter>
     </ClCompile>
-    <ClCompile Include="Name.cpp">
+    <ClCompile Include="Core\Funcdef.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\Intcnst.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\List.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\Mul.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\Name.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\Scope.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\Sub.cpp">
       <Filter>Core</Filter>
     </ClCompile>
   </ItemGroup>
@@ -65,8 +83,8 @@
     <ClInclude Include="..\Includes\Value.h">
       <Filter>Shared</Filter>
     </ClInclude>
-    <ClInclude Include="RuntimeInternal.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="Core\RuntimeInternal.h">
+      <Filter>Core</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
