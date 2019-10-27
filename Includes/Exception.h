@@ -24,7 +24,7 @@ protected:
 class RuntimeException : public Exception
 {
 public:
-	RuntimeException( const Grammar::SymbolLoc_t& location, const std::string& error ) : Exception( "Parsing exception" )
+	RuntimeException( const Grammar::SymbolLoc_t& location, const std::string& error ) : Exception( "Runtime exception" )
 	{
 		m_Location = location;
 		m_Error = error;
