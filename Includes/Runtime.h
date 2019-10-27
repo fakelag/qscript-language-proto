@@ -16,6 +16,12 @@ namespace Runtime
 	class CContext
 	{
 	public:
+		enum ContextFlags
+		{
+			// Don't resolve names to variables. Return the name itself instead
+			CF_NORESOLVE = ( 1<<0 ),
+		};
+
 		struct Scope_t
 		{
 			Scope_t( bool isGlobal )
@@ -29,7 +35,7 @@ namespace Runtime
 		};
 
 		void					PushScope( bool isGlobal );
-		void					PushFunction( const std::string& name, IExec* body, const Grammar::SymbolLoc_t* where );
+		IExec*					PushFunction( const std::string& name, IExec* body, const Grammar::SymbolLoc_t* where );
 		void					PushVariable( const std::string& name, const Value::CValue& value, const Grammar::SymbolLoc_t* where );
 		const Scope_t&			GetCurrentScope() const;
 
@@ -37,11 +43,16 @@ namespace Runtime
 		void					Release();
 		void					PopScope();
 
+		unsigned long			AddFlag( unsigned long flag );
+		unsigned long			RemoveFlag( unsigned long flag );
+
 		IExec*					FindFunction( const std::string& name );
-		const Value::CValue*	FindVariable( const std::string& name );
+		bool					FindVariable( const std::string& name, Value::CValue* out );
+		bool					SetVariable( const std::string& name, const Value::CValue& value );
 
 
 		bool					m_Repl;
+		unsigned long			m_ExecFlags;
 		std::vector< Scope_t >	m_Scopes;
 		std::vector< IExec* >	m_AllocationList;
 
