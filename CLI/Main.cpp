@@ -43,6 +43,9 @@ int main( int argc, const char** argv )
 		return 0;
 	}
 
+	Runtime::CContext runtimeContext;
+	Runtime::CreateDefaultContext( target == "repl", true, &runtimeContext );
+
 	std::string command;
 	for ( ;; )
 	{
@@ -85,11 +88,7 @@ int main( int argc, const char** argv )
 			{
 				auto symbols = Lexer::Parse( command );
 				auto syntaxTree = Parser::Parse( symbols );
-
-				Runtime::CContext context;
-				Runtime::CreateDefaultContext( target == "repl", true, &context );
-
-				auto statements = Runtime::Execute( syntaxTree, context );
+				auto statements = Runtime::Execute( syntaxTree, runtimeContext );
 
 				for ( auto stmt : statements )
 				{
@@ -132,6 +131,9 @@ int main( int argc, const char** argv )
 			std::cout << "Unknown target: " << target << std::endl;
 		}
 	}
+
+	// Release runtime context
+	runtimeContext.Release();
 
 	return 0;
 }

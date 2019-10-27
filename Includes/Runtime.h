@@ -33,6 +33,8 @@ namespace Runtime
 		void					PushVariable( const std::string& name, const Value::CValue& value, const Grammar::SymbolLoc_t* where );
 		const Scope_t&			GetCurrentScope() const;
 
+		void					AddObject( IExec* exec );
+		void					Release();
 		void					PopScope();
 
 		IExec*					FindFunction( const std::string& name );
@@ -41,6 +43,7 @@ namespace Runtime
 
 		bool					m_Repl;
 		std::vector< Scope_t >	m_Scopes;
+		std::vector< IExec* >	m_AllocationList;
 
 #ifdef RTI_DEBUG_ENABLED
 			int 				m_Flag;

@@ -96,7 +96,7 @@ if ( expression->Symbol() == Grammar::Symbol::symbol && expression->Type() == AS
 		convert( static_cast< AST::CComplexExpression* > ( expression )->Lhs() ), \
 		convert( static_cast< AST::CComplexExpression* > ( expression )->Rhs() ), \
 		expression->Location() ); \
-	allocationList->push_back( complex ); \
+	context->AddObject( complex ); \
 	return complex; \
 }
 
@@ -105,7 +105,7 @@ if ( expression->Symbol() == Grammar::Symbol::symbol && expression->Type() == AS
 	auto simple = new RuntimeInternal::CExec_Simple_##symbol( \
 		convert( static_cast< AST::CSimpleExpression* > ( expression )->Expression() ), \
 		expression->Location() ); \
-	allocationList->push_back( simple ); \
+	context->AddObject( simple ); \
 	return simple; \
 }
 
@@ -117,14 +117,14 @@ if ( expression->Symbol() == Grammar::Symbol::symbol && expression->Type() == AS
 	auto list = new RuntimeInternal::CExec_List_##symbol( \
 		objects, \
 		expression->Location() ); \
-	allocationList->push_back( list ); \
+	context->AddObject( list ); \
 	return list; \
 }
 
 #define EXEC_VALUE( symbol ) \
 if ( expression->Symbol() == Grammar::Symbol::symbol && expression->Type() == AST::ExpressionType::ET_VALUE ) { \
 	auto value = new RuntimeInternal::CExec_Value_##symbol( static_cast< AST::CValueExpression* > ( expression )->Value(), expression->Location() ); \
-	allocationList->push_back( value ); \
+	context->AddObject( value ); \
 	return value; \
 }
 

@@ -10,13 +10,13 @@ namespace Runtime
 	// Unknown location
 	const static Grammar::SymbolLoc_t unknownLocation{ -1, -1, "[[unknown]]" };
 
-	std::vector< IExec* > CreateExecutionObjects( const std::vector< AST::IExpression* >& expressions, std::vector< IExec* >* allocationList )
+	std::vector< IExec* > CreateExecutionObjects( const std::vector< AST::IExpression* >& expressions, CContext* context )
 	{
 		std::vector< IExec* > executors;
 
 		// Convert AST expressions into executor objects
 		std::function< IExec*( AST::IExpression* ) > convert;
-		convert = [ &convert, &allocationList ]( AST::IExpression* expression ) -> IExec*
+		convert = [ &convert, &context ]( AST::IExpression* expression ) -> IExec*
 		{
 			if ( expression == NULL )
 				return NULL;
@@ -48,15 +48,6 @@ namespace Runtime
 		return executors;
 	}
 
-	void FreeExecutionObjects( std::vector< IExec* >* allocationList )
-	{
-		// Release all resources allocated for execution
-		for ( size_t i = 0; i < allocationList->size(); ++i )
-			delete ( *allocationList )[ i ];
-
-		allocationList->clear();
-	}
-
 	void CreateDefaultContext( bool isRepl, bool enableDebugging, CContext* ctx )
 	{
 		// Read-Eval-Print-Loop ?
@@ -85,11 +76,10 @@ namespace Runtime
 
 	std::vector< Statement_t > Execute( const std::vector< AST::IExpression* >& expressions, CContext& context )
 	{
-		std::vector< IExec* > allocationList;
 		std::vector< Statement_t > statementList;
 
 		// Allocate executors
-		std::vector< IExec* > executors = CreateExecutionObjects( expressions, &allocationList );
+		std::vector< IExec* > executors = CreateExecutionObjects( expressions, &context );
 
 		try
 		{
@@ -118,20 +108,23 @@ namespace Runtime
 		}
 		catch ( const RuntimeException& exception )
 		{
-			FreeExecutionObjects( &allocationList );
+			if ( !context.m_Repl )
+				context.Release();
+
 			throw exception;
 		}
 		catch ( const Exception& exception )
 		{
-			FreeExecutionObjects( &allocationList );
+			if ( !context.m_Repl )
+				context.Release();
+
 			throw exception;
 		}
 
-		// Pop global scope
-		context.PopScope();
+		// Release the context
+		if ( !context.m_Repl )
+			context.Release();
 
-		// Free all resources
-		FreeExecutionObjects( &allocationList );
 		return statementList;
 	}
 
@@ -199,7 +192,7 @@ namespace Runtime
 
 	IExec* CContext::FindFunction( const std::string& name )
 	{
-		for ( size_t i = m_Scopes.size() - 1; i >= 0; --i )
+		for ( int i = ( int ) m_Scopes.size() - 1; i >= 0; --i )
 		{
 			auto function = m_Scopes[ i ].m_Functions.find( name );
 			if ( function != m_Scopes[ i ].m_Functions.end() )
@@ -211,7 +204,7 @@ namespace Runtime
 
 	const Value::CValue* CContext::FindVariable( const std::string& name )
 	{
-		for ( size_t i = m_Scopes.size() - 1; i >= 0; --i )
+		for ( int i = ( int ) m_Scopes.size() - 1; i >= 0; --i )
 		{
 			auto function = m_Scopes[ i ].m_Variables.find( name );
 			if ( function != m_Scopes[ i ].m_Variables.end() )
@@ -219,5 +212,22 @@ namespace Runtime
 		}
 
 		return NULL;
+	}
+
+	void CContext::AddObject( IExec* exec )
+	{
+		m_AllocationList.push_back( exec );
+	}
+
+	void CContext::Release()
+	{
+		// Release all resources allocated for execution
+		for ( int i = ( int ) m_AllocationList.size() - 1; i >= 0; --i )
+			delete m_AllocationList[ i ];
+
+		m_AllocationList.clear();
+
+		// Pop global scope
+		PopScope();
 	}
 }
