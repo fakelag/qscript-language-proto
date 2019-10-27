@@ -29,9 +29,11 @@ namespace Runtime
 			EXEC_COMPLEX( S_CALL );
 			EXEC_COMPLEX( S_FUNC );
 			EXEC_COMPLEX( S_FUNCDEF );
+			EXEC_COMPLEX( S_ASSIGN );
 			EXEC_SIMPLE( S_SUB );
 			EXEC_SIMPLE( S_ADD );
 			EXEC_SIMPLE( S_FUNCBODY );
+			EXEC_SIMPLE( S_VAR );
 			EXEC_LIST( S_SCOPE );
 			EXEC_LIST( S_LIST );
 			EXEC_VALUE( S_DBLCNST );
@@ -52,6 +54,7 @@ namespace Runtime
 	{
 		// Read-Eval-Print-Loop ?
 		ctx->m_Repl = isRepl;
+		ctx->m_ExecFlags = 0;
 
 		// Push global scope into the stack
 		ctx->PushScope( true );
@@ -230,7 +233,7 @@ namespace Runtime
 			{
 				function->second = value;
 				return true;
-		}
+			}
 		}
 
 		return false;
