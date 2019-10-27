@@ -29,9 +29,11 @@ namespace Runtime
 			EXEC_COMPLEX( S_CALL );
 			EXEC_COMPLEX( S_FUNC );
 			EXEC_COMPLEX( S_FUNCDEF );
+			EXEC_COMPLEX( S_ASSIGN );
 			EXEC_SIMPLE( S_SUB );
 			EXEC_SIMPLE( S_ADD );
 			EXEC_SIMPLE( S_FUNCBODY );
+			EXEC_SIMPLE( S_VAR );
 			EXEC_LIST( S_SCOPE );
 			EXEC_LIST( S_LIST );
 			EXEC_VALUE( S_DBLCNST );
@@ -52,6 +54,7 @@ namespace Runtime
 	{
 		// Read-Eval-Print-Loop ?
 		ctx->m_Repl = isRepl;
+		ctx->m_ExecFlags = 0;
 
 		// Push global scope into the stack
 		ctx->PushScope( true );
@@ -138,7 +141,7 @@ namespace Runtime
 		m_Scopes.pop_back();
 	}
 
-	void CContext::PushFunction( const std::string& name, IExec* body, const Grammar::SymbolLoc_t* where )
+	IExec* CContext::PushFunction( const std::string& name, IExec* body, const Grammar::SymbolLoc_t* where )
 	{
 		if ( m_Scopes.size() <= 0 )
 			throw RuntimeException( where ? *where : unknownLocation, "No available scope found" );
@@ -148,6 +151,7 @@ namespace Runtime
 		{
 			// Insert new function
 			m_Scopes[ m_Scopes.size() - 1 ].m_Functions.insert( { name, body } );
+			return body;
 		}
 		else
 		{
@@ -155,6 +159,7 @@ namespace Runtime
 			{
 				// Link function to its body
 				function->second = body;
+				return body;
 			}
 			else
 			{
@@ -162,6 +167,8 @@ namespace Runtime
 				throw RuntimeException( where ? *where : unknownLocation, "Function " + name + " is already defined" );
 			}
 		}
+
+		return NULL;
 	}
 
 	void CContext::PushVariable( const std::string& name, const Value::CValue& value, const Grammar::SymbolLoc_t* where )
@@ -202,21 +209,49 @@ namespace Runtime
 		return NULL;
 	}
 
-	const Value::CValue* CContext::FindVariable( const std::string& name )
+	bool CContext::FindVariable( const std::string& name, Value::CValue* out )
 	{
 		for ( int i = ( int ) m_Scopes.size() - 1; i >= 0; --i )
 		{
 			auto function = m_Scopes[ i ].m_Variables.find( name );
 			if ( function != m_Scopes[ i ].m_Variables.end() )
-				return &function->second;
+			{
+				*out = function->second;
+				return true;
+			}
 		}
 
-		return NULL;
+		return false;
+	}
+
+	bool CContext::SetVariable( const std::string& name, const Value::CValue& value )
+	{
+		for ( int i = ( int ) m_Scopes.size() - 1; i >= 0; --i )
+		{
+			auto function = m_Scopes[ i ].m_Variables.find( name );
+			if ( function != m_Scopes[ i ].m_Variables.end() )
+			{
+				function->second = value;
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	void CContext::AddObject( IExec* exec )
 	{
 		m_AllocationList.push_back( exec );
+	}
+
+	unsigned long CContext::AddFlag( unsigned long flag )
+	{
+		return ( m_ExecFlags |= flag );
+	}
+
+	unsigned long CContext::RemoveFlag( unsigned long flag )
+	{
+		return ( m_ExecFlags &= ~flag );
 	}
 
 	void CContext::Release()

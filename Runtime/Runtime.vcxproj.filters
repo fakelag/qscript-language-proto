@@ -66,6 +66,12 @@
     <ClCompile Include="Core\Sub.cpp">
       <Filter>Core</Filter>
     </ClCompile>
+    <ClCompile Include="Core\Var.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\Assign.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Includes\AST.h">

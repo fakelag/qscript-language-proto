@@ -123,6 +123,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Core\Add.cpp" />
+    <ClCompile Include="Core\Assign.cpp" />
     <ClCompile Include="Core\Call.cpp" />
     <ClCompile Include="Core\Dblcnst.cpp" />
     <ClCompile Include="Core\Debug.cpp" />
@@ -136,6 +137,7 @@
     <ClCompile Include="Core\Name.cpp" />
     <ClCompile Include="Core\Scope.cpp" />
     <ClCompile Include="Core\Sub.cpp" />
+    <ClCompile Include="Core\Var.cpp" />
     <ClCompile Include="Runtime.cpp" />
   </ItemGroup>
   <ItemGroup>

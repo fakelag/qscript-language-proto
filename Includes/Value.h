@@ -50,6 +50,9 @@ namespace Value
 		ValueType						GetType()			const;
 		FORCEINLINE bool				IsInitialized()		const { return m_ValueType != VT_UNINITIALIZED; }
 
+		// Uninitialize
+		void Uninitialize();
+
 		// Array functions
 		void							ArrayPush( const CValue& value );
 		void							ArrayConcat( const CValue& array );
@@ -71,6 +74,9 @@ namespace Value
 				return *this;
 			case VT_ARRAY:
 				SetArray( other.m_ArrayValue );
+				return *this;
+			case VT_UNINITIALIZED:
+				Uninitialize();
 				return *this;
 			default:
 				throw Exception( "Invalid CValue type" );
