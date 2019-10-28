@@ -347,20 +347,6 @@ namespace Parser
 					symbol.m_LeftBind = [ &nextExpression ]( const ParserSymbol_t& symbol, AST::IExpression* left ) -> AST::IExpression*
 					{
 						auto right = nextExpression( symbol.m_LBP );
-
-						if ( left->Symbol() == Grammar::Symbol::S_INTCNST && right->Symbol() == Grammar::Symbol::S_INTCNST )
-						{
-							auto leftValue = static_cast< AST::CValueExpression* >( left )->Value().GetString();
-							auto rightValue = static_cast< AST::CValueExpression* >( right )->Value().GetString();
-
-							Value::CValue dblValue( std::stod( leftValue + "." + rightValue ) );
-
-							delete left;
-							delete right;
-
-							return new AST::CValueExpression( dblValue, Grammar::Symbol::S_DBLCNST, symbol.m_Location );
-						}
-
 						return new AST::CComplexExpression( left, right, symbol.m_Symbol, symbol.m_Location );
 					};
 					break;

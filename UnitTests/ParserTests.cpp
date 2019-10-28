@@ -70,6 +70,39 @@ void RunParserTests()
 		UTEST_CASE_CLOSED();
 	}( );
 
+	UTEST_CASE( "Decimal constants" )
+	{
+		auto syntaxTree = Parser::Parse( Lexer::Parse( "\
+			1.1;										\
+			1.5;										\
+			5.5555;										\
+			1.01;										\
+			1.000101;									\
+		" ) );
+
+		UTEST_ASSERT( syntaxTree.size() == 5 );
+		UTEST_ASSERT( syntaxTree[ 0 ]->Type() == AST::ExpressionType::ET_VALUE );
+		UTEST_ASSERT( syntaxTree[ 1 ]->Type() == AST::ExpressionType::ET_VALUE );
+		UTEST_ASSERT( syntaxTree[ 2 ]->Type() == AST::ExpressionType::ET_VALUE );
+		UTEST_ASSERT( syntaxTree[ 3 ]->Type() == AST::ExpressionType::ET_VALUE );
+		UTEST_ASSERT( syntaxTree[ 4 ]->Type() == AST::ExpressionType::ET_VALUE );
+
+		UTEST_ASSERT( syntaxTree[ 0 ]->Symbol() == Grammar::Symbol::S_DBLCNST );
+		UTEST_ASSERT( syntaxTree[ 1 ]->Symbol() == Grammar::Symbol::S_DBLCNST );
+		UTEST_ASSERT( syntaxTree[ 2 ]->Symbol() == Grammar::Symbol::S_DBLCNST );
+		UTEST_ASSERT( syntaxTree[ 3 ]->Symbol() == Grammar::Symbol::S_DBLCNST );
+		UTEST_ASSERT( syntaxTree[ 4 ]->Symbol() == Grammar::Symbol::S_DBLCNST );
+
+		UTEST_ASSERT( static_cast< AST::CValueExpression* >( syntaxTree[ 0 ] )->Value().GetDouble() == 1.1 );
+		UTEST_ASSERT( static_cast< AST::CValueExpression* >( syntaxTree[ 1 ] )->Value().GetDouble() == 1.5 );
+		UTEST_ASSERT( static_cast< AST::CValueExpression* >( syntaxTree[ 2 ] )->Value().GetDouble() == 5.5555 );
+		UTEST_ASSERT( static_cast< AST::CValueExpression* >( syntaxTree[ 3 ] )->Value().GetDouble() == 1.01 );
+		UTEST_ASSERT( static_cast< AST::CValueExpression* >( syntaxTree[ 4 ] )->Value().GetDouble() == 1.000101 );
+
+		AST::FreeTree( syntaxTree );
+		UTEST_CASE_CLOSED();
+	}( );
+
 	UTEST_CASE( "Assign operators (=, +=, -=, *=, /=, %=)" )
 	{
 		auto syntaxTree = Parser::Parse( Lexer::Parse( "a += 5; a -= 5; a *= 1; a /= 1; a %= 1; a = 4;a += 4 * 1 + 2;" ) );
