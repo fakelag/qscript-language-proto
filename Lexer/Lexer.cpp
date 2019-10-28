@@ -1,5 +1,6 @@
 #include <exception>
 #include <algorithm>
+#include <regex>
 #include "Lexer.h"
 
 namespace Lexer
@@ -28,23 +29,31 @@ namespace Lexer
 			return a.m_Info.m_Token.length() > b.m_Info.m_Token.length();
 		} );
 
+		// Is this string an integer ?
+		auto isInteger = []( const std::string token ) -> bool {
+			std::regex re("[-+]?([0-9]*[0-9]+|[0-9]+)");
+			return std::regex_match( token, re );
+		};
+
+		// Is it a decimal ?
+		auto isDecimal = []( const std::string token ) -> bool {
+			std::regex re("[-+]?\\d+\\.\\d*");
+			return std::regex_match( token, re );
+		};
+
 		// Get the longest searchable token length
 		int longestToken = commonSymbols.size() > 0 ? commonSymbols[ 0 ].m_Info.m_Token.length() : 0;
 
-		auto pushSymbol = [ &currentLineNr, &currentColNr, &stringBuffer, &symbols ]() -> void {
+		auto pushSymbol = [ &currentLineNr, &currentColNr, &stringBuffer, &symbols, &isInteger, &isDecimal ]() -> void {
 			if ( stringBuffer.length() == 0 )
 				return;
 
 			Grammar::Symbol symbolType = Grammar::S_NAME;
-			try
-			{
-				std::stoi( stringBuffer );
-				symbolType = Grammar::S_INTCNST;
-			}
-			catch ( std::exception e )
-			{
-				// Conversion failed, it's probably a name
-			}
+
+			if ( isDecimal( stringBuffer ) )
+				symbolType = Grammar::Symbol::S_DBLCNST;
+			else if ( isInteger( stringBuffer ) )
+				symbolType = Grammar::Symbol::S_INTCNST;
 
 			// Push the last accumulated string as SG_NAME and flush stringBuffer
 			symbols.push_back( LexerSymbol_t {
@@ -61,12 +70,16 @@ namespace Lexer
 		// Iterate through source and look for common symbols
 		for ( auto srcIt = source.cbegin(); srcIt != source.cend(); ++srcIt )
 		{
-			auto findSymbol = [ &commonSymbols, &symbols, &currentLineNr, &currentColNr, &pushSymbol ]( std::string pattern ) -> int {
+			auto findSymbol = [ &commonSymbols, &symbols, &currentLineNr,
+				&currentColNr, &pushSymbol, &stringBuffer, &isInteger ]( std::string pattern ) -> int {
 				// Iterate all the commons
 				for ( auto symIt = commonSymbols.cbegin(); symIt != commonSymbols.cend(); ++symIt )
 				{
 					if ( symIt->m_Info.m_Token == pattern.substr( 0, symIt->m_Info.m_Token.length() ) )
 					{
+						if ( symIt->m_Info.m_Token == "." && isInteger( stringBuffer ) )
+							return 0;
+
 						pushSymbol();
 
 						// Push the found common symbol
@@ -135,7 +148,7 @@ namespace Lexer
 		char szFormat[ 256 ];
 		for ( auto symbol : symbols )
 		{
-			std::snprintf( szFormat, sizeof( szFormat ), "%s | lbp: %i\n", symbol.m_Token.c_str(), symbol.m_LBP );
+			std::snprintf( szFormat, sizeof( szFormat ), "%s | sym: %i\n", symbol.m_Token.c_str(), symbol.m_Symbol );
 			output += szFormat;
 		}
 
