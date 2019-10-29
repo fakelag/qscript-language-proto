@@ -71,7 +71,7 @@ void RunLexerTests()
 		UTEST_ASSERT( symbols[ 9 ].m_Location.m_ColNr		== 0 ); // *
 		UTEST_ASSERT( symbols[ 9 ].m_Location.m_LineNr		== 3 );
 		UTEST_ASSERT( symbols[ 10 ].m_Location.m_ColNr		== 1 ); // 1
-		UTEST_ASSERT( symbols[ 10 ].m_Location.m_LineNr	== 3 );
+		UTEST_ASSERT( symbols[ 10 ].m_Location.m_LineNr		== 3 );
 
 		UTEST_CASE_CLOSED();
 	}( );
