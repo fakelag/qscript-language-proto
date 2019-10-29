@@ -11,11 +11,27 @@ RTI_EXECFN_COMPLEX( S_CALL )
 		throw RuntimeException( m_Loc, "Invalid function name: " + funcName.m_Value.GetString() );
 
 	// Find the function to execute
-	auto function = context.FindFunction( funcName.m_Value.GetString() );
-
-	if ( function == NULL )
+	Runtime::CContext::Function_t function;
+	if ( !context.FindFunction( funcName.m_Value.GetString(), &function ) )
 		throw RuntimeException( m_Loc, "Function \"" + funcName.m_Value.GetString() + "\" is not defined" );
 
-	// TODO: Check + Push args
-	return function->Execute( context );
+	if ( !function.m_Body )
+		throw RuntimeException( m_Loc, "Function \"" + funcName.m_Value.GetString() + "\" is declared, but not defined" );
+
+	auto argsList = m_RHS->Execute( context );
+
+	if ( function.m_Args.size() != argsList.m_Value.ArraySize() )
+		throw RuntimeException( m_Loc, "Invalid Function call to \"" + funcName.m_Value.GetString() + "\" (missing arguments)" );
+
+	context.PushScope( false, true );
+
+	int argCount = argsList.m_Value.ArraySize();
+	for ( int i = 0; i < argCount; ++i )
+		context.PushVariable( function.m_Args[ i ], argsList.m_Value[ i ], &m_Loc );
+
+	auto returnValue = function.m_Body->Execute( context );
+
+	context.PopScope();
+
+	return returnValue;
 }

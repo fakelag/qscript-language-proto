@@ -22,20 +22,28 @@ namespace Runtime
 			CF_NORESOLVE = ( 1<<0 ),
 		};
 
-		struct Scope_t
+		struct Function_t
 		{
-			Scope_t( bool isGlobal )
-			{
-				m_IsGlobal = isGlobal;
-			}
-
-			std::unordered_map< std::string, IExec* >				m_Functions;
-			std::unordered_map< std::string, Value::CValue >		m_Variables;
-			bool													m_IsGlobal;
+			std::vector< std::string >	m_Args;
+			IExec* 						m_Body;
 		};
 
-		void					PushScope( bool isGlobal );
-		IExec*					PushFunction( const std::string& name, IExec* body, const Grammar::SymbolLoc_t* where );
+		struct Scope_t
+		{
+			Scope_t( bool isGlobal, bool isArgsScope )
+			{
+				m_IsGlobal = isGlobal;
+				m_IsArgsScope = isArgsScope;
+			}
+
+			std::unordered_map< std::string, Function_t >			m_Functions;
+			std::unordered_map< std::string, Value::CValue >		m_Variables;
+			bool													m_IsGlobal;
+			bool 													m_IsArgsScope;
+		};
+
+		void					PushScope( bool isGlobal, bool isArgsScope );
+		void					PushFunction( const std::string& name, IExec* body, const std::vector< std::string >& args, const Grammar::SymbolLoc_t* where );
 		void					PushVariable( const std::string& name, const Value::CValue& value, const Grammar::SymbolLoc_t* where );
 		const Scope_t&			GetCurrentScope() const;
 
@@ -46,7 +54,7 @@ namespace Runtime
 		unsigned long			AddFlag( unsigned long flag );
 		unsigned long			RemoveFlag( unsigned long flag );
 
-		IExec*					FindFunction( const std::string& name );
+		bool					FindFunction( const std::string& name, Function_t* out );
 		bool					FindVariable( const std::string& name, Value::CValue* out );
 		bool					SetVariable( const std::string& name, const Value::CValue& value );
 

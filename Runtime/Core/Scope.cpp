@@ -4,7 +4,7 @@
 RTI_EXECFN_LIST( S_SCOPE )
 {
 	// Push a new scope to the stack
-	context.PushScope( false );
+	context.PushScope( false, false );
 
 	Value::CValue result;
 	for ( auto node : m_List )

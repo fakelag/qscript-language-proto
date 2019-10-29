@@ -114,6 +114,31 @@ void RunRuntimeTests()
 		UTEST_CASE_CLOSED();
 	}( );
 
+	UTEST_CASE( "Function calls & arguments" )
+	{
+		auto syntaxTree = Parser::Parse( Lexer::Parse( "\
+			function a() { __setFlag(); }				\
+			function b(x) { 2 * x; }					\
+			function c(x, y, z) { x + y * z; }			\
+			a();										\
+			b(2);										\
+			c(1, 2, 3);									\
+		" ) );
+
+		Runtime::CContext context;
+		Runtime::CreateDefaultContext( true, true, &context );
+
+		auto results = Runtime::Execute( syntaxTree, context );
+
+		UTEST_ASSERT( results.size() == 6 );
+		UTEST_ASSERT( results[ 4 ].m_Value == Value::CValue( 4 ) );
+		UTEST_ASSERT( results[ 5 ].m_Value == Value::CValue( 7 ) );
+
+		context.Release();
+		AST::FreeTree( syntaxTree );
+		UTEST_CASE_CLOSED();
+	}( );
+
 	UTEST_CASE( "Parser/AST memory management" )
 	{
 		auto leakedNodes = AST::AllocatedExpressions();
