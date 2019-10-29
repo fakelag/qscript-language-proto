@@ -14,6 +14,13 @@ RTI_EXECFN_COMPLEX( S_FUNC )
 	// def.m_Value[0] = the function name
 	// def.m_Value[1] = a list of names for the function args
 
-	context.PushFunction( def.m_Value[ 0 ].GetString(), m_RHS, &m_Loc );
+	std::vector< std::string > arguments;
+	auto argsArray = def.m_Value[ 1 ].GetArray();
+
+	std::transform( argsArray.begin(), argsArray.end(), std::back_inserter( arguments ), []( Value::CValue& arg ) {
+		return arg.GetString();
+	});
+
+	context.PushFunction( def.m_Value[ 0 ].GetString(), m_RHS, arguments, &m_Loc );
 	return { def.m_Value[ 0 ] };
 }

@@ -57,7 +57,7 @@ namespace Runtime
 		ctx->m_ExecFlags = 0;
 
 		// Push global scope into the stack
-		ctx->PushScope( true );
+		ctx->PushScope( true, false );
 
 #ifdef RTI_DEBUG_ENABLED
 		// Reset the debugging flag. This flag is used by tests
@@ -69,7 +69,7 @@ namespace Runtime
 			// Link debugging functions
 			static auto __setFlag = RuntimeInternal::CExec_Internal___setFlag();
 
-			ctx->PushFunction( "__setFlag", &__setFlag, NULL );
+			ctx->PushFunction( "__setFlag", &__setFlag, {}, NULL );
 		}
 #else
 		if ( enableDebugging )
@@ -106,7 +106,7 @@ namespace Runtime
 					throw Exception( "Entrypoint not found" );
 
 				// Execute code from the program's main entrypoint
-				statementList.push_back( main->second->Execute( context ) );
+				statementList.push_back( main->second.m_Body->Execute( context ) );
 			}
 		}
 		catch ( const RuntimeException& exception )
@@ -131,9 +131,9 @@ namespace Runtime
 		return statementList;
 	}
 
-	void CContext::PushScope( bool isGlobal )
+	void CContext::PushScope( bool isGlobal, bool isArgsScope )
 	{
-		m_Scopes.push_back( Scope_t( isGlobal ) );
+		m_Scopes.push_back( Scope_t( isGlobal, isArgsScope ) );
 	}
 
 	void CContext::PopScope()
@@ -141,7 +141,7 @@ namespace Runtime
 		m_Scopes.pop_back();
 	}
 
-	IExec* CContext::PushFunction( const std::string& name, IExec* body, const Grammar::SymbolLoc_t* where )
+	void CContext::PushFunction( const std::string& name, IExec* body, const std::vector< std::string >& args, const Grammar::SymbolLoc_t* where )
 	{
 		if ( m_Scopes.size() <= 0 )
 			throw RuntimeException( where ? *where : unknownLocation, "No available scope found" );
@@ -150,16 +150,15 @@ namespace Runtime
 		if ( function == m_Scopes[ m_Scopes.size() - 1 ].m_Functions.end() )
 		{
 			// Insert new function
-			m_Scopes[ m_Scopes.size() - 1 ].m_Functions.insert( { name, body } );
-			return body;
+			auto funcDef = Function_t{ args, body };
+			m_Scopes[ m_Scopes.size() - 1 ].m_Functions.insert({ name, funcDef });
 		}
 		else
 		{
-			if ( function->second == NULL )
+			if ( function->second.m_Body == NULL )
 			{
 				// Link function to its body
-				function->second = body;
-				return body;
+				function->second.m_Body = body;
 			}
 			else
 			{
@@ -167,8 +166,6 @@ namespace Runtime
 				throw RuntimeException( where ? *where : unknownLocation, "Function " + name + " is already defined" );
 			}
 		}
-
-		return NULL;
 	}
 
 	void CContext::PushVariable( const std::string& name, const Value::CValue& value, const Grammar::SymbolLoc_t* where )
@@ -197,16 +194,19 @@ namespace Runtime
 		return m_Scopes[ m_Scopes.size() - 1 ];
 	}
 
-	IExec* CContext::FindFunction( const std::string& name )
+	bool CContext::FindFunction( const std::string& name, Function_t* out )
 	{
 		for ( int i = ( int ) m_Scopes.size() - 1; i >= 0; --i )
 		{
 			auto function = m_Scopes[ i ].m_Functions.find( name );
 			if ( function != m_Scopes[ i ].m_Functions.end() )
-				return function->second;
+			{
+				*out = function->second;
+				return true;
+			}
 		}
 
-		return NULL;
+		return false;
 	}
 
 	bool CContext::FindVariable( const std::string& name, Value::CValue* out )
