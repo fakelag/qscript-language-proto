@@ -139,6 +139,70 @@ void RunRuntimeTests()
 		UTEST_CASE_CLOSED();
 	}( );
 
+	UTEST_CASE( "Function scope access" )
+	{
+		auto syntaxTree = Parser::Parse( Lexer::Parse( "\
+			var globalVar = 20;							\
+			function a()								\
+			{											\
+				globalVar + 1;							\
+			}											\
+			a();										\
+		" ) );
+
+		Runtime::CContext context;
+		Runtime::CreateDefaultContext( true, true, &context );
+
+		auto results = Runtime::Execute( syntaxTree, context );
+
+		UTEST_ASSERT( results.size() == 3 );
+		UTEST_ASSERT( results[ 2 ].m_Value == Value::CValue( 21 ) );
+
+		context.Release();
+		AST::FreeTree( syntaxTree );
+
+		syntaxTree = Parser::Parse( Lexer::Parse( "		\
+			function a(x)								\
+			{											\
+				var localVar = x + 1;					\
+				localVar;								\
+			}											\
+			a(20);										\
+		" ) );
+
+		Runtime::CreateDefaultContext( true, true, &context );
+
+		results = Runtime::Execute( syntaxTree, context );
+
+		UTEST_ASSERT( results.size() == 2 );
+		UTEST_ASSERT( results[ 1 ].m_Value == Value::CValue( 21 ) );
+
+		context.Release();
+		AST::FreeTree( syntaxTree );
+
+		syntaxTree = Parser::Parse( Lexer::Parse( "		\
+			function b() { localVar; }					\
+			function a(x)								\
+			{											\
+				var localVar = x + 1;					\
+				b();									\
+			}											\
+			a(20);										\
+		" ) );
+
+		Runtime::CreateDefaultContext( true, true, &context );
+
+		UTEST_THROW_EXCEPTION(
+			Runtime::Execute( syntaxTree, context ),
+			const RuntimeException& e,
+			true );
+
+		context.Release();
+		AST::FreeTree( syntaxTree );
+
+		UTEST_CASE_CLOSED();
+	}( );
+
 	UTEST_CASE( "Parser/AST memory management" )
 	{
 		auto leakedNodes = AST::AllocatedExpressions();
