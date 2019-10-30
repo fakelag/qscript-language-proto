@@ -204,6 +204,19 @@ namespace Runtime
 				*out = function->second;
 				return true;
 			}
+
+			if ( m_Scopes[ i ].m_IsArgsScope )
+			{
+				// This is the last subscope to check, now consult the global scope
+				function = m_Scopes[ 0 ].m_Functions.find( name );
+				if ( function != m_Scopes[ 0 ].m_Functions.end() )
+				{
+					*out = function->second;
+					return true;
+				}
+
+				break;
+			}
 		}
 
 		return false;
@@ -213,11 +226,24 @@ namespace Runtime
 	{
 		for ( int i = ( int ) m_Scopes.size() - 1; i >= 0; --i )
 		{
-			auto function = m_Scopes[ i ].m_Variables.find( name );
-			if ( function != m_Scopes[ i ].m_Variables.end() )
+			auto variable = m_Scopes[ i ].m_Variables.find( name );
+			if ( variable != m_Scopes[ i ].m_Variables.end() )
 			{
-				*out = function->second;
+				*out = variable->second;
 				return true;
+			}
+
+			if ( m_Scopes[ i ].m_IsArgsScope )
+			{
+				// This is the last subscope to check, now consult the global scope
+				variable = m_Scopes[ 0 ].m_Variables.find( name );
+				if ( variable != m_Scopes[ 0 ].m_Variables.end() )
+				{
+					*out = variable->second;
+					return true;
+				}
+
+				break;
 			}
 		}
 
@@ -228,10 +254,10 @@ namespace Runtime
 	{
 		for ( int i = ( int ) m_Scopes.size() - 1; i >= 0; --i )
 		{
-			auto function = m_Scopes[ i ].m_Variables.find( name );
-			if ( function != m_Scopes[ i ].m_Variables.end() )
+			auto variable = m_Scopes[ i ].m_Variables.find( name );
+			if ( variable != m_Scopes[ i ].m_Variables.end() )
 			{
-				function->second = value;
+				variable->second = value;
 				return true;
 			}
 		}
