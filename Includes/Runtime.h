@@ -54,10 +54,8 @@ namespace Runtime
 		unsigned long			AddFlag( unsigned long flag );
 		unsigned long			RemoveFlag( unsigned long flag );
 
-		bool					FindFunction( const std::string& name, Function_t* out );
-		bool					FindVariable( const std::string& name, Value::CValue* out );
-		bool					SetVariable( const std::string& name, const Value::CValue& value );
-
+		Function_t*				FindFunction( const std::string& name );
+		Value::CValue*			FindVariable( const std::string& name );
 
 		bool					m_Repl;
 		unsigned long			m_ExecFlags;
@@ -65,7 +63,7 @@ namespace Runtime
 		std::vector< IExec* >	m_AllocationList;
 
 #ifdef RTI_DEBUG_ENABLED
-			int 				m_Flag;
+		int 					m_Flag;
 #endif
 	};
 

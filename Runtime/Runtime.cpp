@@ -194,75 +194,48 @@ namespace Runtime
 		return m_Scopes[ m_Scopes.size() - 1 ];
 	}
 
-	bool CContext::FindFunction( const std::string& name, Function_t* out )
+	Runtime::CContext::Function_t* CContext::FindFunction( const std::string& name )
 	{
 		for ( int i = ( int ) m_Scopes.size() - 1; i >= 0; --i )
 		{
 			auto function = m_Scopes[ i ].m_Functions.find( name );
 			if ( function != m_Scopes[ i ].m_Functions.end() )
-			{
-				*out = function->second;
-				return true;
-			}
+				return &function->second; // references to std::unordered_map elements should be safe
 
 			if ( m_Scopes[ i ].m_IsArgsScope )
 			{
 				// This is the last subscope to check, now consult the global scope
 				function = m_Scopes[ 0 ].m_Functions.find( name );
 				if ( function != m_Scopes[ 0 ].m_Functions.end() )
-				{
-					*out = function->second;
-					return true;
-				}
+					return &function->second;
 
 				break;
 			}
 		}
 
-		return false;
+		return NULL;
 	}
 
-	bool CContext::FindVariable( const std::string& name, Value::CValue* out )
+	Value::CValue* CContext::FindVariable( const std::string& name )
 	{
 		for ( int i = ( int ) m_Scopes.size() - 1; i >= 0; --i )
 		{
 			auto variable = m_Scopes[ i ].m_Variables.find( name );
 			if ( variable != m_Scopes[ i ].m_Variables.end() )
-			{
-				*out = variable->second;
-				return true;
-			}
+				return &variable->second; // references to std::unordered_map elements should be safe
 
 			if ( m_Scopes[ i ].m_IsArgsScope )
 			{
 				// This is the last subscope to check, now consult the global scope
 				variable = m_Scopes[ 0 ].m_Variables.find( name );
 				if ( variable != m_Scopes[ 0 ].m_Variables.end() )
-				{
-					*out = variable->second;
-					return true;
-				}
+					return &variable->second;
 
 				break;
 			}
 		}
 
-		return false;
-	}
-
-	bool CContext::SetVariable( const std::string& name, const Value::CValue& value )
-	{
-		for ( int i = ( int ) m_Scopes.size() - 1; i >= 0; --i )
-		{
-			auto variable = m_Scopes[ i ].m_Variables.find( name );
-			if ( variable != m_Scopes[ i ].m_Variables.end() )
-			{
-				variable->second = value;
-				return true;
-			}
-		}
-
-		return false;
+		return NULL;
 	}
 
 	void CContext::AddObject( IExec* exec )
