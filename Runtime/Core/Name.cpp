@@ -9,9 +9,10 @@ RTI_EXECFN_VALUE( S_NAME )
 	if ( m_Value.GetType() != Value::ValueType::VT_STRING )
 		throw RuntimeException( m_Loc, "Invalid variable name: " + m_Value.GetString() );
 
-	Value::CValue variable;
-	if ( !context.FindVariable( m_Value.GetString(), &variable ) )
+	auto variable = context.FindVariable( m_Value.GetString() );
+
+	if ( !variable )
 		throw RuntimeException( m_Loc, "Variable \"" + m_Value.GetString() + "\" is not defined" );
 
-	return { variable };
+	return { *variable };
 }

@@ -12,12 +12,11 @@ RTI_EXECFN_COMPLEX( S_ASSIGN )
 	if ( varName.m_Value.GetType() != Value::ValueType::VT_STRING )
 		throw RuntimeException( m_Loc, "Invalid variable name: " + varName.m_Value.GetString() );
 
-	Value::CValue variable;
-	if ( !context.FindVariable( varName.m_Value.GetString(), &variable ) )
+	auto variable = context.FindVariable( varName.m_Value.GetString() );
+
+	if ( !variable )
 		throw RuntimeException( m_Loc, "Variable \"" + varName.m_Value.GetString() + "\" is not defined" );
 
-	if ( !context.SetVariable( varName.m_Value.GetString(), newValue.m_Value ) )
-		throw RuntimeException( m_Loc, "Error assigning value (name=" + varName.m_Value.GetString() + " value=" + newValue.m_Value.GetString() + ")" );
-
+	*variable = newValue.m_Value;
 	return newValue;
 }
