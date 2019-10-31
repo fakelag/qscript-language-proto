@@ -13,6 +13,8 @@
 #endif
 #endif
 
+#include <cmath>
+
 namespace Value
 {
 	enum ValueType
@@ -284,6 +286,43 @@ namespace Value
 				case VT_STRING: throw Exception( "Invalid CValue type" );
 				case VT_INTEGER: return CValue( m_DoubleValue * ( double ) other.m_IntValue );
 				case VT_DOUBLE: return CValue( m_DoubleValue * other.m_DoubleValue );
+				case VT_ARRAY: throw Exception( "Invalid CValue type" );
+				default: throw Exception( "Invalid CValue type" );
+				}
+			}
+			case VT_ARRAY:
+			{
+				throw Exception( "Invalid operation on an array" );
+			}
+			default:
+				throw Exception( "Invalid CValue type" );
+			}
+		}
+
+		FORCEINLINE CValue operator%( const CValue& other ) const
+		{
+			switch ( m_ValueType )
+			{
+			case VT_STRING:
+				throw Exception( "Invalid CValue type" );
+			case VT_INTEGER:
+			{
+				switch ( other.m_ValueType )
+				{
+				case VT_STRING: throw Exception( "Invalid CValue type" );
+				case VT_INTEGER: return CValue( m_IntValue % other.m_IntValue );
+				case VT_DOUBLE: return CValue( std::fmodf( ( double ) m_IntValue, other.m_DoubleValue ) );
+				case VT_ARRAY: throw Exception( "Invalid CValue type" );
+				default: throw Exception( "Invalid CValue type" );
+				}
+			}
+			case VT_DOUBLE:
+			{
+				switch ( other.m_ValueType )
+				{
+				case VT_STRING: throw Exception( "Invalid CValue type" );
+				case VT_INTEGER: return CValue( std::fmodf( m_DoubleValue, ( double ) other.m_IntValue ) );
+				case VT_DOUBLE: return CValue( std::fmodf( m_DoubleValue, other.m_DoubleValue ) );
 				case VT_ARRAY: throw Exception( "Invalid CValue type" );
 				default: throw Exception( "Invalid CValue type" );
 				}

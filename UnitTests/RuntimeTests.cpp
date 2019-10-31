@@ -203,6 +203,64 @@ void RunRuntimeTests()
 		UTEST_CASE_CLOSED();
 	}( );
 
+	UTEST_CASE( "Modulo operator (%)" )
+	{
+		auto syntaxTree = Parser::Parse( Lexer::Parse( "\
+			5 % 2; 										\
+			1 % 1;										\
+			2 % 4;										\
+			5.2 % 2.4; 									\
+			1.5 % 1.5;									\
+			100.30 % 4.7;								\
+		" ) );
+
+		Runtime::CContext context;
+		Runtime::CreateDefaultContext( true, true, &context );
+
+		auto results = Runtime::Execute( syntaxTree, context );
+
+		UTEST_ASSERT( results.size() == 6 );
+		UTEST_ASSERT( results[ 0 ].m_Value == Value::CValue( 5 % 2 ) );
+		UTEST_ASSERT( results[ 1 ].m_Value == Value::CValue( 1 % 1 ) );
+		UTEST_ASSERT( results[ 2 ].m_Value == Value::CValue( 2 % 4 ) );
+		UTEST_ASSERT( results[ 3 ].m_Value == Value::CValue( std::fmodf( 5.2, 2.4 ) ) );
+		UTEST_ASSERT( results[ 4 ].m_Value == Value::CValue( std::fmodf( 1.5, 1.5 ) ) );
+		UTEST_ASSERT( results[ 5 ].m_Value == Value::CValue( std::fmodf( 100.30, 4.7 ) ) );
+
+		context.Release();
+		AST::FreeTree( syntaxTree );
+		UTEST_CASE_CLOSED();
+	}( );
+
+	UTEST_CASE( "Power operator (**)" )
+	{
+		auto syntaxTree = Parser::Parse( Lexer::Parse( "\
+			5 ** 2; 									\
+			1 ** 1;										\
+			2 ** 4;										\
+			5.2 ** 2.4; 								\
+			1.5 ** 1.5;									\
+			100.30 ** 4.7;								\
+		" ) );
+
+		Runtime::CContext context;
+		Runtime::CreateDefaultContext( true, true, &context );
+
+		auto results = Runtime::Execute( syntaxTree, context );
+
+		UTEST_ASSERT( results.size() == 6 );
+		UTEST_ASSERT( results[ 0 ].m_Value == Value::CValue( std::pow( 5, 2 ) ) );
+		UTEST_ASSERT( results[ 1 ].m_Value == Value::CValue( std::pow( 1, 1 ) ) );
+		UTEST_ASSERT( results[ 2 ].m_Value == Value::CValue( std::pow( 2, 4 ) ) );
+		UTEST_ASSERT( results[ 3 ].m_Value == Value::CValue( std::pow( 5.2, 2.4 ) ) );
+		UTEST_ASSERT( results[ 4 ].m_Value == Value::CValue( std::pow( 1.5, 1.5 ) ) );
+		UTEST_ASSERT( results[ 5 ].m_Value == Value::CValue( std::pow( 100.30, 4.7 ) ) );
+
+		context.Release();
+		AST::FreeTree( syntaxTree );
+		UTEST_CASE_CLOSED();
+	}( );
+
 	UTEST_CASE( "Parser/AST memory management" )
 	{
 		auto leakedNodes = AST::AllocatedExpressions();
