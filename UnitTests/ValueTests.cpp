@@ -391,32 +391,49 @@ void RunValueTests()
 		Value::CValue undefined1;
 		Value::CValue undefined2;
 
-		UTEST_ASSERT( ( int1 == int2 ) == true );
-		UTEST_ASSERT( ( int1 != int2 ) == false );
-		UTEST_ASSERT( ( int1 == undefined1 ) == false );
+		UTEST_ASSERT( ( int1 == int2 ) == Value::CValue( true ) );
+		UTEST_ASSERT( ( int1 != int2 ) == Value::CValue( false ) );
+		UTEST_ASSERT( ( int1 == undefined1 ) == Value::CValue( false ) );
 
-		UTEST_ASSERT( ( int1 == int3 ) == false );
-		UTEST_ASSERT( ( int1 != int3 ) == true );
+		UTEST_ASSERT( ( int1 == int3 ) == Value::CValue( false ) );
+		UTEST_ASSERT( ( int1 != int3 ) == Value::CValue( true ) );
 
-		UTEST_ASSERT( ( string1 == string2 ) == true );
-		UTEST_ASSERT( ( string1 != string2 ) == false );
-		UTEST_ASSERT( ( string1 == undefined1 ) == false );
+		UTEST_ASSERT( ( string1 == string2 ) == Value::CValue( true ) );
+		UTEST_ASSERT( ( string1 != string2 ) == Value::CValue( false ) );
+		UTEST_ASSERT( ( string1 == undefined1 ) == Value::CValue( false ) );
 
-		UTEST_ASSERT( ( string1 == string3 ) == false );
-		UTEST_ASSERT( ( string1 != string3 ) == true );
+		UTEST_ASSERT( ( string1 == string3 ) == Value::CValue( false ) );
+		UTEST_ASSERT( ( string1 != string3 ) == Value::CValue( true ) );
 
-		UTEST_ASSERT( ( double1 == double2 ) == true );
-		UTEST_ASSERT( ( double1 != double2 ) == false );
-		UTEST_ASSERT( ( double1 == undefined1 ) == false );
+		UTEST_ASSERT( ( double1 == double2 ) == Value::CValue( true ) );
+		UTEST_ASSERT( ( double1 != double2 ) == Value::CValue( false ) );
+		UTEST_ASSERT( ( double1 == undefined1 ) == Value::CValue( false ) );
 
-		UTEST_ASSERT( ( double1 == double3 ) == false );
-		UTEST_ASSERT( ( double1 != double3 ) == true );
+		UTEST_ASSERT( ( double1 == double3 ) == Value::CValue( false ) );
+		UTEST_ASSERT( ( double1 != double3 ) == Value::CValue( true ) );
 
-		// Arrays don't have equality
-		UTEST_ASSERT( ( array1 == array2 ) == false );
-		UTEST_ASSERT( ( array1 != array2 ) == true );
+		// Arrays don't have equality + operator bool()
+		UTEST_ASSERT( bool ( array1 == array2 ) == false );
+		UTEST_ASSERT( bool ( array1 != array2 ) == true );
+		UTEST_ASSERT( bool ( undefined1 == undefined2 ) == true );
 
-		UTEST_ASSERT( ( undefined1 == undefined2 ) == true );
+		UTEST_CASE_CLOSED();
+	}( );
+
+	UTEST_CASE( "Value equality (operator<, operator>, operator<=, operator>=)" )
+	{
+		Value::CValue val1( 5 );
+		Value::CValue val2( 10 );
+		Value::CValue val3( 10 );
+
+		UTEST_ASSERT( bool ( val1 > val2 ) == false );
+		UTEST_ASSERT( bool ( val1 < val2 ) == true );
+		UTEST_ASSERT( bool ( val1 >= val2 ) == false );
+		UTEST_ASSERT( bool ( val1 <= val2 ) == true );
+		UTEST_ASSERT( bool ( val1 >= val3 ) == false );
+		UTEST_ASSERT( bool ( val1 <= val3 ) == true );
+		UTEST_ASSERT( bool ( val2 <= val3 ) == true );
+		UTEST_ASSERT( bool ( val2 >= val3 ) == true );
 
 		UTEST_CASE_CLOSED();
 	}( );
