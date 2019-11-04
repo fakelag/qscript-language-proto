@@ -261,6 +261,106 @@ void RunRuntimeTests()
 		UTEST_CASE_CLOSED();
 	}( );
 
+	UTEST_CASE( "Equality operator (==, !=)" )
+	{
+		auto syntaxTree = Parser::Parse( Lexer::Parse( "\
+			var a = 10 == 10;							\
+			var b = 11 == 10;							\
+			a;											\
+			b;											\
+		" ) );
+
+		Runtime::CContext context;
+		Runtime::CreateDefaultContext( true, true, &context );
+
+		auto results = Runtime::Execute( syntaxTree, context );
+
+		UTEST_ASSERT( results.size() == 4 );
+		UTEST_ASSERT( results[ 2 ].m_Value == Value::CValue( true ) );
+		UTEST_ASSERT( results[ 3 ].m_Value == Value::CValue( false ) );
+
+		context.Release();
+		AST::FreeTree( syntaxTree );
+		UTEST_CASE_CLOSED();
+	}( );
+
+	UTEST_CASE( "If operator (if)" )
+	{
+		auto syntaxTree = Parser::Parse( Lexer::Parse( "\
+			var a = 10;									\
+			var b = 5;									\
+			if (a == 10) {								\
+				__setFlag();							\
+			}											\
+			if (a != 10) {								\
+				__setFlag();							\
+			}											\
+		" ) );
+
+		Runtime::CContext context;
+		Runtime::CreateDefaultContext( true, true, &context );
+
+		auto results = Runtime::Execute( syntaxTree, context );
+
+		UTEST_ASSERT( context.m_Flag == 1 );
+
+		context.Release();
+		AST::FreeTree( syntaxTree );
+		UTEST_CASE_CLOSED();
+	}( );
+
+	UTEST_CASE( "While operator (while)" )
+	{
+		auto syntaxTree = Parser::Parse( Lexer::Parse( "\
+			var a = 10;									\
+			var b = 0;									\
+			while (a > 5)								\
+			{											\
+				__setFlag();							\
+				b = b + 2;								\
+				a = a - 1;								\
+			}											\
+			b;											\
+		" ) );
+
+		Runtime::CContext context;
+		Runtime::CreateDefaultContext( true, true, &context );
+
+		auto results = Runtime::Execute( syntaxTree, context );
+
+		UTEST_ASSERT( context.m_Flag == 5 );
+		UTEST_ASSERT( results[ 3 ].m_Value == Value::CValue( 10 ) );
+
+		context.Release();
+		AST::FreeTree( syntaxTree );
+		UTEST_CASE_CLOSED();
+	}( );
+
+	UTEST_CASE( "For operator (for)" )
+	{
+		auto syntaxTree = Parser::Parse( Lexer::Parse( "\
+			var a = 4;									\
+			for (var i = 0; i < 20 * 20; i = i + 1)		\
+			{											\
+				__setFlag();							\
+				a = i + a;								\
+			}											\
+			a;											\
+		" ) );
+
+		Runtime::CContext context;
+		Runtime::CreateDefaultContext( true, true, &context );
+
+		auto results = Runtime::Execute( syntaxTree, context );
+
+		UTEST_ASSERT( context.m_Flag == 400 );
+		UTEST_ASSERT( results[ 2 ].m_Value.GetInt() == 79804 );
+
+		context.Release();
+		AST::FreeTree( syntaxTree );
+		UTEST_CASE_CLOSED();
+	}( );
+
 	UTEST_CASE( "Parser/AST memory management" )
 	{
 		auto leakedNodes = AST::AllocatedExpressions();
