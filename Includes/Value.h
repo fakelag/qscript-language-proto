@@ -85,30 +85,78 @@ namespace Value
 			}
 		}
 
-		FORCEINLINE bool operator==( const CValue& other ) const
+		FORCEINLINE CValue operator==( const CValue& other ) const
 		{
 			if ( other.m_ValueType != m_ValueType )
-				return false;
+				return CValue( false );
 
 			switch ( m_ValueType )
 			{
-				case VT_UNINITIALIZED: return true;
-				case VT_ARRAY: return false;
-				case VT_INTEGER: return m_IntValue == other.m_IntValue;
-				case VT_DOUBLE: return m_DoubleValue == other.m_DoubleValue;
-				case VT_STRING: return m_StringValue == other.m_StringValue;
+				case VT_UNINITIALIZED: return CValue( true );
+				case VT_ARRAY: return CValue( false );
+				case VT_INTEGER: return CValue( m_IntValue == other.m_IntValue );
+				case VT_DOUBLE: return CValue( m_DoubleValue == other.m_DoubleValue );
+				case VT_STRING: return CValue( m_StringValue == other.m_StringValue );
 				default: throw Exception( "Invalid CValue type" );
 			}
 		}
 
-		FORCEINLINE bool operator!=( const CValue& other ) const
+		FORCEINLINE CValue operator!=( const CValue& other ) const
 		{
-			return !operator==( other );
+			if ( other.m_ValueType != m_ValueType )
+				return CValue( true );
+
+			switch ( m_ValueType )
+			{
+				case VT_UNINITIALIZED: return CValue( false );
+				case VT_ARRAY: return CValue( true );
+				case VT_INTEGER: return CValue( m_IntValue != other.m_IntValue );
+				case VT_DOUBLE: return CValue( m_DoubleValue != other.m_DoubleValue );
+				case VT_STRING: return CValue( m_StringValue != other.m_StringValue );
+				default: throw Exception( "Invalid CValue type" );
+			}
 		}
 
 		FORCEINLINE CValue operator!() const
 		{
 			return !GetInt();
+		}
+
+		FORCEINLINE operator bool() const
+		{
+			return !!GetInt();
+		}
+
+		FORCEINLINE CValue operator<( const CValue& other )
+		{
+			if ( m_ValueType == VT_INTEGER && other.m_ValueType == VT_INTEGER )
+				return Value::CValue( GetInt() < other.GetInt() );
+
+			return Value::CValue( GetDouble() < other.GetDouble() );
+		}
+
+		FORCEINLINE CValue operator>( const CValue& other )
+		{
+			if ( m_ValueType == VT_INTEGER && other.m_ValueType == VT_INTEGER )
+				return Value::CValue( GetInt() > other.GetInt() );
+
+			return Value::CValue( GetDouble() > other.GetDouble() );
+		}
+
+		FORCEINLINE CValue operator<=( const CValue& other )
+		{
+			if ( m_ValueType == VT_INTEGER && other.m_ValueType == VT_INTEGER )
+				return Value::CValue( GetInt() <= other.GetInt() );
+
+			return Value::CValue( GetDouble() <= other.GetDouble() );
+		}
+
+		FORCEINLINE CValue operator>=( const CValue& other )
+		{
+			if ( m_ValueType == VT_INTEGER && other.m_ValueType == VT_INTEGER )
+				return Value::CValue( GetInt() >= other.GetInt() );
+
+			return Value::CValue( GetDouble() >= other.GetDouble() );
 		}
 
 		FORCEINLINE CValue operator+( const CValue& other ) const
