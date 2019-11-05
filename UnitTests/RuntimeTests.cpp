@@ -403,6 +403,74 @@ void RunRuntimeTests()
 		UTEST_CASE_CLOSED();
 	}( );
 
+	UTEST_CASE( "Logical operators (||, &&, !)" )
+	{
+		auto syntaxTree = Parser::Parse( Lexer::Parse( "\
+			var a = 1;									\
+			var b = 2;									\
+			var c = 3;									\
+			var d = a || b;								\
+			var e = a && b;								\
+			var f = !a;									\
+			if ( a == b || b == c ) __setFlag();		\
+			if ( a == b || b == b ) __setFlag();		\
+			if ( a == a || b == c ) __setFlag();		\
+			if ( a == b && b == c ) __setFlag();		\
+			if ( a == b && b == b ) __setFlag();		\
+			if ( a == b && b == c ) __setFlag();		\
+			if ( a == a && b == b ) __setFlag();		\
+			if ( d == a ) __setFlag();					\
+			if ( f ) __setFlag();						\
+			if ( !!e ) __setFlag();						\
+		" ) );
+
+		Runtime::CContext context;
+		Runtime::CreateDefaultContext( true, true, &context );
+
+		auto results = Runtime::Execute( syntaxTree, context );
+
+		UTEST_ASSERT( context.m_Flag == 5 );
+
+		context.Release();
+		AST::FreeTree( syntaxTree );
+		UTEST_CASE_CLOSED();
+	}( );
+
+	UTEST_CASE( "Increment/Decrement operators (++, --)" )
+	{
+		auto syntaxTree = Parser::Parse( Lexer::Parse( "\
+			var a = 1;									\
+			var b = 1;									\
+			var c = 1.5;								\
+			++a;										\
+			a++;										\
+			--b;										\
+			b--;										\
+			--c;										\
+			a;											\
+			b;											\
+			c;											\
+		" ) );
+
+		Runtime::CContext context;
+		Runtime::CreateDefaultContext( true, true, &context );
+
+		auto results = Runtime::Execute( syntaxTree, context );
+
+		UTEST_ASSERT( results[ 3 ].m_Value == Value::CValue( 2 ) );
+		UTEST_ASSERT( results[ 4 ].m_Value == Value::CValue( 2 ) );
+		UTEST_ASSERT( results[ 5 ].m_Value == Value::CValue( 0 ) );
+		UTEST_ASSERT( results[ 6 ].m_Value == Value::CValue( 0 ) );
+		UTEST_ASSERT( results[ 7 ].m_Value == Value::CValue( 0.5 ) );
+		UTEST_ASSERT( results[ 8 ].m_Value == Value::CValue( 3 ) );
+		UTEST_ASSERT( results[ 9 ].m_Value == Value::CValue( -1 ) );
+		UTEST_ASSERT( results[ 10 ].m_Value == Value::CValue( 0.5 ) );
+
+		context.Release();
+		AST::FreeTree( syntaxTree );
+		UTEST_CASE_CLOSED();
+	}( );
+
 	UTEST_CASE( "Parser/AST memory management" )
 	{
 		auto leakedNodes = AST::AllocatedExpressions();
