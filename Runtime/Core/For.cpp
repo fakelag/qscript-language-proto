@@ -6,7 +6,7 @@ RTI_EXECFN_LIST( S_FOR )
 	context.PushScope( false, false );
 
 	for ( m_List[ 0 ]->Execute( context );
-		m_List[ 1 ]->Execute( context ).m_Value.GetBool();
+		bool ( m_List[ 1 ]->Execute( context ).m_Value );
 		m_List[ 2 ]->Execute( context ) )
 	{
 		m_List[ 3 ]->Execute( context );
