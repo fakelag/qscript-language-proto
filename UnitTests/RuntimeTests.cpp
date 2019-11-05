@@ -361,6 +361,48 @@ void RunRuntimeTests()
 		UTEST_CASE_CLOSED();
 	}( );
 
+	UTEST_CASE( "Assign operators (+=, -=, /=, *=, %=)" )
+	{
+		auto syntaxTree = Parser::Parse( Lexer::Parse( "\
+			var a = 6;									\
+			var b = 6;									\
+			var c = 6;									\
+			var d = 6;									\
+			var e = 6;									\
+			a += 2;										\
+			b -= 2;										\
+			c /= 2;										\
+			d *= 2.7;									\
+			e %= 2;										\
+			a;											\
+			b;											\
+			c;											\
+			d;											\
+			e;											\
+		" ) );
+
+		Runtime::CContext context;
+		Runtime::CreateDefaultContext( true, true, &context );
+
+		auto results = Runtime::Execute( syntaxTree, context );
+
+		UTEST_ASSERT( results.size() == 15 );
+		UTEST_ASSERT( results[ 5 ].m_Value.GetInt() == 8 );
+		UTEST_ASSERT( results[ 6 ].m_Value.GetInt() == 4 );
+		UTEST_ASSERT( results[ 7 ].m_Value.GetInt() == 3 );
+		UTEST_ASSERT( results[ 8 ].m_Value.GetDouble() == 6 * 2.7 );
+		UTEST_ASSERT( results[ 9 ].m_Value.GetInt() == 0 );
+		UTEST_ASSERT( results[ 10 ].m_Value.GetInt() == 8 );
+		UTEST_ASSERT( results[ 11 ].m_Value.GetInt() == 4 );
+		UTEST_ASSERT( results[ 12 ].m_Value.GetInt() == 3 );
+		UTEST_ASSERT( results[ 13 ].m_Value.GetDouble() == 6 * 2.7 );
+		UTEST_ASSERT( results[ 14 ].m_Value.GetInt() == 0 );
+
+		context.Release();
+		AST::FreeTree( syntaxTree );
+		UTEST_CASE_CLOSED();
+	}( );
+
 	UTEST_CASE( "Parser/AST memory management" )
 	{
 		auto leakedNodes = AST::AllocatedExpressions();
