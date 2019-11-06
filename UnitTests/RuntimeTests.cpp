@@ -471,6 +471,81 @@ void RunRuntimeTests()
 		UTEST_CASE_CLOSED();
 	}( );
 
+	UTEST_CASE( "Return operator (return)" )
+	{
+		auto syntaxTree = Parser::Parse( Lexer::Parse( "\
+			function a(x) {								\
+				if (x <= 1)	{							\
+					{									\
+						return 1;						\
+					}									\
+				}										\
+				return x * x;							\
+			}											\
+			function b() {								\
+				return;									\
+				__setFlag();							\
+			}											\
+			a(0);										\
+			a(5);										\
+			b();										\
+		" ) );
+
+		Runtime::CContext context;
+		Runtime::CreateDefaultContext( true, true, &context );
+
+		auto results = Runtime::Execute( syntaxTree, context );
+
+		UTEST_ASSERT( results.size() == 5 );
+		UTEST_ASSERT( context.m_Flag == 0 );
+		UTEST_ASSERT( results[ 2 ].m_Value == Value::CValue( 1 ) );
+		UTEST_ASSERT( results[ 3 ].m_Value == Value::CValue( 25 ) );
+		UTEST_ASSERT( results[ 4 ].m_Value.IsInitialized() == false );
+
+		context.Release();
+		AST::FreeTree( syntaxTree );
+		UTEST_CASE_CLOSED();
+	}( );
+
+	UTEST_CASE( "Break operator (break)" )
+	{
+		auto syntaxTree = Parser::Parse( Lexer::Parse( "\
+			var i = 0;									\
+			var j = 0;									\
+			for (; i < 20; ++i) {						\
+				if (i == 15)							\
+					break;								\
+				__setFlag();							\
+			}											\
+			while (j < 100 * 100) {						\
+				if (j >= 5) { break; } ++j;				\
+				__setFlag();							\
+			}											\
+			var x = while (1) {							\
+				__setFlag();							\
+				break j;								\
+			}											\
+			i;											\
+			j;											\
+			x;											\
+		" ) );
+
+		Runtime::CContext context;
+		Runtime::CreateDefaultContext( true, true, &context );
+
+		auto results = Runtime::Execute( syntaxTree, context );
+
+		UTEST_ASSERT( results.size() == 8 );
+		UTEST_ASSERT( context.m_Flag == 21 );
+		UTEST_ASSERT( results[ 5 ].m_Value.GetInt() == 15 );
+		UTEST_ASSERT( results[ 6 ].m_Value.GetInt() == 5 );
+		UTEST_ASSERT( results[ 7 ].m_Value.GetInt() == 5 );
+
+		context.Release();
+		AST::FreeTree( syntaxTree );
+		UTEST_CASE_CLOSED();
+	}( );
+
 	UTEST_CASE( "Parser/AST memory management" )
 	{
 		auto leakedNodes = AST::AllocatedExpressions();

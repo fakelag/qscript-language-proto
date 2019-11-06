@@ -3,15 +3,23 @@
 
 RTI_EXECFN_LIST( S_FOR )
 {
-	context.PushScope( false, false );
+	context.PushScope( Runtime::CContext::ScopeType::ST_LOOP );
 
-	for ( m_List[ 0 ]->Execute( context );
-		bool ( m_List[ 1 ]->Execute( context ).m_Value );
-		m_List[ 2 ]->Execute( context ) )
+	if ( m_List[ 0 ] )
+		m_List[ 0 ]->Execute( context );
+
+	auto result = Value::CValue();
+	for (; m_List[ 1 ] ? bool ( m_List[ 1 ]->Execute( context ).m_Value ) : true; )
 	{
-		m_List[ 3 ]->Execute( context );
+		result = m_List[ 3 ]->Execute( context ).m_Value;
+
+		if ( context.GetCurrentScope().m_IsBreaking )
+			break;
+
+		if ( m_List[ 2 ] )
+			m_List[ 2 ]->Execute( context );
 	}
 
 	context.PopScope();
-	return { Value::CValue() };
+	return { result };
 }

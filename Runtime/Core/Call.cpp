@@ -24,7 +24,7 @@ RTI_EXECFN_COMPLEX( S_CALL )
 	if ( function->m_Args.size() != argsList.m_Value.ArraySize() )
 		throw RuntimeException( m_Loc, "Invalid Function call to \"" + funcName.m_Value.GetString() + "\" (missing arguments)" );
 
-	context.PushScope( false, true );
+	context.PushScope( Runtime::CContext::ScopeType::ST_ARGS );
 
 	int argCount = argsList.m_Value.ArraySize();
 	for ( int i = 0; i < argCount; ++i )

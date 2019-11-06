@@ -3,11 +3,17 @@
 
 RTI_EXECFN_COMPLEX( S_WHILE )
 {
-	context.PushScope( false, true );
+	context.PushScope( Runtime::CContext::ScopeType::ST_LOOP );
 
+	auto result = Value::CValue();
 	while ( bool ( m_LHS->Execute( context ).m_Value ) )
-		m_RHS->Execute( context );
+	{
+		result = m_RHS->Execute( context ).m_Value;
+
+		if ( context.GetCurrentScope().m_IsBreaking )
+			break;
+	}
 
 	context.PopScope();
-	return { Value::CValue() };
+	return { result };
 }
