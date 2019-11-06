@@ -41,6 +41,7 @@ namespace Runtime
 			Scope_t( ScopeType scopeType )
 			{
 				m_ScopeType = scopeType;
+				m_IsBreaking = false;
 			}
 
 			std::unordered_map< std::string, Function_t >			m_Functions;
