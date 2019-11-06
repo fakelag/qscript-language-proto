@@ -515,11 +515,14 @@ void RunRuntimeTests()
 			for (; i < 20; ++i) {						\
 				if (i == 15)							\
 					break;								\
+				__setFlag();							\
 			}											\
 			while (j < 100 * 100) {						\
 				if (j >= 5) { break; } ++j;				\
+				__setFlag();							\
 			}											\
 			var x = while (1) {							\
+				__setFlag();							\
 				break j;								\
 			}											\
 			i;											\
@@ -533,7 +536,7 @@ void RunRuntimeTests()
 		auto results = Runtime::Execute( syntaxTree, context );
 
 		UTEST_ASSERT( results.size() == 8 );
-		std::cout << results[ 5 ].m_Value.GetString() << std::endl;
+		UTEST_ASSERT( context.m_Flag == 21 );
 		UTEST_ASSERT( results[ 5 ].m_Value.GetInt() == 15 );
 		UTEST_ASSERT( results[ 6 ].m_Value.GetInt() == 5 );
 		UTEST_ASSERT( results[ 7 ].m_Value.GetInt() == 5 );
