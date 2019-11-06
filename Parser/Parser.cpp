@@ -72,7 +72,7 @@ namespace Parser
 			if ( m_CurrentSymbol - offset < 0 )
 				return NULL;
 
-			if ( IsFinished() )
+			if ( m_CurrentSymbol - offset >= m_Symbols.size() )
 				throw Exception( "Reading tokens past end of stream" );
 
 			return &m_Symbols[ m_CurrentSymbol - offset ];
@@ -356,8 +356,7 @@ namespace Parser
 				{
 					symbol.m_RightBind = [ &nextExpression ]( const ParserSymbol_t& symbol ) -> AST::IExpression*
 					{
-						auto retValue = symbol.m_Symbol == Grammar::Symbol::S_RETURN ? nextExpression() : NULL;
-						return new AST::CSimpleExpression( retValue, symbol.m_Symbol, symbol.m_Location );
+						return new AST::CSimpleExpression( nextExpression(), symbol.m_Symbol, symbol.m_Location );
 					};
 					break;
 				}
@@ -413,12 +412,10 @@ namespace Parser
 
 						std::vector< AST::IExpression* > forLoop = static_cast< AST::CListExpression* >( head )->List();
 
-						// Remove surplus semicolons (and other NULL expressions)
-						forLoop.erase(std::remove_if( forLoop.begin(), forLoop.end(), []( AST::IExpression* expr ) {
-							return expr == NULL;
-						} ), forLoop.end());
-
 						forLoop.push_back( body );
+
+						if ( forLoop.size() != 4 )
+							throw ParseException( head->Location(), "Invalid for loop declaration" );
 
 						// remove the head node, and append it's content to the for node
 						delete head;
@@ -672,13 +669,34 @@ namespace Parser
 								throw ParseException( parserState.CurrentSymbol().m_Location, "Expected a for loop, got: \"" + parserState.CurrentSymbol().m_Token + "\"" );
 
 							std::vector< AST::IExpression* > expressionList ={};
-
 							while ( true )
 							{
+								if ( parserState.CurrentSymbol().m_Symbol == Grammar::Symbol::S_SEMICOLON )
+								{
+									expressionList.push_back( NULL );
+
+									parserState.NextSymbol();
+									if ( parserState.CurrentSymbol().m_Symbol == Grammar::Symbol::S_PARENT_CLOSE )
+									{
+										expressionList.push_back( NULL );
+										parserState.NextSymbol();
+										break;
+									}
+
+									continue;
+								}
+
 								expressionList.push_back( nextExpression() );
 
 								if ( parserState.NextSymbol().m_Symbol == Grammar::Symbol::S_PARENT_CLOSE )
 									break;
+
+								if ( parserState.CurrentSymbol().m_Symbol == Grammar::Symbol::S_PARENT_CLOSE )
+								{
+									expressionList.push_back( NULL );
+									parserState.NextSymbol();
+									break;
+								}
 							}
 
 							return new AST::CListExpression( expressionList, Grammar::Symbol::S_LIST, symbol.m_Location );
