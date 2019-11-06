@@ -54,6 +54,8 @@ namespace Runtime
 			EXEC_SIMPLE( S_FUNCBODY );
 			EXEC_SIMPLE( S_VAR );
 			EXEC_SIMPLE( S_LOGIC_NOT );
+			EXEC_SIMPLE( S_RETURN );
+			EXEC_SIMPLE( S_BREAK );
 			EXEC_LIST( S_SCOPE );
 			EXEC_LIST( S_LIST );
 			EXEC_LIST( S_FOR );
@@ -78,7 +80,7 @@ namespace Runtime
 		ctx->m_ExecFlags = 0;
 
 		// Push global scope into the stack
-		ctx->PushScope( true, false );
+		ctx->PushScope( Runtime::CContext::ScopeType::ST_GLOBAL );
 
 #ifdef RTI_DEBUG_ENABLED
 		// Reset the debugging flag. This flag is used by tests
@@ -152,9 +154,9 @@ namespace Runtime
 		return statementList;
 	}
 
-	void CContext::PushScope( bool isGlobal, bool isArgsScope )
+	void CContext::PushScope( ScopeType type )
 	{
-		m_Scopes.push_back( Scope_t( isGlobal, isArgsScope ) );
+		m_Scopes.push_back( Scope_t( type ) );
 	}
 
 	void CContext::PopScope()
@@ -207,6 +209,29 @@ namespace Runtime
 		}
 	}
 
+	void CContext::BreakScope( bool isReturn, const Grammar::SymbolLoc_t* where )
+	{
+		for ( int i = ( int ) m_Scopes.size() - 1; i >= 0; --i )
+		{
+			if ( m_Scopes[ i ].m_ScopeType == Runtime::CContext::ScopeType::ST_GLOBAL )
+				throw RuntimeException( where ? *where : unknownLocation, "Unhandled scope break" );
+
+			// Stop executing the current tree
+			m_Scopes[ i ].m_IsBreaking = true;
+
+			if ( isReturn )
+			{
+				if ( m_Scopes[ i ].m_ScopeType == Runtime::CContext::ScopeType::ST_ARGS )
+					break;
+			}
+			else
+			{
+				if ( m_Scopes[ i ].m_ScopeType == Runtime::CContext::ScopeType::ST_LOOP )
+					break;
+			}
+		}
+	}
+
 	const CContext::Scope_t& CContext::GetCurrentScope() const
 	{
 		if ( m_Scopes.size() <= 0 )
@@ -223,7 +248,7 @@ namespace Runtime
 			if ( function != m_Scopes[ i ].m_Functions.end() )
 				return &function->second; // references to std::unordered_map elements should be safe
 
-			if ( m_Scopes[ i ].m_IsArgsScope )
+			if ( m_Scopes[ i ].m_ScopeType == Runtime::CContext::ScopeType::ST_ARGS )
 			{
 				// This is the last subscope to check, now consult the global scope
 				function = m_Scopes[ 0 ].m_Functions.find( name );
@@ -245,7 +270,7 @@ namespace Runtime
 			if ( variable != m_Scopes[ i ].m_Variables.end() )
 				return &variable->second; // references to std::unordered_map elements should be safe
 
-			if ( m_Scopes[ i ].m_IsArgsScope )
+			if ( m_Scopes[ i ].m_ScopeType == Runtime::CContext::ScopeType::ST_ARGS )
 			{
 				// This is the last subscope to check, now consult the global scope
 				variable = m_Scopes[ 0 ].m_Variables.find( name );

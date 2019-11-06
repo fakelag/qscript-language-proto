@@ -22,6 +22,14 @@ namespace Runtime
 			CF_NORESOLVE = ( 1<<0 ),
 		};
 
+		enum ScopeType
+		{
+			ST_GLOBAL = 0,
+			ST_NORMAL,
+			ST_ARGS,
+			ST_LOOP,
+		};
+
 		struct Function_t
 		{
 			std::vector< std::string >	m_Args;
@@ -30,21 +38,21 @@ namespace Runtime
 
 		struct Scope_t
 		{
-			Scope_t( bool isGlobal, bool isArgsScope )
+			Scope_t( ScopeType scopeType )
 			{
-				m_IsGlobal = isGlobal;
-				m_IsArgsScope = isArgsScope;
+				m_ScopeType = scopeType;
 			}
 
 			std::unordered_map< std::string, Function_t >			m_Functions;
 			std::unordered_map< std::string, Value::CValue >		m_Variables;
-			bool													m_IsGlobal;
-			bool 													m_IsArgsScope;
+			ScopeType												m_ScopeType;
+			bool 													m_IsBreaking;
 		};
 
-		void					PushScope( bool isGlobal, bool isArgsScope );
+		void					PushScope( ScopeType type );
 		void					PushFunction( const std::string& name, IExec* body, const std::vector< std::string >& args, const Grammar::SymbolLoc_t* where );
 		void					PushVariable( const std::string& name, const Value::CValue& value, const Grammar::SymbolLoc_t* where );
+		void 					BreakScope( bool isReturn, const Grammar::SymbolLoc_t* where );
 		const Scope_t&			GetCurrentScope() const;
 
 		void					AddObject( IExec* exec );
