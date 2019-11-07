@@ -195,22 +195,16 @@ void RunParserTests()
 
 		UTEST_ASSERT( syntaxTree.size() == 3 );
 		UTEST_ASSERT( syntaxTree[ 0 ]->Type() == AST::ExpressionType::ET_COMPLEX );
-		UTEST_ASSERT( static_cast< AST::CComplexExpression* >( syntaxTree[ 0 ] )->Symbol() == Grammar::Symbol::S_LOGIC_OR );
 		UTEST_ASSERT( syntaxTree[ 1 ]->Type() == AST::ExpressionType::ET_COMPLEX );
 		UTEST_ASSERT( syntaxTree[ 2 ]->Type() == AST::ExpressionType::ET_SIMPLE );
-		UTEST_ASSERT( syntaxTree[ 0 ]->Symbol() == Grammar::Symbol::S_LOGIC_OR );
+		UTEST_ASSERT( syntaxTree[ 0 ]->Symbol() == Grammar::Symbol::S_ASSIGN );
 		UTEST_ASSERT( syntaxTree[ 1 ]->Symbol() == Grammar::Symbol::S_LOGIC_AND );
 		UTEST_ASSERT( syntaxTree[ 2 ]->Symbol() == Grammar::Symbol::S_LOGIC_NOT );
 
 		UTEST_ASSERT(
 			static_cast< AST::IExpression* >(
-				static_cast< AST::CComplexExpression* >( syntaxTree[ 0 ] )->Lhs()
+				static_cast< AST::CComplexExpression* >( syntaxTree[ 0 ] )->Rhs()
 				)->Type() == AST::ExpressionType::ET_COMPLEX );
-
-		UTEST_ASSERT(
-			static_cast< AST::CComplexExpression* >(
-				static_cast< AST::CComplexExpression* >( syntaxTree[ 0 ] )->Lhs()
-				)->Rhs()->Type() == AST::ExpressionType::ET_VALUE );
 
 		UTEST_ASSERT(
 			static_cast< AST::IExpression* >(
