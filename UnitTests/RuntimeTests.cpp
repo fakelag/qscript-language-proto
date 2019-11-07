@@ -546,6 +546,33 @@ void RunRuntimeTests()
 		UTEST_CASE_CLOSED();
 	}( );
 
+	UTEST_CASE( "True/False constants (true, false)" )
+	{
+		auto syntaxTree = Parser::Parse( Lexer::Parse( "\
+			var a = true;								\
+			var b = false;								\
+			var c = false || true;						\
+			var d = false && true;						\
+			if (a) __setFlag();							\
+			if (!b) __setFlag();						\
+			if (c) __setFlag();							\
+			if (!d) __setFlag();						\
+			if (true) __setFlag();						\
+			if (b == false) __setFlag();				\
+		" ) );
+
+		Runtime::CContext context;
+		Runtime::CreateDefaultContext( true, true, &context );
+
+		auto results = Runtime::Execute( syntaxTree, context );
+
+		UTEST_ASSERT( context.m_Flag == 6 );
+
+		context.Release();
+		AST::FreeTree( syntaxTree );
+		UTEST_CASE_CLOSED();
+	}( );
+
 	UTEST_CASE( "Parser/AST memory management" )
 	{
 		auto leakedNodes = AST::AllocatedExpressions();
