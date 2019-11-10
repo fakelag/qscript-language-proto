@@ -640,12 +640,18 @@ namespace Parser
 					{
 						if ( parserState.CurrentSymbol().m_Symbol == Grammar::Symbol::S_PARENT_CLOSE )
 						{
+							parserState.NextSymbol(); // skip ')'
 							auto emptyArgs = new AST::CListExpression( {}, Grammar::Symbol::S_LIST, symbol.m_Location );
 							return new AST::CComplexExpression( left, emptyArgs, Grammar::Symbol::S_CALL, symbol.m_Location );
 						}
 						else
 						{
 							auto right = nextExpression();
+
+							if ( parserState.CurrentSymbol().m_Symbol != Grammar::Symbol::S_PARENT_CLOSE )
+								throw ParseException( parserState.CurrentSymbol().m_Location, "Expected a closing parenthesis, got: \"" + parserState.CurrentSymbol().m_Token + "\"" );
+
+							parserState.NextSymbol(); // skip ')'
 
 							if ( right->Symbol() == Grammar::Symbol::S_LIST )
 							{
