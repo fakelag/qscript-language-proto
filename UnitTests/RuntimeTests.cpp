@@ -203,6 +203,36 @@ void RunRuntimeTests()
 		UTEST_CASE_CLOSED();
 	}( );
 
+
+	UTEST_CASE( "Recursive functions" )
+	{
+		auto syntaxTree = Parser::Parse( Lexer::Parse( "\
+			function fibonacci(number)					\
+			{											\
+				if (number <= 1)						\
+					return 1;							\
+														\
+				return fibonacci(number - 1)			\
+					+ fibonacci(number -2); 			\
+			}											\
+			if (fibonacci(5) == 8) __setFlag();			\
+			if (fibonacci(10) == 89) __setFlag();		\
+			if (fibonacci(15) == 987) __setFlag();		\
+		" ) );
+
+		Runtime::CContext context;
+		Runtime::CreateDefaultContext( true, true, &context );
+
+		auto results = Runtime::Execute( syntaxTree, context );
+
+		UTEST_ASSERT( results.size() == 4 );
+		UTEST_ASSERT( context.m_Flag == 3 );
+
+		context.Release();
+		AST::FreeTree( syntaxTree );
+		UTEST_CASE_CLOSED();
+	}( );
+
 	UTEST_CASE( "Modulo operator (%)" )
 	{
 		auto syntaxTree = Parser::Parse( Lexer::Parse( "\
@@ -577,7 +607,7 @@ void RunRuntimeTests()
 	{
 		auto syntaxTree = Parser::Parse( Lexer::Parse( "\
 			var x = \"Hello world\";					\
-			var y = \"123.00 + !ï¿½ï¿½%&/;()=?;;\";			\
+			var y = \"123.00 + !´¤%&/;()=?;;\";			\
 			var z = \"\";								\
 			if ( x != \"abcdefg\" ) __setFlag();		\
 			if ( x == \"Hello world\" ) __setFlag();	\
