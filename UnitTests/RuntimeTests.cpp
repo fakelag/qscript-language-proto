@@ -223,9 +223,9 @@ void RunRuntimeTests()
 		UTEST_ASSERT( results[ 0 ].m_Value == Value::CValue( 5 % 2 ) );
 		UTEST_ASSERT( results[ 1 ].m_Value == Value::CValue( 1 % 1 ) );
 		UTEST_ASSERT( results[ 2 ].m_Value == Value::CValue( 2 % 4 ) );
-		UTEST_ASSERT( results[ 3 ].m_Value == Value::CValue( std::fmodf( 5.2, 2.4 ) ) );
-		UTEST_ASSERT( results[ 4 ].m_Value == Value::CValue( std::fmodf( 1.5, 1.5 ) ) );
-		UTEST_ASSERT( results[ 5 ].m_Value == Value::CValue( std::fmodf( 100.30, 4.7 ) ) );
+		UTEST_ASSERT( results[ 3 ].m_Value == Value::CValue( std::fmod( 5.2, 2.4 ) ) );
+		UTEST_ASSERT( results[ 4 ].m_Value == Value::CValue( std::fmod( 1.5, 1.5 ) ) );
+		UTEST_ASSERT( results[ 5 ].m_Value == Value::CValue( std::fmod( 100.30, 4.7 ) ) );
 
 		context.Release();
 		AST::FreeTree( syntaxTree );
@@ -261,7 +261,7 @@ void RunRuntimeTests()
 		UTEST_CASE_CLOSED();
 	}( );
 
-	UTEST_CASE( "Equality operator (==, !=)" )
+	UTEST_CASE( "Equality operators (==, !=)" )
 	{
 		auto syntaxTree = Parser::Parse( Lexer::Parse( "\
 			var a = 10 == 10;							\
@@ -284,7 +284,7 @@ void RunRuntimeTests()
 		UTEST_CASE_CLOSED();
 	}( );
 
-	UTEST_CASE( "If operator (if)" )
+	UTEST_CASE( "If clause (if)" )
 	{
 		auto syntaxTree = Parser::Parse( Lexer::Parse( "\
 			var a = 10;									\
@@ -309,7 +309,7 @@ void RunRuntimeTests()
 		UTEST_CASE_CLOSED();
 	}( );
 
-	UTEST_CASE( "While operator (while)" )
+	UTEST_CASE( "While clause (while)" )
 	{
 		auto syntaxTree = Parser::Parse( Lexer::Parse( "\
 			var a = 10;									\
@@ -336,7 +336,7 @@ void RunRuntimeTests()
 		UTEST_CASE_CLOSED();
 	}( );
 
-	UTEST_CASE( "For operator (for)" )
+	UTEST_CASE( "For clause (for)" )
 	{
 		auto syntaxTree = Parser::Parse( Lexer::Parse( "\
 			var a = 4;									\

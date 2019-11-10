@@ -359,7 +359,7 @@ namespace Value
 				{
 				case VT_STRING: throw Exception( "Invalid CValue type" );
 				case VT_INTEGER: return CValue( m_IntValue % other.m_IntValue );
-				case VT_DOUBLE: return CValue( std::fmodf( ( double ) m_IntValue, other.m_DoubleValue ) );
+				case VT_DOUBLE: return CValue( std::fmod( ( double ) m_IntValue, other.m_DoubleValue ) );
 				case VT_ARRAY: throw Exception( "Invalid CValue type" );
 				default: throw Exception( "Invalid CValue type" );
 				}
@@ -369,8 +369,8 @@ namespace Value
 				switch ( other.m_ValueType )
 				{
 				case VT_STRING: throw Exception( "Invalid CValue type" );
-				case VT_INTEGER: return CValue( std::fmodf( m_DoubleValue, ( double ) other.m_IntValue ) );
-				case VT_DOUBLE: return CValue( std::fmodf( m_DoubleValue, other.m_DoubleValue ) );
+				case VT_INTEGER: return CValue( std::fmod( m_DoubleValue, ( double ) other.m_IntValue ) );
+				case VT_DOUBLE: return CValue( std::fmod( m_DoubleValue, other.m_DoubleValue ) );
 				case VT_ARRAY: throw Exception( "Invalid CValue type" );
 				default: throw Exception( "Invalid CValue type" );
 				}
