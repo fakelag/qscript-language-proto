@@ -83,7 +83,7 @@ namespace Lexer
 			// Iterate all the commons
 			for ( auto symIt = commonSymbols.cbegin(); symIt != commonSymbols.cend(); ++symIt )
 			{
-				if ( symIt->m_Info.m_Token == pattern.substr( 0, symIt->m_Info.m_Token.length() ) )
+				if ( symIt->m_Info.m_Token == pattern.substr( symIt->m_Info.m_IsWord ? 0 : stringBuffer.length(), symIt->m_Info.m_Token.length() ) )
 				{
 					if ( symIt->m_Info.m_Token == "." && isInteger( stringBuffer ) )
 						return 0;
@@ -125,7 +125,8 @@ namespace Lexer
 
 			if ( !parsingString )
 			{
-				int commonLength = findSymbol( source.substr( std::distance( source.cbegin(), srcIt ), longestToken ) );
+				int commonLength = findSymbol( source.substr( std::distance( source.cbegin(), srcIt - stringBuffer.length() ),
+					longestToken + stringBuffer.length() ) );
 
 				if ( commonLength > 0 )
 				{

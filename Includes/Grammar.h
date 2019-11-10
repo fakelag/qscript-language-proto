@@ -33,6 +33,7 @@ namespace Grammar
 	{
 		std::string			m_Token;
 		int					m_LBP;
+		bool				m_IsWord;
 	};
 
 	enum Symbol
@@ -110,63 +111,63 @@ namespace Grammar
 
 	static const std::map<Symbol, SymbolInfo_t> LanguageSymbols = {
 		// Assignments
-		{ S_ASSIGN,			{ "=",			LBP_ASSIGN,			} },
-		{ S_ASSIGN_ADD,		{ "+=",			LBP_ASSIGN,			} },
-		{ S_ASSIGN_SUB,		{ "-=",			LBP_ASSIGN,			} },
-		{ S_ASSIGN_MUL,		{ "*=",			LBP_ASSIGN,			} },
-		{ S_ASSIGN_DIV,		{ "/=",			LBP_ASSIGN,			} },
-		{ S_ASSIGN_MOD,		{ "%=",			LBP_ASSIGN,			} },
+		{ S_ASSIGN,			{ "=",			LBP_ASSIGN,			false } },
+		{ S_ASSIGN_ADD,		{ "+=",			LBP_ASSIGN,			false } },
+		{ S_ASSIGN_SUB,		{ "-=",			LBP_ASSIGN,			false } },
+		{ S_ASSIGN_MUL,		{ "*=",			LBP_ASSIGN,			false } },
+		{ S_ASSIGN_DIV,		{ "/=",			LBP_ASSIGN,			false } },
+		{ S_ASSIGN_MOD,		{ "%=",			LBP_ASSIGN,			false } },
 
 		// Logical operators
-		{ S_LOGIC_AND,		{ "&&",			LBP_LOGIC,			} },
-		{ S_LOGIC_OR,		{ "||",			LBP_LOGIC,			} },
-		{ S_LOGIC_NOT,		{ "!",			LBP_LOGIC_NOT,		} },
+		{ S_LOGIC_AND,		{ "&&",			LBP_LOGIC,			false } },
+		{ S_LOGIC_OR,		{ "||",			LBP_LOGIC,			false } },
+		{ S_LOGIC_NOT,		{ "!",			LBP_LOGIC_NOT,		false } },
 
 		// Equality
-		{ S_EQUALS,			{ "==",			LBP_EQUALITY,		} },
-		{ S_EQUALS_NOT,		{ "!=",			LBP_EQUALITY,		} },
-		{ S_MORE_OR_EQUALS,	{ ">=",			LBP_EQUALITY,		} },
-		{ S_LESS_OR_EQUALS,	{ "<=",			LBP_EQUALITY,		} },
-		{ S_MORETHAN,		{ ">",			LBP_EQUALITY,		} },
-		{ S_LESSTHAN,		{ "<",			LBP_EQUALITY,		} },
+		{ S_EQUALS,			{ "==",			LBP_EQUALITY,		false } },
+		{ S_EQUALS_NOT,		{ "!=",			LBP_EQUALITY,		false } },
+		{ S_MORE_OR_EQUALS,	{ ">=",			LBP_EQUALITY,		false } },
+		{ S_LESS_OR_EQUALS,	{ "<=",			LBP_EQUALITY,		false } },
+		{ S_MORETHAN,		{ ">",			LBP_EQUALITY,		false } },
+		{ S_LESSTHAN,		{ "<",			LBP_EQUALITY,		false } },
 
 		// Increment/Decrement
-		{ S_INCREMENT,		{ "++",			LBP_INCDEC,			} },
-		{ S_DECREMENT,		{ "--",			LBP_INCDEC,			} },
+		{ S_INCREMENT,		{ "++",			LBP_INCDEC,			false } },
+		{ S_DECREMENT,		{ "--",			LBP_INCDEC,			false } },
 
 		// Brackets
-		{ S_BRACKET_OPEN,	{ "{",			LBP_NONE,			} },
-		{ S_BRACKET_CLOSE,	{ "}",			LBP_NONE,			} },
-		{ S_SBRACKET_OPEN,	{ "[",			LBP_OPENBRACKET,	} },
-		{ S_SBRACKET_CLOSE,	{ "]",			LBP_NONE,			} },
-		{ S_PARENT_OPEN,	{ "(",			LBP_OPENBRACKET,	} },
-		{ S_PARENT_CLOSE,	{ ")",			LBP_NONE,			} },
+		{ S_BRACKET_OPEN,	{ "{",			LBP_NONE,			false } },
+		{ S_BRACKET_CLOSE,	{ "}",			LBP_NONE,			false } },
+		{ S_SBRACKET_OPEN,	{ "[",			LBP_OPENBRACKET,	false } },
+		{ S_SBRACKET_CLOSE,	{ "]",			LBP_NONE,			false } },
+		{ S_PARENT_OPEN,	{ "(",			LBP_OPENBRACKET,	false } },
+		{ S_PARENT_CLOSE,	{ ")",			LBP_NONE,			false } },
 
 		// Arithmetics
-		{ S_ADD,			{ "+",			LBP_ARITHMETIC_1,	} },
-		{ S_SUB,			{ "-",			LBP_ARITHMETIC_1,	} },
-		{ S_MUL,			{ "*",			LBP_ARITHMETIC_2,	} },
-		{ S_DIV,			{ "/",			LBP_ARITHMETIC_2,	} },
-		{ S_MOD,			{ "%",			LBP_ARITHMETIC_2,	} },
-		{ S_POW,			{ "**",			LBP_ARITHMETIC_3,	} },
+		{ S_ADD,			{ "+",			LBP_ARITHMETIC_1,	false } },
+		{ S_SUB,			{ "-",			LBP_ARITHMETIC_1,	false } },
+		{ S_MUL,			{ "*",			LBP_ARITHMETIC_2,	false } },
+		{ S_DIV,			{ "/",			LBP_ARITHMETIC_2,	false } },
+		{ S_MOD,			{ "%",			LBP_ARITHMETIC_2,	false } },
+		{ S_POW,			{ "**",			LBP_ARITHMETIC_3,	false } },
 
 		// Separators
-		{ S_SEMICOLON,		{ ";",			LBP_NONE,			} },
-		{ S_COMMA,			{ ",",			LBP_COMMA,			} },
-		{ S_DOT,			{ ".",			LBP_DOT,			} },
-		{ S_COLON, 			{ ":", 			LBP_NONE, 			} },
+		{ S_SEMICOLON,		{ ";",			LBP_NONE,			false } },
+		{ S_COMMA,			{ ",",			LBP_COMMA,			false } },
+		{ S_DOT,			{ ".",			LBP_DOT,			false } },
+		{ S_COLON, 			{ ":", 			LBP_NONE, 			false } },
 
 		// Language Features
-		{ S_IF,				{ "if",			LBP_NONE,			} },
-		{ S_WHILE,			{ "while",		LBP_NONE,			} },
-		{ S_FOR, 			{ "for", 		LBP_NONE, 			} },
-		{ S_VAR,			{ "var",		LBP_IMMEDIATE,		} },
-		{ S_FUNC,			{ "function",	LBP_NONE,			} },
-		{ S_RETURN,			{ "return",		LBP_NONE,			} },
-		{ S_BREAK,			{ "break",		LBP_NONE,			} },
-		{ S_TRUE,			{ "true",		LBP_NONE,			} },
-		{ S_FALSE,			{ "false",		LBP_NONE,			} },
-		{ S_CLASS, 			{ "class", 		LBP_NONE, 			} },
-		{ S_DEFER, 			{ "defer", 		LBP_NONE, 			} },
+		{ S_IF,				{ "if",			LBP_NONE,			true } },
+		{ S_WHILE,			{ "while",		LBP_NONE,			true } },
+		{ S_FOR, 			{ "for", 		LBP_NONE, 			true } },
+		{ S_VAR,			{ "var",		LBP_IMMEDIATE,		true } },
+		{ S_FUNC,			{ "function",	LBP_NONE,			true } },
+		{ S_RETURN,			{ "return",		LBP_NONE,			true } },
+		{ S_BREAK,			{ "break",		LBP_NONE,			true } },
+		{ S_TRUE,			{ "true",		LBP_NONE,			true } },
+		{ S_FALSE,			{ "false",		LBP_NONE,			true } },
+		{ S_CLASS, 			{ "class", 		LBP_NONE, 			true } },
+		{ S_DEFER, 			{ "defer", 		LBP_NONE, 			true } },
 	};
 }
