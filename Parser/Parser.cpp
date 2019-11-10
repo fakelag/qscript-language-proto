@@ -351,12 +351,14 @@ namespace Parser
 					};
 					break;
 				}
+				case Grammar::Symbol::S_TYPE:
+				case Grammar::Symbol::S_TYPETEXT:
 				case Grammar::Symbol::S_RETURN:
 				case Grammar::Symbol::S_BREAK:
 				{
 					symbol.m_RightBind = [ &nextExpression ]( const ParserSymbol_t& symbol ) -> AST::IExpression*
 					{
-						return new AST::CSimpleExpression( nextExpression(), symbol.m_Symbol, symbol.m_Location );
+						return new AST::CSimpleExpression( nextExpression( symbol.m_LBP ), symbol.m_Symbol, symbol.m_Location );
 					};
 					break;
 				}
@@ -733,6 +735,36 @@ namespace Parser
 				case Grammar::Symbol::S_SBRACKET_CLOSE:
 				case Grammar::Symbol::S_BRACKET_CLOSE:
 					break;
+				case Grammar::Symbol::S_TYPESTRING:
+				case Grammar::Symbol::S_TYPEINTEGER:
+				case Grammar::Symbol::S_TYPEDECIMAL:
+				case Grammar::Symbol::S_TYPEBOOLEAN:
+				case Grammar::Symbol::S_TYPEARRAY:
+				case Grammar::Symbol::S_TYPENONE:
+				case Grammar::Symbol::S_TYPEOBJECT:
+				{
+					// TODO: Static typing.
+					// Replicate functionality from S_VAR
+					symbol.m_RightBind = [ &nextExpression ]( const ParserSymbol_t& symbol ) -> AST::IExpression*
+					{
+						// Return the types integer index for fast comparisons
+						Value::ValueType valType;
+						switch ( symbol.m_Symbol )
+						{
+						case Grammar::Symbol::S_TYPESTRING: valType = Value::ValueType::VT_STRING; break;
+						case Grammar::Symbol::S_TYPEINTEGER: valType = Value::ValueType::VT_INTEGER; break;
+						case Grammar::Symbol::S_TYPEDECIMAL: valType = Value::ValueType::VT_DOUBLE; break;
+						case Grammar::Symbol::S_TYPEBOOLEAN: valType = Value::ValueType::VT_BOOLEAN; break;
+						case Grammar::Symbol::S_TYPENONE: valType = Value::ValueType::VT_UNINITIALIZED; break;
+						case Grammar::Symbol::S_TYPEARRAY: valType = Value::ValueType::VT_ARRAY; break;
+						// case Grammar::Symbol::S_TYPEOBJECT: TODO_THIS break;
+						default: throw ParseException( symbol.m_Location, "Unimplemented type symbol: " + std::to_string( symbol.m_Symbol ) );
+						}
+
+						return new AST::CValueExpression( Value::CValue( ( int ) valType ), symbol.m_Symbol, symbol.m_Location );
+					};
+					break;
+				}
 				default:
 					throw ParseException( lexerSymbol.m_Location, "Unknown symbol: " + std::to_string( lexerSymbol.m_Symbol ) );
 				}

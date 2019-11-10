@@ -56,6 +56,8 @@ namespace Runtime
 			EXEC_SIMPLE( S_LOGIC_NOT );
 			EXEC_SIMPLE( S_RETURN );
 			EXEC_SIMPLE( S_BREAK );
+			EXEC_SIMPLE( S_TYPE );
+			EXEC_SIMPLE( S_TYPETEXT );
 			EXEC_LIST( S_SCOPE );
 			EXEC_LIST( S_LIST );
 			EXEC_LIST( S_FOR );
@@ -65,6 +67,13 @@ namespace Runtime
 			EXEC_VALUE( S_NAME );
 			EXEC_VALUE( S_TRUE );
 			EXEC_VALUE( S_FALSE );
+			EXEC_VALUE( S_TYPESTRING );
+			EXEC_VALUE( S_TYPEINTEGER );
+			EXEC_VALUE( S_TYPEDECIMAL );
+			EXEC_VALUE( S_TYPEBOOLEAN );
+			EXEC_VALUE( S_TYPEARRAY );
+			EXEC_VALUE( S_TYPENONE );
+			//EXEC_VALUE( S_TYPEOBJECT );
 
 			throw Exception( "Unknown expression: " + std::to_string( expression->Symbol() ) );
 		};

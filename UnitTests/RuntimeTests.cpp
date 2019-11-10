@@ -627,6 +627,41 @@ void RunRuntimeTests()
 		UTEST_CASE_CLOSED();
 	}( );
 
+	UTEST_CASE( "Type operators (type, typestr)" )
+	{
+		auto syntaxTree = Parser::Parse( Lexer::Parse( "		\
+			var x = \"abcdefg\";								\
+			var y = 1.4;										\
+			var z = 1;											\
+			var q = false;										\
+			var w;												\
+			if ( type x == string )	__setFlag();				\
+			if ( type y == decimal ) __setFlag();				\
+			if ( type z == int ) __setFlag();					\
+			if ( type q == bool ) __setFlag();					\
+			if ( type \"\" == string ) __setFlag();				\
+			if ( type false != int ) __setFlag();				\
+			if ( type w == none ) __setFlag();					\
+			if ( typestr \"\" == \"string\" ) __setFlag();		\
+			if ( typestr 1 == \"int\" ) __setFlag();			\
+			if ( typestr true == \"bool\" ) __setFlag();		\
+			if ( typestr 0.0000001 == \"decimal\" ) __setFlag();\
+			if ( typestr false != \"int\" ) __setFlag();		\
+			if ( typestr w == \"none\" ) __setFlag();			\
+		" ) );
+
+		Runtime::CContext context;
+		Runtime::CreateDefaultContext( true, true, &context );
+
+		auto results = Runtime::Execute( syntaxTree, context );
+
+		UTEST_ASSERT( context.m_Flag == 13 );
+
+		context.Release();
+		AST::FreeTree( syntaxTree );
+		UTEST_CASE_CLOSED();
+	}( );
+
 	UTEST_CASE( "Parser/AST memory management" )
 	{
 		auto leakedNodes = AST::AllocatedExpressions();
