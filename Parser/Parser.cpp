@@ -72,7 +72,7 @@ namespace Parser
 			if ( m_CurrentSymbol - offset < 0 )
 				return NULL;
 
-			if ( m_CurrentSymbol - offset >= m_Symbols.size() )
+			if ( m_CurrentSymbol - offset >= ( int ) m_Symbols.size() )
 				throw Exception( "Reading tokens past end of stream" );
 
 			return &m_Symbols[ m_CurrentSymbol - offset ];

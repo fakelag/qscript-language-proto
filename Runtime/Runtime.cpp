@@ -125,9 +125,9 @@ namespace Runtime
 					node->Execute( context );
 
 				// find "main" function
-				auto main = context.m_Scopes[ 0 ].m_Functions.find( "main" );
+				auto main = context.m_Scopes[ 0 ]->m_Functions.find( "main" );
 
-				if ( main == context.m_Scopes[ 0 ].m_Functions.end() )
+				if ( main == context.m_Scopes[ 0 ]->m_Functions.end() )
 					throw Exception( "Entrypoint not found" );
 
 				// Execute code from the program's main entrypoint
@@ -158,11 +158,12 @@ namespace Runtime
 
 	void CContext::PushScope( ScopeType type )
 	{
-		m_Scopes.push_back( Scope_t( type ) );
+		m_Scopes.push_back( new Scope_t( type ) );
 	}
 
 	void CContext::PopScope()
 	{
+		delete m_Scopes[ m_Scopes.size() - 1 ];
 		m_Scopes.pop_back();
 	}
 
@@ -171,12 +172,12 @@ namespace Runtime
 		if ( m_Scopes.size() <= 0 )
 			throw RuntimeException( where ? *where : unknownLocation, "No available scope found" );
 
-		auto function = m_Scopes[ m_Scopes.size() - 1 ].m_Functions.find( name );
-		if ( function == m_Scopes[ m_Scopes.size() - 1 ].m_Functions.end() )
+		auto function = m_Scopes[ m_Scopes.size() - 1 ]->m_Functions.find( name );
+		if ( function == m_Scopes[ m_Scopes.size() - 1 ]->m_Functions.end() )
 		{
 			// Insert new function
 			auto funcDef = Function_t{ args, body };
-			m_Scopes[ m_Scopes.size() - 1 ].m_Functions.insert({ name, funcDef });
+			m_Scopes[ m_Scopes.size() - 1 ]->m_Functions.insert({ name, funcDef });
 		}
 		else
 		{
@@ -198,12 +199,12 @@ namespace Runtime
 		if ( m_Scopes.size() <= 0 )
 			throw RuntimeException( where ? *where : unknownLocation, "No available scope found" );
 
-		auto variable = m_Scopes[ m_Scopes.size() - 1 ].m_Variables.find( name );
+		auto variable = m_Scopes[ m_Scopes.size() - 1 ]->m_Variables.find( name );
 
-		if ( variable == m_Scopes[ m_Scopes.size() - 1 ].m_Variables.end() )
+		if ( variable == m_Scopes[ m_Scopes.size() - 1 ]->m_Variables.end() )
 		{
 			// Insert new variable
-			m_Scopes[ m_Scopes.size() - 1 ].m_Variables.insert( { name, value } );
+			m_Scopes[ m_Scopes.size() - 1 ]->m_Variables.insert( { name, value } );
 		}
 		else
 		{
@@ -215,20 +216,20 @@ namespace Runtime
 	{
 		for ( int i = ( int ) m_Scopes.size() - 1; i >= 0; --i )
 		{
-			if ( m_Scopes[ i ].m_ScopeType == Runtime::CContext::ScopeType::ST_GLOBAL )
+			if ( m_Scopes[ i ]->m_ScopeType == Runtime::CContext::ScopeType::ST_GLOBAL )
 				throw RuntimeException( where ? *where : unknownLocation, "Unhandled scope break" );
 
 			// Stop executing the current tree
-			m_Scopes[ i ].m_IsBreaking = true;
+			m_Scopes[ i ]->m_IsBreaking = true;
 
 			if ( isReturn )
 			{
-				if ( m_Scopes[ i ].m_ScopeType == Runtime::CContext::ScopeType::ST_ARGS )
+				if ( m_Scopes[ i ]->m_ScopeType == Runtime::CContext::ScopeType::ST_ARGS )
 					break;
 			}
 			else
 			{
-				if ( m_Scopes[ i ].m_ScopeType == Runtime::CContext::ScopeType::ST_LOOP )
+				if ( m_Scopes[ i ]->m_ScopeType == Runtime::CContext::ScopeType::ST_LOOP )
 					break;
 			}
 		}
@@ -239,22 +240,22 @@ namespace Runtime
 		if ( m_Scopes.size() <= 0 )
 			throw Exception( "GetCurrentScope - No available scope found" );
 
-		return m_Scopes[ m_Scopes.size() - 1 ];
+		return *m_Scopes[ m_Scopes.size() - 1 ];
 	}
 
 	Runtime::CContext::Function_t* CContext::FindFunction( const std::string& name )
 	{
 		for ( int i = ( int ) m_Scopes.size() - 1; i >= 0; --i )
 		{
-			auto function = m_Scopes[ i ].m_Functions.find( name );
-			if ( function != m_Scopes[ i ].m_Functions.end() )
+			auto function = m_Scopes[ i ]->m_Functions.find( name );
+			if ( function != m_Scopes[ i ]->m_Functions.end() )
 				return &function->second; // references to std::unordered_map elements should be safe
 
-			if ( m_Scopes[ i ].m_ScopeType == Runtime::CContext::ScopeType::ST_ARGS )
+			if ( m_Scopes[ i ]->m_ScopeType == Runtime::CContext::ScopeType::ST_ARGS )
 			{
 				// This is the last subscope to check, now consult the global scope
-				function = m_Scopes[ 0 ].m_Functions.find( name );
-				if ( function != m_Scopes[ 0 ].m_Functions.end() )
+				function = m_Scopes[ 0 ]->m_Functions.find( name );
+				if ( function != m_Scopes[ 0 ]->m_Functions.end() )
 					return &function->second;
 
 				break;
@@ -268,15 +269,15 @@ namespace Runtime
 	{
 		for ( int i = ( int ) m_Scopes.size() - 1; i >= 0; --i )
 		{
-			auto variable = m_Scopes[ i ].m_Variables.find( name );
-			if ( variable != m_Scopes[ i ].m_Variables.end() )
+			auto variable = m_Scopes[ i ]->m_Variables.find( name );
+			if ( variable != m_Scopes[ i ]->m_Variables.end() )
 				return &variable->second; // references to std::unordered_map elements should be safe
 
-			if ( m_Scopes[ i ].m_ScopeType == Runtime::CContext::ScopeType::ST_ARGS )
+			if ( m_Scopes[ i ]->m_ScopeType == Runtime::CContext::ScopeType::ST_ARGS )
 			{
 				// This is the last subscope to check, now consult the global scope
-				variable = m_Scopes[ 0 ].m_Variables.find( name );
-				if ( variable != m_Scopes[ 0 ].m_Variables.end() )
+				variable = m_Scopes[ 0 ]->m_Variables.find( name );
+				if ( variable != m_Scopes[ 0 ]->m_Variables.end() )
 					return &variable->second;
 
 				break;

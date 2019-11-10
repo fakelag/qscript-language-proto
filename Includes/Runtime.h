@@ -68,7 +68,7 @@ namespace Runtime
 
 		bool					m_Repl;
 		unsigned long			m_ExecFlags;
-		std::vector< Scope_t >	m_Scopes;
+		std::vector< Scope_t* >	m_Scopes;
 		std::vector< IExec* >	m_AllocationList;
 
 #ifdef RTI_DEBUG_ENABLED

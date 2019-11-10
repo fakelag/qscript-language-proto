@@ -124,20 +124,45 @@
   <ItemGroup>
     <ClCompile Include="Core\Add.cpp" />
     <ClCompile Include="Core\Assign.cpp" />
+    <ClCompile Include="Core\AssignAdd.cpp" />
+    <ClCompile Include="Core\AssignDiv.cpp" />
+    <ClCompile Include="Core\AssignMod.cpp" />
+    <ClCompile Include="Core\AssignMul.cpp" />
+    <ClCompile Include="Core\AssignSub.cpp" />
+    <ClCompile Include="Core\Break.cpp" />
     <ClCompile Include="Core\Call.cpp" />
     <ClCompile Include="Core\Dblcnst.cpp" />
     <ClCompile Include="Core\Debug.cpp" />
+    <ClCompile Include="Core\Decrement.cpp" />
     <ClCompile Include="Core\Div.cpp" />
+    <ClCompile Include="Core\Equals.cpp" />
+    <ClCompile Include="Core\False.cpp" />
+    <ClCompile Include="Core\For.cpp" />
     <ClCompile Include="Core\Func.cpp" />
     <ClCompile Include="Core\Funcbody.cpp" />
     <ClCompile Include="Core\Funcdef.cpp" />
+    <ClCompile Include="Core\If.cpp" />
+    <ClCompile Include="Core\Increment.cpp" />
     <ClCompile Include="Core\Intcnst.cpp" />
+    <ClCompile Include="Core\LessOrEquals.cpp" />
+    <ClCompile Include="Core\LessThan.cpp" />
     <ClCompile Include="Core\List.cpp" />
+    <ClCompile Include="Core\LogicAnd.cpp" />
+    <ClCompile Include="Core\LogicNot.cpp" />
+    <ClCompile Include="Core\LogicOr.cpp" />
+    <ClCompile Include="Core\Mod.cpp" />
+    <ClCompile Include="Core\MoreOrEquals.cpp" />
+    <ClCompile Include="Core\MoreThan.cpp" />
     <ClCompile Include="Core\Mul.cpp" />
     <ClCompile Include="Core\Name.cpp" />
+    <ClCompile Include="Core\NotEquals.cpp" />
+    <ClCompile Include="Core\Pow.cpp" />
+    <ClCompile Include="Core\Return.cpp" />
     <ClCompile Include="Core\Scope.cpp" />
     <ClCompile Include="Core\Sub.cpp" />
+    <ClCompile Include="Core\True.cpp" />
     <ClCompile Include="Core\Var.cpp" />
+    <ClCompile Include="Core\While.cpp" />
     <ClCompile Include="Runtime.cpp" />
   </ItemGroup>
   <ItemGroup>
