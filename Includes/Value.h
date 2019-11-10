@@ -22,6 +22,7 @@ namespace Value
 		VT_UNINITIALIZED = -1,
 		VT_STRING = 0,
 		VT_INTEGER,
+		VT_BOOLEAN,
 		VT_DOUBLE,
 		VT_ARRAY,
 	};
@@ -41,7 +42,7 @@ namespace Value
 		FORCEINLINE void					SetString( const std::string& string ) { m_StringValue = string; m_ValueType = VT_STRING; };
 		FORCEINLINE void					SetInt( int integer ) { m_IntValue = integer; m_ValueType = VT_INTEGER; };
 		FORCEINLINE void					SetDouble( double decimal ) { m_DoubleValue = decimal; m_ValueType = VT_DOUBLE; };
-		FORCEINLINE void					SetBool( bool boolean ) { SetInt( boolean ? 1 : 0 ); };
+		FORCEINLINE void					SetBool( bool boolean ) { m_IntValue = boolean ? 1 : 0; m_ValueType = VT_BOOLEAN; };
 		FORCEINLINE void					SetArray( const std::vector< CValue >& values ) { m_ArrayValue = values; m_ValueType = VT_ARRAY; };
 
 		const std::string&				GetString();		// GetString uses internal optimization
@@ -71,6 +72,9 @@ namespace Value
 			case VT_INTEGER:
 				SetInt( other.m_IntValue );
 				return *this;
+			case VT_BOOLEAN:
+				SetBool( !!other.m_IntValue );
+				return *this;
 			case VT_DOUBLE:
 				SetDouble( other.m_DoubleValue );
 				return *this;
@@ -94,7 +98,7 @@ namespace Value
 			{
 				case VT_UNINITIALIZED: return CValue( true );
 				case VT_ARRAY: return CValue( false );
-				case VT_INTEGER: return CValue( m_IntValue == other.m_IntValue );
+				case VT_BOOLEAN: case VT_INTEGER: return CValue( m_IntValue == other.m_IntValue );
 				case VT_DOUBLE: return CValue( m_DoubleValue == other.m_DoubleValue );
 				case VT_STRING: return CValue( m_StringValue == other.m_StringValue );
 				default: throw Exception( "Invalid CValue type" );
@@ -110,7 +114,7 @@ namespace Value
 			{
 				case VT_UNINITIALIZED: return CValue( false );
 				case VT_ARRAY: return CValue( true );
-				case VT_INTEGER: return CValue( m_IntValue != other.m_IntValue );
+				case VT_BOOLEAN: case VT_INTEGER: return CValue( m_IntValue != other.m_IntValue );
 				case VT_DOUBLE: return CValue( m_DoubleValue != other.m_DoubleValue );
 				case VT_STRING: return CValue( m_StringValue != other.m_StringValue );
 				default: throw Exception( "Invalid CValue type" );
@@ -132,12 +136,18 @@ namespace Value
 			if ( m_ValueType == VT_INTEGER && other.m_ValueType == VT_INTEGER )
 				return Value::CValue( GetInt() < other.GetInt() );
 
+			if ( m_ValueType == VT_BOOLEAN && other.m_ValueType == VT_BOOLEAN )
+				return Value::CValue( GetInt() < other.GetInt() );
+
 			return Value::CValue( GetDouble() < other.GetDouble() );
 		}
 
 		FORCEINLINE CValue operator>( const CValue& other )
 		{
 			if ( m_ValueType == VT_INTEGER && other.m_ValueType == VT_INTEGER )
+				return Value::CValue( GetInt() > other.GetInt() );
+
+			if ( m_ValueType == VT_BOOLEAN && other.m_ValueType == VT_BOOLEAN )
 				return Value::CValue( GetInt() > other.GetInt() );
 
 			return Value::CValue( GetDouble() > other.GetDouble() );
@@ -148,12 +158,18 @@ namespace Value
 			if ( m_ValueType == VT_INTEGER && other.m_ValueType == VT_INTEGER )
 				return Value::CValue( GetInt() <= other.GetInt() );
 
+			if ( m_ValueType == VT_BOOLEAN && other.m_ValueType == VT_BOOLEAN )
+				return Value::CValue( GetInt() <= other.GetInt() );
+
 			return Value::CValue( GetDouble() <= other.GetDouble() );
 		}
 
 		FORCEINLINE CValue operator>=( const CValue& other )
 		{
 			if ( m_ValueType == VT_INTEGER && other.m_ValueType == VT_INTEGER )
+				return Value::CValue( GetInt() >= other.GetInt() );
+
+			if ( m_ValueType == VT_BOOLEAN && other.m_ValueType == VT_BOOLEAN )
 				return Value::CValue( GetInt() >= other.GetInt() );
 
 			return Value::CValue( GetDouble() >= other.GetDouble() );
@@ -253,13 +269,9 @@ namespace Value
 				throw Exception( "Invalid CValue type" );
 			}
 			case VT_INTEGER:
-			{
 				return CValue( -m_IntValue );
-			}
 			case VT_DOUBLE:
-			{
 				return CValue( -m_DoubleValue );
-			}
 			case VT_ARRAY:
 			{
 				throw Exception( "Invalid operation on an array" );
@@ -274,9 +286,7 @@ namespace Value
 			switch ( m_ValueType )
 			{
 			case VT_STRING:
-			{
 				throw Exception( "Invalid CValue type" );
-			}
 			case VT_INTEGER:
 			{
 				switch ( other.m_ValueType )
@@ -300,9 +310,7 @@ namespace Value
 				}
 			}
 			case VT_ARRAY:
-			{
 				throw Exception( "Invalid operation on an array" );
-			}
 			default:
 				throw Exception( "Invalid CValue type" );
 			}

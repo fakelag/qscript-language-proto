@@ -100,6 +100,7 @@ namespace Value
 				return m_StringCacheDouble;
 			}
 		}
+		case VT_BOOLEAN:
 		case VT_INTEGER:
 		{
 			if ( m_StringInt == m_IntValue )
@@ -133,16 +134,12 @@ namespace Value
 	{
 		switch ( m_ValueType )
 		{
-		case VT_INTEGER:
-		case VT_DOUBLE:
-		case VT_STRING:
-			throw Exception( "CValue is not an array" );
 		case VT_ARRAY:
 			return m_ArrayValue;
 		case VT_UNINITIALIZED:
 			throw Exception( "CValue is uninitialized" );
 		default:
-			throw Exception( "Invalid CValue type" );
+			throw Exception( "Invalid CValue type (CValue is not an array)" );
 		}
 	}
 
@@ -150,6 +147,7 @@ namespace Value
 	{
 		switch ( m_ValueType )
 		{
+		case VT_BOOLEAN:
 		case VT_INTEGER:
 			return m_IntValue;
 		case VT_DOUBLE:
@@ -171,6 +169,7 @@ namespace Value
 		{
 		case VT_DOUBLE:
 			return m_DoubleValue;
+		case VT_BOOLEAN:
 		case VT_INTEGER:
 			return ( double ) m_IntValue;
 		case VT_STRING:
