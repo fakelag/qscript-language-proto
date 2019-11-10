@@ -61,6 +61,7 @@ namespace Runtime
 			EXEC_LIST( S_FOR );
 			EXEC_VALUE( S_DBLCNST );
 			EXEC_VALUE( S_INTCNST );
+			EXEC_VALUE( S_STRCNST );
 			EXEC_VALUE( S_NAME );
 			EXEC_VALUE( S_TRUE );
 			EXEC_VALUE( S_FALSE );

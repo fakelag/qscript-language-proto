@@ -159,6 +159,7 @@
     <ClCompile Include="Core\Pow.cpp" />
     <ClCompile Include="Core\Return.cpp" />
     <ClCompile Include="Core\Scope.cpp" />
+    <ClCompile Include="Core\Strcnst.cpp" />
     <ClCompile Include="Core\Sub.cpp" />
     <ClCompile Include="Core\True.cpp" />
     <ClCompile Include="Core\Var.cpp" />
