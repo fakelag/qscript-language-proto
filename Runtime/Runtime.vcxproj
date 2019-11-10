@@ -162,6 +162,15 @@
     <ClCompile Include="Core\Strcnst.cpp" />
     <ClCompile Include="Core\Sub.cpp" />
     <ClCompile Include="Core\True.cpp" />
+    <ClCompile Include="Core\Type.cpp" />
+    <ClCompile Include="Core\TypeArray.cpp" />
+    <ClCompile Include="Core\TypeBoolean.cpp" />
+    <ClCompile Include="Core\TypeDecimal.cpp" />
+    <ClCompile Include="Core\TypeInteger.cpp" />
+    <ClCompile Include="Core\TypeNone.cpp" />
+    <ClCompile Include="Core\TypeObject.cpp" />
+    <ClCompile Include="Core\TypeString.cpp" />
+    <ClCompile Include="Core\TypeText.cpp" />
     <ClCompile Include="Core\Var.cpp" />
     <ClCompile Include="Core\While.cpp" />
     <ClCompile Include="Runtime.cpp" />
