@@ -16,6 +16,8 @@ namespace Lexer
 		std::vector< LexerSymbol_t > symbols;
 		std::vector< CommonSymbol_t > commonSymbols;
 		std::string stringBuffer = "";
+
+		bool parsingString = false;
 		int currentLineNr = 0;
 		int currentColNr = 0;
 
@@ -44,22 +46,31 @@ namespace Lexer
 		// Get the longest searchable token length
 		int longestToken = commonSymbols.size() > 0 ? commonSymbols[ 0 ].m_Info.m_Token.length() : 0;
 
-		auto pushSymbol = [ &currentLineNr, &currentColNr, &stringBuffer, &symbols, &isInteger, &isDecimal ]() -> void {
+		auto pushSymbol = [ &currentLineNr, &currentColNr, &stringBuffer, &symbols, &isInteger, &isDecimal ]( bool isStrCnst = false ) -> void {
 			if ( stringBuffer.length() == 0 )
 				return;
 
-			Grammar::Symbol symbolType = Grammar::S_NAME;
+			Grammar::Symbol symbolType = Grammar::Symbol::S_NAME;
 
-			if ( isDecimal( stringBuffer ) )
-				symbolType = Grammar::Symbol::S_DBLCNST;
-			else if ( isInteger( stringBuffer ) )
-				symbolType = Grammar::Symbol::S_INTCNST;
+			if ( isStrCnst )
+			{
+				// It is a string constant, strip the quotation marks
+				stringBuffer = stringBuffer.substr( 1, stringBuffer.length() - 1 );
+				symbolType = Grammar::Symbol::S_STRCNST;
+			}
+			else
+			{
+				if ( isDecimal( stringBuffer ) )
+					symbolType = Grammar::Symbol::S_DBLCNST;
+				else if ( isInteger( stringBuffer ) )
+					symbolType = Grammar::Symbol::S_INTCNST;
+			}
 
 			// Push the last accumulated string as SG_NAME and flush stringBuffer
 			symbols.push_back( LexerSymbol_t {
 				symbolType,
 				Grammar::SymbolLoc_t { currentLineNr, currentColNr, stringBuffer },
-				Grammar::LBP_NONE,
+				Grammar::LeftBindingPower::LBP_NONE,
 				stringBuffer,
 				} );
 
@@ -67,77 +78,97 @@ namespace Lexer
 			stringBuffer = "";
 		};
 
+		auto findSymbol = [ &commonSymbols, &symbols, &currentLineNr,
+			&currentColNr, &pushSymbol, &stringBuffer, &isInteger ]( std::string pattern ) -> int {
+			// Iterate all the commons
+			for ( auto symIt = commonSymbols.cbegin(); symIt != commonSymbols.cend(); ++symIt )
+			{
+				if ( symIt->m_Info.m_Token == pattern.substr( 0, symIt->m_Info.m_Token.length() ) )
+				{
+					if ( symIt->m_Info.m_Token == "." && isInteger( stringBuffer ) )
+						return 0;
+
+					pushSymbol();
+
+					// Push the found common symbol
+					symbols.push_back( LexerSymbol_t{
+						symIt->m_Symbol,
+						Grammar::SymbolLoc_t { currentLineNr, currentColNr, symIt->m_Info.m_Token },
+						symIt->m_Info.m_LBP,
+						symIt->m_Info.m_Token,
+						} );
+
+					currentColNr += symIt->m_Info.m_Token.length();
+
+					return symIt->m_Info.m_Token.length();
+				}
+			}
+
+			return 0;
+		};
+
 		// Iterate through source and look for common symbols
 		for ( auto srcIt = source.cbegin(); srcIt != source.cend(); ++srcIt )
 		{
-			auto findSymbol = [ &commonSymbols, &symbols, &currentLineNr,
-				&currentColNr, &pushSymbol, &stringBuffer, &isInteger ]( std::string pattern ) -> int {
-				// Iterate all the commons
-				for ( auto symIt = commonSymbols.cbegin(); symIt != commonSymbols.cend(); ++symIt )
+			if ( *srcIt == '"' )
+			{
+				// Switch string parsing state
+				parsingString = !parsingString;
+
+				if ( !parsingString )
 				{
-					if ( symIt->m_Info.m_Token == pattern.substr( 0, symIt->m_Info.m_Token.length() ) )
+					// Push the new string constant to the stack
+					pushSymbol( true );
+					continue;
+				}
+			}
+
+			if ( !parsingString )
+			{
+				int commonLength = findSymbol( source.substr( std::distance( source.cbegin(), srcIt ), longestToken ) );
+
+				if ( commonLength > 0 )
+				{
+					// Increment the iterator by the amount of characters in the symbol
+					srcIt += commonLength - 1;
+					continue;
+				}
+
+				switch ( *srcIt )
+				{
+				case '\n':
+				case '\t':
+				case ' ':
+				{
+					pushSymbol();
+					if ( *srcIt != '\n' )
 					{
-						if ( symIt->m_Info.m_Token == "." && isInteger( stringBuffer ) )
-							return 0;
-
-						pushSymbol();
-
-						// Push the found common symbol
-						symbols.push_back( LexerSymbol_t {
-							symIt->m_Symbol,
-							Grammar::SymbolLoc_t { currentLineNr, currentColNr, symIt->m_Info.m_Token },
-							symIt->m_Info.m_LBP,
-							symIt->m_Info.m_Token,
-						} );
-
-						currentColNr += symIt->m_Info.m_Token.length();
-
-						return symIt->m_Info.m_Token.length();
+						++currentColNr;
 					}
+					else
+					{
+						currentColNr = 0;
+						++currentLineNr;
+					}
+
+					break;
 				}
-
-				return 0;
-			};
-
-			int commonLength = findSymbol( source.substr( std::distance( source.cbegin(), srcIt ), longestToken ) );
-
-			if ( commonLength > 0 )
-			{
-				// Increment the iterator by the amount of characters in the symbol
-				srcIt += commonLength - 1;
-				continue;
-			}
-
-			switch ( *srcIt )
-			{
-			case '\n':
-			case '\t':
-			case ' ':
-			{
-				pushSymbol();
-				if ( *srcIt != '\n' )
+				default:
 				{
-					++currentColNr;
+					// Add the character to the symbol buffer
+					stringBuffer += *srcIt;
+					break;
 				}
-				else
-				{
-					currentColNr = 0;
-					++currentLineNr;
 				}
-
-				break;
 			}
-			default:
+			else
 			{
-				// Add the character to the symbol buffer
+				// Append the character to the string
 				stringBuffer += *srcIt;
-				break;
-			}
 			}
 		}
 
 		pushSymbol();
-
 		return symbols;
 	}
 
