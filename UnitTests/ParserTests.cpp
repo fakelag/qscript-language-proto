@@ -513,7 +513,7 @@ void RunParserTests()
 		UTEST_CASE_CLOSED();
 	}( );
 
-	UTEST_CASE( "Parenthesis (())" )
+	UTEST_CASE( "Parentheses (())" )
 	{
 		auto syntaxTree = Parser::Parse( Lexer::Parse( "a * (4 - 2) / 5; print(); print(x); print(x, y + 1, z);" ) );
 
@@ -1137,6 +1137,39 @@ void RunParserTests()
 		UTEST_ASSERT( syntaxTree[ 2 ]->Symbol() == Grammar::Symbol::S_DEFER );
 		UTEST_ASSERT( static_cast< AST::CSimpleExpression* >( syntaxTree[ 1 ] )->Expression()->Symbol() == Grammar::Symbol::S_CALL );
 		UTEST_ASSERT( static_cast< AST::CSimpleExpression* >( syntaxTree[ 2 ] )->Expression()->Symbol() == Grammar::Symbol::S_SCOPE );
+
+		AST::FreeTree( syntaxTree );
+		UTEST_CASE_CLOSED();
+	}( );
+
+	UTEST_CASE( "Type indexes (string, int, decimal, bool, array, none, (object))" )
+	{
+		auto syntaxTree = Parser::Parse( Lexer::Parse( "string; int; decimal; bool; array; none;" ) ); // TODO: Add object type
+
+		UTEST_ASSERT( syntaxTree.size() == 6 );
+		UTEST_ASSERT( syntaxTree[ 0 ]->Symbol() == Grammar::Symbol::S_TYPESTRING && syntaxTree[ 0 ]->Type() == AST::ExpressionType::ET_VALUE );
+		UTEST_ASSERT( syntaxTree[ 1 ]->Symbol() == Grammar::Symbol::S_TYPEINTEGER && syntaxTree[ 1 ]->Type() == AST::ExpressionType::ET_VALUE );
+		UTEST_ASSERT( syntaxTree[ 2 ]->Symbol() == Grammar::Symbol::S_TYPEDECIMAL && syntaxTree[ 2 ]->Type() == AST::ExpressionType::ET_VALUE );
+		UTEST_ASSERT( syntaxTree[ 3 ]->Symbol() == Grammar::Symbol::S_TYPEBOOLEAN && syntaxTree[ 3 ]->Type() == AST::ExpressionType::ET_VALUE );
+		UTEST_ASSERT( syntaxTree[ 4 ]->Symbol() == Grammar::Symbol::S_TYPEARRAY && syntaxTree[ 4 ]->Type() == AST::ExpressionType::ET_VALUE );
+		UTEST_ASSERT( syntaxTree[ 5 ]->Symbol() == Grammar::Symbol::S_TYPENONE && syntaxTree[ 5 ]->Type() == AST::ExpressionType::ET_VALUE );
+		//UTEST_ASSERT( syntaxTree[ 6 ]->Symbol() == Grammar::Symbol::S_TYPEOBJECT && syntaxTree[ 6 ]->Type() == AST::ExpressionType::ET_VALUE );
+
+		UTEST_ASSERT( static_cast< AST::CValueExpression* >( syntaxTree[ 0 ] )->Value().GetType() == Value::ValueType::VT_INTEGER );
+		UTEST_ASSERT( static_cast< AST::CValueExpression* >( syntaxTree[ 1 ] )->Value().GetType() == Value::ValueType::VT_INTEGER );
+		UTEST_ASSERT( static_cast< AST::CValueExpression* >( syntaxTree[ 2 ] )->Value().GetType() == Value::ValueType::VT_INTEGER );
+		UTEST_ASSERT( static_cast< AST::CValueExpression* >( syntaxTree[ 3 ] )->Value().GetType() == Value::ValueType::VT_INTEGER );
+		UTEST_ASSERT( static_cast< AST::CValueExpression* >( syntaxTree[ 4 ] )->Value().GetType() == Value::ValueType::VT_INTEGER );
+		UTEST_ASSERT( static_cast< AST::CValueExpression* >( syntaxTree[ 5 ] )->Value().GetType() == Value::ValueType::VT_INTEGER );
+		//UTEST_ASSERT( static_cast< AST::CValueExpression* >( syntaxTree[ 6 ] )->Value().GetType() == Value::ValueType::VT_INTEGER );
+
+		UTEST_ASSERT( static_cast< AST::CValueExpression* >( syntaxTree[ 0 ] )->Value().GetInt() == Value::ValueType::VT_STRING );
+		UTEST_ASSERT( static_cast< AST::CValueExpression* >( syntaxTree[ 1 ] )->Value().GetInt() == Value::ValueType::VT_INTEGER );
+		UTEST_ASSERT( static_cast< AST::CValueExpression* >( syntaxTree[ 2 ] )->Value().GetInt() == Value::ValueType::VT_DOUBLE );
+		UTEST_ASSERT( static_cast< AST::CValueExpression* >( syntaxTree[ 3 ] )->Value().GetInt() == Value::ValueType::VT_BOOLEAN );
+		UTEST_ASSERT( static_cast< AST::CValueExpression* >( syntaxTree[ 4 ] )->Value().GetInt() == Value::ValueType::VT_ARRAY );
+		UTEST_ASSERT( static_cast< AST::CValueExpression* >( syntaxTree[ 5 ] )->Value().GetInt() == Value::ValueType::VT_UNINITIALIZED );
+		//UTEST_ASSERT( static_cast< AST::CValueExpression* >( syntaxTree[ 6 ] )->Value().GetInt() == Grammar::Symbol::S_TYPEOBJECT );
 
 		AST::FreeTree( syntaxTree );
 		UTEST_CASE_CLOSED();

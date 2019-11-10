@@ -20,6 +20,7 @@ namespace Grammar
 		LBP_INCDEC			= 90,
 		LBP_OPENBRACKET		= 100,
 		LBP_DOT				= 110,
+		LBP_TYPE			= 120,
 	};
 
 	struct SymbolLoc_t
@@ -86,6 +87,17 @@ namespace Grammar
 		S_FALSE,
 		S_BREAK,
 		S_DEFER,
+
+		// Types
+		S_TYPE,
+		S_TYPETEXT,
+		S_TYPESTRING,
+		S_TYPEINTEGER,
+		S_TYPEDECIMAL,
+		S_TYPEBOOLEAN,
+		S_TYPEARRAY,
+		S_TYPEOBJECT,
+		S_TYPENONE,
 
 		// Pseudo-symbols
 		S_SCOPE,
@@ -169,5 +181,16 @@ namespace Grammar
 		{ S_FALSE,			{ "false",		LBP_NONE,			true } },
 		{ S_CLASS, 			{ "class", 		LBP_NONE, 			true } },
 		{ S_DEFER, 			{ "defer", 		LBP_NONE, 			true } },
+		{ S_TYPE, 			{ "type", 		LBP_TYPE, 			true } },
+		{ S_TYPETEXT, 		{ "typestr",	LBP_TYPE, 			true } },
+
+		// Types
+		{ S_TYPESTRING, 	{ "string", 	LBP_NONE, 			true } },
+		{ S_TYPEINTEGER, 	{ "int", 		LBP_NONE, 			true } },
+		{ S_TYPEDECIMAL, 	{ "decimal", 	LBP_NONE, 			true } },
+		{ S_TYPEBOOLEAN, 	{ "bool", 		LBP_NONE, 			true } },
+		{ S_TYPEARRAY, 		{ "array", 		LBP_NONE, 			true } },
+		{ S_TYPEOBJECT, 	{ "object", 	LBP_NONE, 			true } },
+		{ S_TYPENONE, 		{ "none", 		LBP_NONE, 			true } },
 	};
 }
