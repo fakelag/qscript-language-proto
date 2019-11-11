@@ -307,15 +307,18 @@ namespace Parser
 					{
 						auto right = nextExpression( symbol.m_LBP );
 
-						if ( symbol.m_Symbol == Grammar::Symbol::S_ASSIGN )
+						if ( left->Symbol() != Grammar::Symbol::S_ACCESS )
 						{
-							if ( !AST::IsVariable( left ) && left->Symbol() != Grammar::Symbol::S_VAR )
-								throw ParseException( left->Location(), "Expected a variable, got: \"" + left->Location().m_SrcToken + "\"" );
-						}
-						else
-						{
-							if ( !AST::IsVariable( left ) )
-								throw ParseException( left->Location(), "Expected a variable, got: \"" + left->Location().m_SrcToken + "\"" );
+							if ( symbol.m_Symbol == Grammar::Symbol::S_ASSIGN )
+							{
+								if ( !AST::IsVariable( left ) && left->Symbol() != Grammar::Symbol::S_VAR )
+									throw ParseException( left->Location(), "Expected a variable, got: \"" + left->Location().m_SrcToken + "\"" );
+							}
+							else
+							{
+								if ( !AST::IsVariable( left ) )
+									throw ParseException( left->Location(), "Expected a variable, got: \"" + left->Location().m_SrcToken + "\"" );
+							}
 						}
 
 						return new AST::CComplexExpression( left, right, symbol.m_Symbol, symbol.m_Location );
