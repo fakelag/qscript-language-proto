@@ -9,14 +9,31 @@ RTI_EXECFN_COMPLEX( S_ASSIGN )
 
 	auto newValue = m_RHS->Execute( context );
 
-	if ( varName.m_Value.GetType() != Value::ValueType::VT_STRING )
-		throw RuntimeException( m_Loc, "Invalid variable name: " + varName.m_Value.GetString() );
+	switch ( varName.m_Value.GetType() )
+	{
+		case Value::ValueType::VT_STRING:
+		{
+			auto variable = context.FindVariable( varName.m_Value.GetString() );
 
-	auto variable = context.FindVariable( varName.m_Value.GetString() );
+			if ( !variable )
+				throw RuntimeException( m_Loc, "Variable \"" + varName.m_Value.GetString() + "\" is not defined" );
 
-	if ( !variable )
-		throw RuntimeException( m_Loc, "Variable \"" + varName.m_Value.GetString() + "\" is not defined" );
+			*variable = newValue.m_Value;
+			break;
+		}
+		case Value::ValueType::VT_ARRAY:
+		{
+			auto variable = &varName.m_Value[ 0 ];
 
-	*variable = newValue.m_Value;
+			if ( !variable )
+				throw RuntimeException( m_Loc, "Variable \"" + varName.m_Value.GetString() + "\" is not defined" );
+
+			( *variable )[ varName.m_Value[ 1 ].GetInt() ] = newValue.m_Value;
+			break;
+		}
+		default:
+			throw RuntimeException( m_Loc, "Invalid variable reference: " + varName.m_Value.GetString() );
+	}
+
 	return newValue;
 }
