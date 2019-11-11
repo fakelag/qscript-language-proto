@@ -8,6 +8,8 @@ if ( m_ValueType == VT_UNINITIALIZED ) throw Exception( "CValue is uninitialized
 
 namespace Value
 {
+	static std::string strUndefined( "[[none]]" );
+
 	CValue::CValue()
 	{
 		Uninitialize();
@@ -124,7 +126,7 @@ namespace Value
 			return m_StringValue;
 		}
 		case VT_UNINITIALIZED:
-			throw Exception( "CValue is uninitialized" );
+			return strUndefined;
 		default:
 			throw Exception( "Invalid CValue type" );
 		}
