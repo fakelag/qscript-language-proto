@@ -423,16 +423,18 @@ void RunParserTests()
 
 	UTEST_CASE( "Array operator ([])" )
 	{
-		auto syntaxTree = Parser::Parse( Lexer::Parse( "var a = []; [1, 2, 3, a + 2]; [1, [2, 3], 4]; [ [ [1, 2], [1, 2] ], [ [1, 2 ] ] ];" ) );
+		auto syntaxTree = Parser::Parse( Lexer::Parse( "var a = []; [1, 2, 3, a + 2]; [1, [2, 3], 4]; [ [ [1, 2], [1, 2] ], [ [1, 2 ] ] ]; [[[1,2]]];" ) );
 
-		UTEST_ASSERT( syntaxTree.size() == 4 );
+		UTEST_ASSERT( syntaxTree.size() == 5 );
 		UTEST_ASSERT( syntaxTree[ 0 ]->Type() == AST::ExpressionType::ET_COMPLEX );
 		UTEST_ASSERT( syntaxTree[ 1 ]->Type() == AST::ExpressionType::ET_LIST );
 		UTEST_ASSERT( syntaxTree[ 2 ]->Type() == AST::ExpressionType::ET_LIST );
 		UTEST_ASSERT( syntaxTree[ 3 ]->Type() == AST::ExpressionType::ET_LIST );
+		UTEST_ASSERT( syntaxTree[ 4 ]->Type() == AST::ExpressionType::ET_LIST );
 		UTEST_ASSERT( static_cast< AST::CListExpression* >( syntaxTree[ 1 ] )->List().size() == 4 );
 		UTEST_ASSERT( static_cast< AST::CListExpression* >( syntaxTree[ 2 ] )->List().size() == 3 );
 		UTEST_ASSERT( static_cast< AST::CListExpression* >( syntaxTree[ 3 ] )->List().size() == 2 );
+		UTEST_ASSERT( static_cast< AST::CListExpression* >( syntaxTree[ 4 ] )->List().size() == 1 );
 
 		UTEST_ASSERT(
 			static_cast< AST::CListExpression* >(
@@ -486,6 +488,30 @@ void RunParserTests()
 				static_cast< AST::CListExpression* >(
 					static_cast< AST::CListExpression* >( syntaxTree[ 3 ] )->List()[ 0 ]
 					)->List()[ 1 ] )->List()[ 1 ]->Symbol() == Grammar::Symbol::S_INTCNST );
+
+		UTEST_ASSERT( static_cast< AST::CListExpression* >( syntaxTree[ 4 ] )->List()[ 0 ]->Symbol() == Grammar::Symbol::S_ARRAY );
+
+		UTEST_ASSERT(
+			static_cast< AST::CListExpression* >(
+				static_cast< AST::CListExpression* >( syntaxTree[ 4 ]
+				)->List()[ 0 ] )->List().size() == 1 );
+
+		UTEST_ASSERT(
+			static_cast< AST::CListExpression* >(
+				static_cast< AST::CListExpression* >( syntaxTree[ 4 ]
+				)->List()[ 0 ] )->List()[ 0 ]->Symbol() == Grammar::Symbol::S_ARRAY );
+
+		UTEST_ASSERT(
+			static_cast< AST::CListExpression* >(
+				static_cast< AST::CListExpression* >(
+					static_cast< AST::CListExpression* >( syntaxTree[ 4 ]
+				)->List()[ 0 ] )->List()[ 0 ] )->List().size() == 2 );
+
+		UTEST_ASSERT(
+			static_cast< AST::CListExpression* >(
+				static_cast< AST::CListExpression* >(
+					static_cast< AST::CListExpression* >( syntaxTree[ 4 ]
+				)->List()[ 0 ] )->List()[ 0 ] )->List()[ 0 ]->Symbol() == Grammar::Symbol::S_INTCNST );
 
 		AST::FreeTree( syntaxTree );
 		UTEST_CASE_CLOSED();
