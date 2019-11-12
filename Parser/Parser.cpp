@@ -621,7 +621,7 @@ namespace Parser
 								throw ParseException( curSymbol.m_Location, "Expected end of an array expression, got: \"" + curSymbol.m_Token + "\"" );
 							}
 
-							if ( right->Type() == AST::ExpressionType::ET_LIST )
+							if ( right->Symbol() == Grammar::Symbol::S_LIST )
 							{
 								// Convert the list into an array
 								std::vector< AST::IExpression* > list = static_cast< AST::CListExpression* >( right )->List();
@@ -633,7 +633,8 @@ namespace Parser
 							}
 							else
 							{
-								return new AST::CListExpression( { right }, Grammar::Symbol::S_ARRAY, symbol.m_Location );
+								std::vector< AST::IExpression* > list = { right };
+								return new AST::CListExpression( list, Grammar::Symbol::S_ARRAY, symbol.m_Location );
 							}
 						}
 					};
