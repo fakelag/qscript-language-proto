@@ -1,6 +1,7 @@
 #include "Runtime.h"
 #include "RuntimeInternal.h"
 
+#include <iostream>
 RTI_EXECFN_COMPLEX( S_ASSIGN )
 {
 	context.AddFlag( Runtime::CContext::CF_NORESOLVE );
@@ -23,12 +24,34 @@ RTI_EXECFN_COMPLEX( S_ASSIGN )
 		}
 		case Value::ValueType::VT_ARRAY:
 		{
-			auto variable = &varName.m_Value[ 0 ];
+			auto varPtr = &varName.m_Value;
+
+			std::cout << "VT_ARRAY: " << varName.m_Value.GetString() << std::endl;
+
+			std::vector< int > indexes;
+			while ( varPtr->GetType() != Value::ValueType::VT_STRING )
+			{
+				indexes.push_back( (*varPtr)[ 1 ].GetInt() );
+				varPtr = &varPtr[ 0 ];
+			}
+
+			auto variable = context.FindVariable( varPtr->GetString() );
+			std::cout << "VARIABLE REF: " << varPtr->GetString() << std::endl;
+			std::cout << "VARIABLE: " << variable->GetString() << std::endl;
 
 			if ( !variable )
 				throw RuntimeException( m_Loc, "Variable \"" + varName.m_Value.GetString() + "\" is not defined" );
 
-			( *variable )[ varName.m_Value[ 1 ].GetInt() ] = newValue.m_Value;
+			auto varValue = variable;
+			for ( int i = indexes.size() - 1; i >= 0; --i )
+			{
+				std::cout << "INDEX: " << i << " = " << indexes[ i ] << std::endl;
+				varValue = &((*varValue)[ indexes[ i ] ]);
+				std::cout << "VAL: " << varValue->GetString() << std::endl;
+			}
+
+			std::cout << "value: " << ( *varValue ).GetString() << std::endl;
+			( *varValue ) = newValue.m_Value;
 			break;
 		}
 		default:

@@ -9,9 +9,6 @@ RTI_EXECFN_COMPLEX( S_ASSIGN_SUB )
 
 	auto newValue = m_RHS->Execute( context );
 
-	if ( varName.m_Value.GetType() != Value::ValueType::VT_STRING )
-		throw RuntimeException( m_Loc, "Invalid variable name: " + varName.m_Value.GetString() );
-
 	switch ( varName.m_Value.GetType() )
 	{
 		case Value::ValueType::VT_STRING:
@@ -26,15 +23,26 @@ RTI_EXECFN_COMPLEX( S_ASSIGN_SUB )
 		}
 		case Value::ValueType::VT_ARRAY:
 		{
-			auto variable = &varName.m_Value[ 0 ];
+			auto& varRef = varName.m_Value;
+
+			std::vector< int > indexes;
+			while ( varRef.GetType() != Value::ValueType::VT_STRING )
+			{
+				indexes.push_back( varRef[ 1 ].GetInt() );
+				varRef = varRef[ 0 ];
+			}
+
+			auto variable = context.FindVariable( varRef.GetString() );
 
 			if ( !variable )
 				throw RuntimeException( m_Loc, "Variable \"" + varName.m_Value.GetString() + "\" is not defined" );
 
-			auto& ref = ( *variable )[ varName.m_Value[ 1 ].GetInt() ];
-			ref = ref - newValue.m_Value;
+			auto varValue = variable;
+			for ( int i = indexes.size() - 1; i >= 0; --i )
+				varValue = &((*varValue)[ indexes[ i ] ]);
 
-			return { ref };
+			( *varValue ) = ( *varValue ) - newValue.m_Value;
+			return { *varValue };
 		}
 		default:
 			throw RuntimeException( m_Loc, "Invalid variable reference: " + varName.m_Value.GetString() );
