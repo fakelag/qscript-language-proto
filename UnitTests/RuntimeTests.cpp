@@ -704,7 +704,7 @@ void RunRuntimeTests()
 		UTEST_CASE_CLOSED();
 	}( );
 
-	UTEST_CASE( "Arrays 3 (reading 2D Arrays)" )
+	UTEST_CASE( "Arrays 3 (reading 2D arrays)" )
 	{
 		auto syntaxTree = Parser::Parse( Lexer::Parse( "\
 			var arr = 	[[1, 1],						\
@@ -735,7 +735,7 @@ void RunRuntimeTests()
 		UTEST_CASE_CLOSED();
 	}( );
 
-	UTEST_CASE( "Arrays 4 (reading 3D Arrays)" )
+	UTEST_CASE( "Arrays 4 (reading 3D arrays)" )
 	{
 		auto syntaxTree = Parser::Parse( Lexer::Parse( "		\
 			var arr = [[[1, 1], [0, 1]], [[1, 1], [0, 0]],		\
@@ -769,7 +769,7 @@ void RunRuntimeTests()
 		UTEST_CASE_CLOSED();
 	}( );
 
-	UTEST_CASE( "Arrays 5 (assigning to 3D Arrays)" )
+	UTEST_CASE( "Arrays 5 (assigning to 3D arrays)" )
 	{
 		auto syntaxTree = Parser::Parse( Lexer::Parse( "		\
 			var arr = [[[1, 1], [0, 1]], [[1, 1], [0, 0]],		\
@@ -797,6 +797,58 @@ void RunRuntimeTests()
 					}											\
 				}												\
 			}													\
+		" ) );
+
+		Runtime::CContext context;
+		Runtime::CreateDefaultContext( true, true, &context );
+
+		auto results = Runtime::Execute( syntaxTree, context );
+
+		UTEST_ASSERT( context.m_Flag == 5 );
+
+		context.Release();
+		AST::FreeTree( syntaxTree );
+		UTEST_CASE_CLOSED();
+	}( );
+
+	UTEST_CASE( "Arrays 6 (additive assigning to 3D arrays)" )
+	{
+		auto syntaxTree = Parser::Parse( Lexer::Parse( "		\
+			var arr = [[[1, 1], [0, 1]], [[1, 1], [0, 0]],		\
+						[[1, 1], [0, 0]], [[0, 2], [1, 0]]];	\
+			arr[3][0][1] *= 4;									\
+			arr[3][0][1] += 4;									\
+			arr[3][0][1] %= 5;									\
+			arr[3][0][1] -= 1;									\
+			arr[3][0][1] += 5;									\
+			arr[3][0][1] /= 2;									\
+			if (arr[3][0][1] == 3) __setFlag();					\
+		" ) );
+
+		Runtime::CContext context;
+		Runtime::CreateDefaultContext( true, true, &context );
+
+		auto results = Runtime::Execute( syntaxTree, context );
+
+		UTEST_ASSERT( context.m_Flag == 1 );
+
+		context.Release();
+		AST::FreeTree( syntaxTree );
+		UTEST_CASE_CLOSED();
+	}( );
+
+	UTEST_CASE( "Arrays 7 (incrementing & decrementing array elements)" )
+	{
+		auto syntaxTree = Parser::Parse( Lexer::Parse( "		\
+			var arr = [[[2, 2]]];								\
+			++arr[0][0][1];										\
+			++arr[0][0][1];										\
+			arr[0][0][1]++;										\
+			arr[0][0][0]--;										\
+			--arr[0][0][0];										\
+			if (arr[0][0][1]++ == 5) __setFlag();				\
+			if (arr[0][0][1] == 6) __setFlag();					\
+			if (--arr[0][0][0] == -1) __setFlag();				\
 		" ) );
 
 		Runtime::CContext context;
