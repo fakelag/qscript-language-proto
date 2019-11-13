@@ -1,4 +1,5 @@
 #pragma once
+#include "Value.h"
 #include "Grammar.h"
 #include "AST.h"
 
@@ -72,7 +73,10 @@ private: \
 class CExec_Internal_##func : public Runtime::IExec \
 { \
 public: \
+	CExec_Internal_##func() { m_Loc = Grammar::SymbolLoc_t{ -1, -1, #func }; } \
 	Runtime::Statement_t Execute( Runtime::CContext& context ); \
+private: \
+	Grammar::SymbolLoc_t			m_Loc; \
 };
 
 #define RTI_EXECFN_COMPLEX( symbol ) \
@@ -158,6 +162,7 @@ namespace RuntimeInternal
 	RTI_COMPLEX_HANDLER( S_LOGIC_AND );
 	RTI_COMPLEX_HANDLER( S_INCREMENT );
 	RTI_COMPLEX_HANDLER( S_DECREMENT );
+	RTI_COMPLEX_HANDLER( S_ACCESS );
 
 	RTI_SIMPLE_HANDLER( S_FUNCBODY );
 	RTI_SIMPLE_HANDLER( S_ADD );
@@ -172,6 +177,7 @@ namespace RuntimeInternal
 	RTI_LIST_HANDLER( S_SCOPE );
 	RTI_LIST_HANDLER( S_LIST );
 	RTI_LIST_HANDLER( S_FOR );
+	RTI_LIST_HANDLER( S_ARRAY );
 
 	RTI_VALUE_HANDLER( S_DBLCNST );
 	RTI_VALUE_HANDLER( S_INTCNST );
@@ -179,7 +185,6 @@ namespace RuntimeInternal
 	RTI_VALUE_HANDLER( S_NAME );
 	RTI_VALUE_HANDLER( S_TRUE );
 	RTI_VALUE_HANDLER( S_FALSE );
-
 	RTI_VALUE_HANDLER( S_TYPESTRING );
 	RTI_VALUE_HANDLER( S_TYPEINTEGER );
 	RTI_VALUE_HANDLER( S_TYPEDECIMAL );
@@ -191,5 +196,9 @@ namespace RuntimeInternal
 	// Debug functions
 #ifdef RTI_DEBUG_ENABLED
 	RTI_INTERNALFUNC_HANDLER( __setFlag );
+	RTI_INTERNALFUNC_HANDLER( __getLen );
 #endif
+
+	// Helper functions
+	Value::CValue* ResolveAssignable( const Grammar::SymbolLoc_t& location, Runtime::IExec* node, Runtime::CContext& context );
 }

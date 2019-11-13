@@ -279,7 +279,7 @@ namespace Parser
 				{
 					symbol.m_LeftBind = [ &nextExpression ]( const ParserSymbol_t& symbol, AST::IExpression* left ) -> AST::IExpression*
 					{
-						if ( !AST::IsVariable( left ) )
+						if ( left->Symbol() != Grammar::Symbol::S_ACCESS && !AST::IsVariable( left ) )
 							throw ParseException( left->Location(), "Expected a variable, got: \"" + left->Location().m_SrcToken + "\"" );
 
 						return new AST::CComplexExpression( left, NULL, symbol.m_Symbol, symbol.m_Location );
@@ -289,7 +289,7 @@ namespace Parser
 					{
 						auto right = nextExpression( symbol.m_LBP );
 
-						if ( !AST::IsVariable( right ) )
+						if ( right->Symbol() != Grammar::Symbol::S_ACCESS && !AST::IsVariable( right ) )
 							throw ParseException( right->Location(), "Expected a variable, got: \"" + right->Location().m_SrcToken + "\"" );
 
 						return new AST::CComplexExpression( NULL, right, symbol.m_Symbol, symbol.m_Location );
@@ -307,15 +307,18 @@ namespace Parser
 					{
 						auto right = nextExpression( symbol.m_LBP );
 
-						if ( symbol.m_Symbol == Grammar::Symbol::S_ASSIGN )
+						if ( left->Symbol() != Grammar::Symbol::S_ACCESS )
 						{
-							if ( !AST::IsVariable( left ) && left->Symbol() != Grammar::Symbol::S_VAR )
-								throw ParseException( left->Location(), "Expected a variable, got: \"" + left->Location().m_SrcToken + "\"" );
-						}
-						else
-						{
-							if ( !AST::IsVariable( left ) )
-								throw ParseException( left->Location(), "Expected a variable, got: \"" + left->Location().m_SrcToken + "\"" );
+							if ( symbol.m_Symbol == Grammar::Symbol::S_ASSIGN )
+							{
+								if ( !AST::IsVariable( left ) && left->Symbol() != Grammar::Symbol::S_VAR )
+									throw ParseException( left->Location(), "Expected a variable, got: \"" + left->Location().m_SrcToken + "\"" );
+							}
+							else
+							{
+								if ( !AST::IsVariable( left ) )
+									throw ParseException( left->Location(), "Expected a variable, got: \"" + left->Location().m_SrcToken + "\"" );
+							}
 						}
 
 						return new AST::CComplexExpression( left, right, symbol.m_Symbol, symbol.m_Location );
@@ -618,7 +621,7 @@ namespace Parser
 								throw ParseException( curSymbol.m_Location, "Expected end of an array expression, got: \"" + curSymbol.m_Token + "\"" );
 							}
 
-							if ( right->Type() == AST::ExpressionType::ET_LIST )
+							if ( right->Symbol() == Grammar::Symbol::S_LIST )
 							{
 								// Convert the list into an array
 								std::vector< AST::IExpression* > list = static_cast< AST::CListExpression* >( right )->List();
@@ -630,7 +633,8 @@ namespace Parser
 							}
 							else
 							{
-								return new AST::CListExpression( { right }, Grammar::Symbol::S_ARRAY, symbol.m_Location );
+								std::vector< AST::IExpression* > list = { right };
+								return new AST::CListExpression( list, Grammar::Symbol::S_ARRAY, symbol.m_Location );
 							}
 						}
 					};

@@ -49,6 +49,7 @@ namespace Runtime
 			EXEC_COMPLEX( S_LOGIC_AND );
 			EXEC_COMPLEX( S_INCREMENT );
 			EXEC_COMPLEX( S_DECREMENT );
+			EXEC_COMPLEX( S_ACCESS );
 			EXEC_SIMPLE( S_SUB );
 			EXEC_SIMPLE( S_ADD );
 			EXEC_SIMPLE( S_FUNCBODY );
@@ -61,6 +62,7 @@ namespace Runtime
 			EXEC_LIST( S_SCOPE );
 			EXEC_LIST( S_LIST );
 			EXEC_LIST( S_FOR );
+			EXEC_LIST( S_ARRAY );
 			EXEC_VALUE( S_DBLCNST );
 			EXEC_VALUE( S_INTCNST );
 			EXEC_VALUE( S_STRCNST );
@@ -103,8 +105,10 @@ namespace Runtime
 		{
 			// Link debugging functions
 			static auto __setFlag = RuntimeInternal::CExec_Internal___setFlag();
+			static auto __getLen = RuntimeInternal::CExec_Internal___getLen();
 
 			ctx->PushFunction( "__setFlag", &__setFlag, {}, NULL );
+			ctx->PushFunction( "__getLen", &__getLen, { "arr" }, NULL );
 		}
 #else
 		if ( enableDebugging )
