@@ -1,4 +1,5 @@
 #pragma once
+#include "Value.h"
 #include "Grammar.h"
 #include "AST.h"
 
@@ -193,4 +194,7 @@ namespace RuntimeInternal
 #ifdef RTI_DEBUG_ENABLED
 	RTI_INTERNALFUNC_HANDLER( __setFlag );
 #endif
+
+	// Helper functions
+	Value::CValue* ResolveAssignable( const Grammar::SymbolLoc_t& location, Runtime::IExec* node, Runtime::CContext& context );
 }
