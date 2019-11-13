@@ -105,8 +105,10 @@ namespace Runtime
 		{
 			// Link debugging functions
 			static auto __setFlag = RuntimeInternal::CExec_Internal___setFlag();
+			static auto __getLen = RuntimeInternal::CExec_Internal___getLen();
 
 			ctx->PushFunction( "__setFlag", &__setFlag, {}, NULL );
+			ctx->PushFunction( "__getLen", &__getLen, { "arr" }, NULL );
 		}
 #else
 		if ( enableDebugging )

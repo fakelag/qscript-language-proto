@@ -73,7 +73,10 @@ private: \
 class CExec_Internal_##func : public Runtime::IExec \
 { \
 public: \
+	CExec_Internal_##func() { m_Loc = Grammar::SymbolLoc_t{ -1, -1, #func }; } \
 	Runtime::Statement_t Execute( Runtime::CContext& context ); \
+private: \
+	Grammar::SymbolLoc_t			m_Loc; \
 };
 
 #define RTI_EXECFN_COMPLEX( symbol ) \
@@ -193,6 +196,7 @@ namespace RuntimeInternal
 	// Debug functions
 #ifdef RTI_DEBUG_ENABLED
 	RTI_INTERNALFUNC_HANDLER( __setFlag );
+	RTI_INTERNALFUNC_HANDLER( __getLen );
 #endif
 
 	// Helper functions
