@@ -23,16 +23,16 @@ RTI_EXECFN_COMPLEX( S_ASSIGN_DIV )
 		}
 		case Value::ValueType::VT_ARRAY:
 		{
-			auto& varRef = varName.m_Value;
+			auto varPtr = &varName.m_Value;
 
 			std::vector< int > indexes;
-			while ( varRef.GetType() != Value::ValueType::VT_STRING )
+			while ( varPtr->GetType() != Value::ValueType::VT_STRING )
 			{
-				indexes.push_back( varRef[ 1 ].GetInt() );
-				varRef = varRef[ 0 ];
+				indexes.push_back( (*varPtr)[ 1 ].GetInt() );
+				varPtr = &(*varPtr)[ 0 ];
 			}
 
-			auto variable = context.FindVariable( varRef.GetString() );
+			auto variable = context.FindVariable( varPtr->GetString() );
 
 			if ( !variable )
 				throw RuntimeException( m_Loc, "Variable \"" + varName.m_Value.GetString() + "\" is not defined" );
