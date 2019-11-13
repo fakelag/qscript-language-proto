@@ -279,7 +279,7 @@ namespace Parser
 				{
 					symbol.m_LeftBind = [ &nextExpression ]( const ParserSymbol_t& symbol, AST::IExpression* left ) -> AST::IExpression*
 					{
-						if ( !AST::IsVariable( left ) )
+						if ( left->Symbol() != Grammar::Symbol::S_ACCESS && !AST::IsVariable( left ) )
 							throw ParseException( left->Location(), "Expected a variable, got: \"" + left->Location().m_SrcToken + "\"" );
 
 						return new AST::CComplexExpression( left, NULL, symbol.m_Symbol, symbol.m_Location );
@@ -289,7 +289,7 @@ namespace Parser
 					{
 						auto right = nextExpression( symbol.m_LBP );
 
-						if ( !AST::IsVariable( right ) )
+						if ( right->Symbol() != Grammar::Symbol::S_ACCESS && !AST::IsVariable( right ) )
 							throw ParseException( right->Location(), "Expected a variable, got: \"" + right->Location().m_SrcToken + "\"" );
 
 						return new AST::CComplexExpression( NULL, right, symbol.m_Symbol, symbol.m_Location );
