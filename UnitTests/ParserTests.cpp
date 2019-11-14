@@ -633,21 +633,12 @@ void RunParserTests()
 		auto syntaxTree = Parser::Parse( Lexer::Parse( "while ( a > 1 ) a;" ) );
 
 		UTEST_ASSERT( syntaxTree.size() == 1 );
-		UTEST_ASSERT( syntaxTree[ 0 ]->Type() == AST::ExpressionType::ET_COMPLEX );
+		UTEST_ASSERT( syntaxTree[ 0 ]->Type() == AST::ExpressionType::ET_LIST );
 		UTEST_ASSERT( syntaxTree[ 0 ]->Symbol() == Grammar::Symbol::S_WHILE );
-		UTEST_ASSERT( static_cast< AST::CComplexExpression* >( syntaxTree[ 0 ] )->Lhs()->Symbol() == Grammar::Symbol::S_MORETHAN );
-		UTEST_ASSERT( static_cast< AST::CComplexExpression* >( syntaxTree[ 0 ] )->Rhs()->Symbol() == Grammar::Symbol::S_SCOPE );
-		UTEST_ASSERT( static_cast< AST::CComplexExpression* >( syntaxTree[ 0 ] )->Rhs()->Type() == AST::ExpressionType::ET_LIST );
-
-		UTEST_ASSERT(
-			static_cast< AST::CListExpression* >(
-				static_cast< AST::CComplexExpression* >( syntaxTree[ 0 ] )->Rhs()
-				)->List().size() == 1 );
-
-		UTEST_ASSERT(
-			static_cast< AST::CListExpression* >(
-				static_cast< AST::CComplexExpression* >( syntaxTree[ 0 ] )->Rhs()
-				)->List()[ 0 ]->Symbol() == Grammar::Symbol::S_NAME );
+		UTEST_ASSERT( static_cast< AST::CListExpression* >( syntaxTree[ 0 ] )->List().size() == 3 );
+		UTEST_ASSERT( static_cast< AST::CListExpression* >( syntaxTree[ 0 ] )->List()[ 0 ]->Symbol() == Grammar::Symbol::S_MORETHAN );
+		UTEST_ASSERT( static_cast< AST::CListExpression* >( syntaxTree[ 0 ] )->List()[ 1 ] == NULL );
+		UTEST_ASSERT( static_cast< AST::CListExpression* >( syntaxTree[ 0 ] )->List()[ 2 ]->Symbol() == Grammar::Symbol::S_SCOPE );
 
 		AST::FreeTree( syntaxTree );
 		UTEST_CASE_CLOSED();
@@ -832,31 +823,30 @@ void RunParserTests()
 		auto syntaxTree = Parser::Parse( Lexer::Parse( "while ( a > 1 ) break;" ) );
 
 		UTEST_ASSERT( syntaxTree.size() == 1 );
-		UTEST_ASSERT( syntaxTree[ 0 ]->Type() == AST::ExpressionType::ET_COMPLEX );
+		UTEST_ASSERT( syntaxTree[ 0 ]->Type() == AST::ExpressionType::ET_LIST );
 		UTEST_ASSERT( syntaxTree[ 0 ]->Symbol() == Grammar::Symbol::S_WHILE );
-		UTEST_ASSERT( static_cast< AST::CComplexExpression* >( syntaxTree[ 0 ] )->Lhs()->Symbol() == Grammar::Symbol::S_MORETHAN );
-		UTEST_ASSERT( static_cast< AST::CComplexExpression* >( syntaxTree[ 0 ] )->Rhs()->Symbol() == Grammar::Symbol::S_SCOPE );
-		UTEST_ASSERT( static_cast< AST::CComplexExpression* >( syntaxTree[ 0 ] )->Rhs()->Type() == AST::ExpressionType::ET_LIST );
+		UTEST_ASSERT( static_cast< AST::CListExpression* >( syntaxTree[ 0 ] )->List()[ 0 ]->Symbol() == Grammar::Symbol::S_MORETHAN );
+		UTEST_ASSERT( static_cast< AST::CListExpression* >( syntaxTree[ 0 ] )->List()[ 2 ]->Symbol() == Grammar::Symbol::S_SCOPE );
 
 		UTEST_ASSERT(
 			static_cast< AST::CListExpression* >(
-				static_cast< AST::CComplexExpression* >( syntaxTree[ 0 ] )->Rhs()
+				static_cast< AST::CListExpression* >( syntaxTree[ 0 ] )->List()[ 2 ]
 				)->List().size() == 1 );
 
 		UTEST_ASSERT(
 			static_cast< AST::CListExpression* >(
-				static_cast< AST::CComplexExpression* >( syntaxTree[ 0 ] )->Rhs()
+				static_cast< AST::CListExpression* >( syntaxTree[ 0 ] )->List()[ 2 ]
 				)->List()[ 0 ]->Symbol() == Grammar::Symbol::S_BREAK );
 
 		UTEST_ASSERT(
 			static_cast< AST::CListExpression* >(
-				static_cast< AST::CComplexExpression* >( syntaxTree[ 0 ] )->Rhs()
+				static_cast< AST::CListExpression* >( syntaxTree[ 0 ] )->List()[ 2 ]
 				)->List()[ 0 ]->Type() == AST::ExpressionType::ET_SIMPLE );
 
 		UTEST_ASSERT(
 			static_cast< AST::CSimpleExpression*>(
 				static_cast< AST::CListExpression* >(
-					static_cast< AST::CComplexExpression* >( syntaxTree[ 0 ] )->Rhs()
+					static_cast< AST::CListExpression* >( syntaxTree[ 0 ] )->List()[ 2 ]
 					)->List()[ 0 ]
 				)->Expression() == NULL );
 

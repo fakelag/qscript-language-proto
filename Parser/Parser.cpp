@@ -393,6 +393,36 @@ namespace Parser
 					break;
 				}
 				case Grammar::Symbol::S_WHILE:
+				{
+					symbol.m_RightBind = [ &nextExpression ]( const ParserSymbol_t& symbol ) -> AST::IExpression*
+					{
+						auto head = nextExpression();
+						auto body = nextExpression();
+
+						if ( head->Type() != AST::ExpressionType::ET_LIST )
+							head = new AST::CListExpression( { head, NULL }, Grammar::Symbol::S_LIST, symbol.m_Location );
+
+						// Append a scope for single line bodies
+						if ( body->Symbol() != Grammar::Symbol::S_SCOPE )
+							body = new AST::CListExpression( { body }, Grammar::Symbol::S_SCOPE, symbol.m_Location );
+
+						std::vector< AST::IExpression* > whileLoop = static_cast< AST::CListExpression* >( head )->List();
+
+						if ( whileLoop.size() < 2 )
+							whileLoop.push_back( NULL ); // no return value (null)
+
+						whileLoop.push_back( body );
+
+						if ( whileLoop.size() != 3 )
+							throw ParseException( head->Location(), "Invalid while loop declaration" );
+
+						// remove the head node, and append it's content to the while node
+						delete head;
+
+						return new AST::CListExpression( whileLoop, symbol.m_Symbol, symbol.m_Location );
+					};
+					break;
+				}
 				case Grammar::Symbol::S_IF:
 				{
 					symbol.m_RightBind = [ &nextExpression ]( const ParserSymbol_t& symbol ) -> AST::IExpression*
@@ -686,10 +716,11 @@ namespace Parser
 					{
 						auto previousSymbol = parserState.PreviousSymbol( 2 );
 
-						if ( previousSymbol && previousSymbol->m_Symbol == Grammar::Symbol::S_FOR )
+						if ( previousSymbol && ( previousSymbol->m_Symbol == Grammar::Symbol::S_FOR
+							|| previousSymbol->m_Symbol == Grammar::Symbol::S_WHILE ) )
 						{
 							if ( parserState.CurrentSymbol().m_Symbol == Grammar::Symbol::S_PARENT_CLOSE )
-								throw ParseException( parserState.CurrentSymbol().m_Location, "Expected a for loop, got: \"" + parserState.CurrentSymbol().m_Token + "\"" );
+								throw ParseException( parserState.CurrentSymbol().m_Location, "Expected a loop, got: \"" + parserState.CurrentSymbol().m_Token + "\"" );
 
 							std::vector< AST::IExpression* > expressionList ={};
 							while ( true )
