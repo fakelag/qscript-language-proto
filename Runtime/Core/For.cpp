@@ -8,13 +8,16 @@ RTI_EXECFN_LIST( S_FOR )
 	if ( m_List[ 0 ] )
 		m_List[ 0 ]->Execute( context );
 
-	auto result = Value::CValue();
+	auto result = m_List[ 3 ] ? m_List[ 3 ]->Execute( context ).m_Value : Value::CValue();
 	for (; m_List[ 1 ] ? bool ( m_List[ 1 ]->Execute( context ).m_Value ) : true; )
 	{
-		result = m_List[ 3 ]->Execute( context ).m_Value;
+		auto currentResult = m_List[ 4 ]->Execute( context ).m_Value;
 
 		if ( context.GetCurrentScope().m_IsBreaking )
+		{
+			result = currentResult;
 			break;
+		}
 
 		if ( m_List[ 2 ] )
 			m_List[ 2 ]->Execute( context );
