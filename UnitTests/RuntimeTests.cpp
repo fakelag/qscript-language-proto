@@ -863,6 +863,39 @@ void RunRuntimeTests()
 		UTEST_CASE_CLOSED();
 	}( );
 
+	UTEST_CASE( "Loop returns (for, while)" )
+	{
+		auto syntaxTree = Parser::Parse( Lexer::Parse( "\
+			var a = for (var i = 0; i < 5; ++i; -1)		\
+			{											\
+				if (i == 7) break i;					\
+			}											\
+			if (a == -1) __setFlag();					\
+			var b = for (var i = 0; i < 10; ++i; -1)	\
+			{											\
+				if (i == 7) break i + 2;				\
+			}											\
+			if (b == 9) __setFlag();					\
+			var c = 1;									\
+			c = for (var i = 0; i < 5; ++i)				\
+			{											\
+				if (i == 7) break i;					\
+			}											\
+			if (c == null) __setFlag();					\
+		" ) );
+
+		Runtime::CContext context;
+		Runtime::CreateDefaultContext( true, true, &context );
+
+		auto results = Runtime::Execute( syntaxTree, context );
+
+		UTEST_ASSERT( context.m_Flag == 3 );
+
+		context.Release();
+		AST::FreeTree( syntaxTree );
+		UTEST_CASE_CLOSED();
+	}( );
+
 	UTEST_CASE( "Parser/AST memory management" )
 	{
 		auto leakedNodes = AST::AllocatedExpressions();
