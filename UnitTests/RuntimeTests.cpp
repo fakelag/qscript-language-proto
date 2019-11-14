@@ -882,6 +882,17 @@ void RunRuntimeTests()
 				if (i == 7) break i;					\
 			}											\
 			if (c == null) __setFlag();					\
+			var d = while(true; -1)						\
+			{											\
+				break 1;								\
+			}											\
+			if (d == 1) __setFlag();					\
+			var i = 4;									\
+			var e = while(i > 0; -1)					\
+			{											\
+				--i;									\
+			}											\
+			if (e == -1) __setFlag();					\
 		" ) );
 
 		Runtime::CContext context;
@@ -889,7 +900,7 @@ void RunRuntimeTests()
 
 		auto results = Runtime::Execute( syntaxTree, context );
 
-		UTEST_ASSERT( context.m_Flag == 3 );
+		UTEST_ASSERT( context.m_Flag == 5 );
 
 		context.Release();
 		AST::FreeTree( syntaxTree );
