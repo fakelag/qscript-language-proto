@@ -85,6 +85,7 @@ namespace Grammar
 		S_RETURN,
 		S_TRUE,
 		S_FALSE,
+		S_NULL,
 		S_BREAK,
 		S_DEFER,
 
@@ -181,6 +182,7 @@ namespace Grammar
 		{ S_FALSE,			{ "false",		LBP_NONE,			true } },
 		{ S_CLASS, 			{ "class", 		LBP_NONE, 			true } },
 		{ S_DEFER, 			{ "defer", 		LBP_NONE, 			true } },
+		{ S_NULL, 			{ "null", 		LBP_NONE, 			true } },
 		{ S_TYPE, 			{ "type", 		LBP_TYPE, 			true } },
 		{ S_TYPETEXT, 		{ "typestr",	LBP_TYPE, 			true } },
 

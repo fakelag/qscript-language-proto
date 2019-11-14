@@ -1,4 +1,4 @@
-﻿#include <functional>
+#include <functional>
 #include <algorithm>
 #include "Grammar.h"
 #include "Parser.h"
@@ -372,6 +372,14 @@ namespace Parser
 					{
 						Value::CValue boolValue( symbol.m_Symbol == Grammar::Symbol::S_TRUE ? true : false );
 						return new AST::CValueExpression( boolValue, symbol.m_Symbol, symbol.m_Location );
+					};
+					break;
+				}
+				case Grammar::Symbol::S_NULL:
+				{
+					symbol.m_RightBind = [ &nextExpression ]( const ParserSymbol_t& symbol ) -> AST::IExpression*
+					{
+						return new AST::CValueExpression( Value::CValue(), symbol.m_Symbol, symbol.m_Location );
 					};
 					break;
 				}
