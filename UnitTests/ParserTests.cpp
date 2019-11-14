@@ -660,20 +660,21 @@ void RunParserTests()
 		UTEST_ASSERT( syntaxTree.size() == 1 );
 		UTEST_ASSERT( syntaxTree[ 0 ]->Type() == AST::ExpressionType::ET_LIST );
 		UTEST_ASSERT( syntaxTree[ 0 ]->Symbol() == Grammar::Symbol::S_FOR );
-		UTEST_ASSERT( static_cast< AST::CListExpression* >( syntaxTree[ 0 ] )->List().size() == 4 );
+		UTEST_ASSERT( static_cast< AST::CListExpression* >( syntaxTree[ 0 ] )->List().size() == 5 );
 		UTEST_ASSERT( static_cast< AST::CListExpression* >( syntaxTree[ 0 ] )->List()[ 0 ]->Symbol() == Grammar::Symbol::S_ASSIGN );
 		UTEST_ASSERT( static_cast< AST::CListExpression* >( syntaxTree[ 0 ] )->List()[ 1 ]->Symbol() == Grammar::Symbol::S_LESSTHAN );
 		UTEST_ASSERT( static_cast< AST::CListExpression* >( syntaxTree[ 0 ] )->List()[ 2 ]->Symbol() == Grammar::Symbol::S_INCREMENT );
-		UTEST_ASSERT( static_cast< AST::CListExpression* >( syntaxTree[ 0 ] )->List()[ 3 ]->Symbol() == Grammar::Symbol::S_SCOPE );
+		UTEST_ASSERT( static_cast< AST::CListExpression* >( syntaxTree[ 0 ] )->List()[ 3 ] == NULL );
+		UTEST_ASSERT( static_cast< AST::CListExpression* >( syntaxTree[ 0 ] )->List()[ 4 ]->Symbol() == Grammar::Symbol::S_SCOPE );
 
 		UTEST_ASSERT(
 			static_cast< AST::CListExpression* >(
-				static_cast< AST::CListExpression* >( syntaxTree[ 0 ] )->List()[ 3 ]
+				static_cast< AST::CListExpression* >( syntaxTree[ 0 ] )->List()[ 4 ]
 				)->List().size() == 1 );
 
 		UTEST_ASSERT(
 			static_cast< AST::CListExpression* >(
-				static_cast< AST::CListExpression* >( syntaxTree[ 0 ] )->List()[ 3 ]
+				static_cast< AST::CListExpression* >( syntaxTree[ 0 ] )->List()[ 4 ]
 				)->List()[ 0 ]->Symbol() == Grammar::Symbol::S_NAME );
 
 		AST::FreeTree( syntaxTree );
@@ -682,20 +683,21 @@ void RunParserTests()
 		UTEST_ASSERT( syntaxTree.size() == 1 );
 		UTEST_ASSERT( syntaxTree[ 0 ]->Type() == AST::ExpressionType::ET_LIST );
 		UTEST_ASSERT( syntaxTree[ 0 ]->Symbol() == Grammar::Symbol::S_FOR );
-		UTEST_ASSERT( static_cast< AST::CListExpression* >( syntaxTree[ 0 ] )->List().size() == 4 );
+		UTEST_ASSERT( static_cast< AST::CListExpression* >( syntaxTree[ 0 ] )->List().size() == 5 );
 		UTEST_ASSERT( static_cast< AST::CListExpression* >( syntaxTree[ 0 ] )->List()[ 0 ]->Symbol() == Grammar::Symbol::S_LIST );
 		UTEST_ASSERT( static_cast< AST::CListExpression* >( syntaxTree[ 0 ] )->List()[ 1 ]->Symbol() == Grammar::Symbol::S_LOGIC_AND );
 		UTEST_ASSERT( static_cast< AST::CListExpression* >( syntaxTree[ 0 ] )->List()[ 2 ]->Symbol() == Grammar::Symbol::S_INCREMENT );
-		UTEST_ASSERT( static_cast< AST::CListExpression* >( syntaxTree[ 0 ] )->List()[ 3 ]->Symbol() == Grammar::Symbol::S_SCOPE );
+		UTEST_ASSERT( static_cast< AST::CListExpression* >( syntaxTree[ 0 ] )->List()[ 3 ] == NULL );
+		UTEST_ASSERT( static_cast< AST::CListExpression* >( syntaxTree[ 0 ] )->List()[ 4 ]->Symbol() == Grammar::Symbol::S_SCOPE );
 
 		UTEST_ASSERT(
 			static_cast< AST::CListExpression* >(
-				static_cast< AST::CListExpression* >( syntaxTree[ 0 ] )->List()[ 3 ]
+				static_cast< AST::CListExpression* >( syntaxTree[ 0 ] )->List()[ 4 ]
 				)->List().size() == 1 );
 
 		UTEST_ASSERT(
 			static_cast< AST::CListExpression* >(
-				static_cast< AST::CListExpression* >( syntaxTree[ 0 ] )->List()[ 3 ]
+				static_cast< AST::CListExpression* >( syntaxTree[ 0 ] )->List()[ 4 ]
 				)->List()[ 0 ]->Symbol() == Grammar::Symbol::S_NAME );
 
 		UTEST_ASSERT(
@@ -729,11 +731,12 @@ void RunParserTests()
 		UTEST_ASSERT( syntaxTree.size() == 1 );
 		UTEST_ASSERT( syntaxTree[ 0 ]->Type() == AST::ExpressionType::ET_LIST );
 		UTEST_ASSERT( syntaxTree[ 0 ]->Symbol() == Grammar::Symbol::S_FOR );
-		UTEST_ASSERT( static_cast< AST::CListExpression* >( syntaxTree[ 0 ] )->List().size() == 4 );
+		UTEST_ASSERT( static_cast< AST::CListExpression* >( syntaxTree[ 0 ] )->List().size() == 5 );
 		UTEST_ASSERT( static_cast< AST::CListExpression* >( syntaxTree[ 0 ] )->List()[ 0 ] == NULL );
 		UTEST_ASSERT( static_cast< AST::CListExpression* >( syntaxTree[ 0 ] )->List()[ 1 ] == NULL );
 		UTEST_ASSERT( static_cast< AST::CListExpression* >( syntaxTree[ 0 ] )->List()[ 2 ] == NULL );
-		UTEST_ASSERT( static_cast< AST::CListExpression* >( syntaxTree[ 0 ] )->List()[ 3 ]->Symbol() == Grammar::Symbol::S_SCOPE );
+		UTEST_ASSERT( static_cast< AST::CListExpression* >( syntaxTree[ 0 ] )->List()[ 3 ] == NULL );
+		UTEST_ASSERT( static_cast< AST::CListExpression* >( syntaxTree[ 0 ] )->List()[ 4 ]->Symbol() == Grammar::Symbol::S_SCOPE );
 
 		AST::FreeTree( syntaxTree );
 
@@ -742,11 +745,12 @@ void RunParserTests()
 		UTEST_ASSERT( syntaxTree.size() == 1 );
 		UTEST_ASSERT( syntaxTree[ 0 ]->Type() == AST::ExpressionType::ET_LIST );
 		UTEST_ASSERT( syntaxTree[ 0 ]->Symbol() == Grammar::Symbol::S_FOR );
-		UTEST_ASSERT( static_cast< AST::CListExpression* >( syntaxTree[ 0 ] )->List().size() == 4 );
+		UTEST_ASSERT( static_cast< AST::CListExpression* >( syntaxTree[ 0 ] )->List().size() == 5 );
 		UTEST_ASSERT( static_cast< AST::CListExpression* >( syntaxTree[ 0 ] )->List()[ 0 ]->Symbol() == Grammar::Symbol::S_NAME );
 		UTEST_ASSERT( static_cast< AST::CListExpression* >( syntaxTree[ 0 ] )->List()[ 1 ] == NULL );
 		UTEST_ASSERT( static_cast< AST::CListExpression* >( syntaxTree[ 0 ] )->List()[ 2 ] == NULL );
-		UTEST_ASSERT( static_cast< AST::CListExpression* >( syntaxTree[ 0 ] )->List()[ 3 ]->Symbol() == Grammar::Symbol::S_SCOPE );
+		UTEST_ASSERT( static_cast< AST::CListExpression* >( syntaxTree[ 0 ] )->List()[ 3 ] == NULL );
+		UTEST_ASSERT( static_cast< AST::CListExpression* >( syntaxTree[ 0 ] )->List()[ 4 ]->Symbol() == Grammar::Symbol::S_SCOPE );
 
 		AST::FreeTree( syntaxTree );
 
@@ -755,11 +759,12 @@ void RunParserTests()
 		UTEST_ASSERT( syntaxTree.size() == 1 );
 		UTEST_ASSERT( syntaxTree[ 0 ]->Type() == AST::ExpressionType::ET_LIST );
 		UTEST_ASSERT( syntaxTree[ 0 ]->Symbol() == Grammar::Symbol::S_FOR );
-		UTEST_ASSERT( static_cast< AST::CListExpression* >( syntaxTree[ 0 ] )->List().size() == 4 );
+		UTEST_ASSERT( static_cast< AST::CListExpression* >( syntaxTree[ 0 ] )->List().size() == 5 );
 		UTEST_ASSERT( static_cast< AST::CListExpression* >( syntaxTree[ 0 ] )->List()[ 0 ]->Symbol() == Grammar::Symbol::S_NAME );
 		UTEST_ASSERT( static_cast< AST::CListExpression* >( syntaxTree[ 0 ] )->List()[ 1 ]->Symbol() == Grammar::Symbol::S_NAME );
 		UTEST_ASSERT( static_cast< AST::CListExpression* >( syntaxTree[ 0 ] )->List()[ 2 ] == NULL );
-		UTEST_ASSERT( static_cast< AST::CListExpression* >( syntaxTree[ 0 ] )->List()[ 3 ]->Symbol() == Grammar::Symbol::S_SCOPE );
+		UTEST_ASSERT( static_cast< AST::CListExpression* >( syntaxTree[ 0 ] )->List()[ 3 ] == NULL );
+		UTEST_ASSERT( static_cast< AST::CListExpression* >( syntaxTree[ 0 ] )->List()[ 4 ]->Symbol() == Grammar::Symbol::S_SCOPE );
 
 		AST::FreeTree( syntaxTree );
 
@@ -768,11 +773,12 @@ void RunParserTests()
 		UTEST_ASSERT( syntaxTree.size() == 1 );
 		UTEST_ASSERT( syntaxTree[ 0 ]->Type() == AST::ExpressionType::ET_LIST );
 		UTEST_ASSERT( syntaxTree[ 0 ]->Symbol() == Grammar::Symbol::S_FOR );
-		UTEST_ASSERT( static_cast< AST::CListExpression* >( syntaxTree[ 0 ] )->List().size() == 4 );
+		UTEST_ASSERT( static_cast< AST::CListExpression* >( syntaxTree[ 0 ] )->List().size() == 5 );
 		UTEST_ASSERT( static_cast< AST::CListExpression* >( syntaxTree[ 0 ] )->List()[ 0 ] == NULL );
 		UTEST_ASSERT( static_cast< AST::CListExpression* >( syntaxTree[ 0 ] )->List()[ 1 ]->Symbol() == Grammar::Symbol::S_NAME );
 		UTEST_ASSERT( static_cast< AST::CListExpression* >( syntaxTree[ 0 ] )->List()[ 2 ] == NULL );
-		UTEST_ASSERT( static_cast< AST::CListExpression* >( syntaxTree[ 0 ] )->List()[ 3 ]->Symbol() == Grammar::Symbol::S_SCOPE );
+		UTEST_ASSERT( static_cast< AST::CListExpression* >( syntaxTree[ 0 ] )->List()[ 3 ] == NULL );
+		UTEST_ASSERT( static_cast< AST::CListExpression* >( syntaxTree[ 0 ] )->List()[ 4 ]->Symbol() == Grammar::Symbol::S_SCOPE );
 
 		AST::FreeTree( syntaxTree );
 
@@ -781,11 +787,12 @@ void RunParserTests()
 		UTEST_ASSERT( syntaxTree.size() == 1 );
 		UTEST_ASSERT( syntaxTree[ 0 ]->Type() == AST::ExpressionType::ET_LIST );
 		UTEST_ASSERT( syntaxTree[ 0 ]->Symbol() == Grammar::Symbol::S_FOR );
-		UTEST_ASSERT( static_cast< AST::CListExpression* >( syntaxTree[ 0 ] )->List().size() == 4 );
+		UTEST_ASSERT( static_cast< AST::CListExpression* >( syntaxTree[ 0 ] )->List().size() == 5 );
 		UTEST_ASSERT( static_cast< AST::CListExpression* >( syntaxTree[ 0 ] )->List()[ 0 ] == NULL );
 		UTEST_ASSERT( static_cast< AST::CListExpression* >( syntaxTree[ 0 ] )->List()[ 1 ]->Symbol() == Grammar::Symbol::S_NAME );
 		UTEST_ASSERT( static_cast< AST::CListExpression* >( syntaxTree[ 0 ] )->List()[ 2 ]->Symbol() == Grammar::Symbol::S_NAME );
-		UTEST_ASSERT( static_cast< AST::CListExpression* >( syntaxTree[ 0 ] )->List()[ 3 ]->Symbol() == Grammar::Symbol::S_SCOPE );
+		UTEST_ASSERT( static_cast< AST::CListExpression* >( syntaxTree[ 0 ] )->List()[ 3 ] == NULL );
+		UTEST_ASSERT( static_cast< AST::CListExpression* >( syntaxTree[ 0 ] )->List()[ 4 ]->Symbol() == Grammar::Symbol::S_SCOPE );
 
 		AST::FreeTree( syntaxTree );
 
@@ -794,11 +801,26 @@ void RunParserTests()
 		UTEST_ASSERT( syntaxTree.size() == 1 );
 		UTEST_ASSERT( syntaxTree[ 0 ]->Type() == AST::ExpressionType::ET_LIST );
 		UTEST_ASSERT( syntaxTree[ 0 ]->Symbol() == Grammar::Symbol::S_FOR );
-		UTEST_ASSERT( static_cast< AST::CListExpression* >( syntaxTree[ 0 ] )->List().size() == 4 );
+		UTEST_ASSERT( static_cast< AST::CListExpression* >( syntaxTree[ 0 ] )->List().size() == 5 );
 		UTEST_ASSERT( static_cast< AST::CListExpression* >( syntaxTree[ 0 ] )->List()[ 0 ] == NULL );
 		UTEST_ASSERT( static_cast< AST::CListExpression* >( syntaxTree[ 0 ] )->List()[ 1 ] == NULL );
 		UTEST_ASSERT( static_cast< AST::CListExpression* >( syntaxTree[ 0 ] )->List()[ 2 ]->Symbol() == Grammar::Symbol::S_NAME );
-		UTEST_ASSERT( static_cast< AST::CListExpression* >( syntaxTree[ 0 ] )->List()[ 3 ]->Symbol() == Grammar::Symbol::S_SCOPE );
+		UTEST_ASSERT( static_cast< AST::CListExpression* >( syntaxTree[ 0 ] )->List()[ 3 ] == NULL );
+		UTEST_ASSERT( static_cast< AST::CListExpression* >( syntaxTree[ 0 ] )->List()[ 4 ]->Symbol() == Grammar::Symbol::S_SCOPE );
+
+		AST::FreeTree( syntaxTree );
+
+		syntaxTree = Parser::Parse( Lexer::Parse( "for (;;;1) { i; };" ) );
+
+		UTEST_ASSERT( syntaxTree.size() == 1 );
+		UTEST_ASSERT( syntaxTree[ 0 ]->Type() == AST::ExpressionType::ET_LIST );
+		UTEST_ASSERT( syntaxTree[ 0 ]->Symbol() == Grammar::Symbol::S_FOR );
+		UTEST_ASSERT( static_cast< AST::CListExpression* >( syntaxTree[ 0 ] )->List().size() == 5 );
+		UTEST_ASSERT( static_cast< AST::CListExpression* >( syntaxTree[ 0 ] )->List()[ 0 ] == NULL );
+		UTEST_ASSERT( static_cast< AST::CListExpression* >( syntaxTree[ 0 ] )->List()[ 1 ] == NULL );
+		UTEST_ASSERT( static_cast< AST::CListExpression* >( syntaxTree[ 0 ] )->List()[ 2 ] == NULL );
+		UTEST_ASSERT( static_cast< AST::CListExpression* >( syntaxTree[ 0 ] )->List()[ 3 ]->Symbol() == Grammar::Symbol::S_INTCNST );
+		UTEST_ASSERT( static_cast< AST::CListExpression* >( syntaxTree[ 0 ] )->List()[ 4 ]->Symbol() == Grammar::Symbol::S_SCOPE );
 
 		AST::FreeTree( syntaxTree );
 

@@ -1,4 +1,4 @@
-#include <functional>
+﻿#include <functional>
 #include <algorithm>
 #include "Grammar.h"
 #include "Parser.h"
@@ -425,9 +425,12 @@ namespace Parser
 
 						std::vector< AST::IExpression* > forLoop = static_cast< AST::CListExpression* >( head )->List();
 
+						if ( forLoop.size() == 3 )
+							forLoop.push_back( NULL );
+
 						forLoop.push_back( body );
 
-						if ( forLoop.size() != 4 )
+						if ( forLoop.size() != 5 )
 							throw ParseException( head->Location(), "Invalid for loop declaration" );
 
 						// remove the head node, and append it's content to the for node
